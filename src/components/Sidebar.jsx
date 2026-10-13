@@ -12,6 +12,8 @@ import {
   LogOut,
   Sparkles,
   ExternalLink,
+  Globe,
+  GraduationCap,
   X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -23,7 +25,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { name: 'Admin Dashboard', path: '/', icon: LayoutDashboard },
+    { name: 'Student Dashboard', path: '/student', icon: GraduationCap },
     { name: 'Students', path: '/students', icon: Users },
     { name: 'Question Bank', path: '/questions', icon: HelpCircle },
     { name: 'Coding Problems', path: '/coding', icon: Code2 },
@@ -123,6 +126,32 @@ export default function Sidebar() {
 
       {/* Footer Switch to Student Portal & Logout */}
       <div style={{ padding: '16px', borderTop: '1px solid var(--divider)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <button
+          onClick={() => {
+            window.open('/landing', '_blank');
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '10px 14px',
+            borderRadius: '10px',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            color: 'var(--success, #10b981)',
+            fontSize: '12px',
+            fontWeight: 600,
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+            cursor: 'pointer',
+            textAlign: 'left'
+          }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Globe size={14} />
+            <span>SkillPrep Website</span>
+          </span>
+          <ExternalLink size={14} />
+        </button>
+
         <button
           onClick={() => {
             const savedUrl = localStorage.getItem('student_portal_url') || 'http://localhost:5000';

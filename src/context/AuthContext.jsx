@@ -24,17 +24,23 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('/api/v1/auth/admin/login', { email, password });
+      let response;
+      try {
+        response = await axios.post('/api/v1/auth/admin/login', { email, password });
+      } catch (adminErr) {
+        // Fallback to regular student/user login
+        response = await axios.post('/api/v1/auth/login', { email, password });
+      }
       const { access_token, user } = response.data;
-      const adminData = { ...user, token: access_token };
-      setAdmin(adminData);
-      localStorage.setItem('codearena_admin', JSON.stringify(adminData));
+      const userData = { ...user, token: access_token };
+      setAdmin(userData);
+      localStorage.setItem('codearena_admin', JSON.stringify(userData));
       setLoading(false);
-      return true;
+      return { success: true, user: userData };
     } catch (err) {
-      setError(err.response?.data?.detail || 'Invalid administrator credentials');
+      setError(err.response?.data?.detail || 'Invalid credentials');
       setLoading(false);
-      return false;
+      return { success: false, error: err.response?.data?.detail };
     }
   };
 
@@ -43,8 +49,16 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('codearena_admin');
   };
 
+  const updateAdmin = (updatedFields) => {
+    setAdmin(prev => {
+      const next = { ...prev, ...updatedFields };
+      localStorage.setItem('codearena_admin', JSON.stringify(next));
+      return next;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ admin, login, logout, loading, error }}>
+    <AuthContext.Provider value={{ admin, login, logout, updateAdmin, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

@@ -451,9 +451,49 @@ export default function Login() {
               <span>Your account information is securely protected.</span>
             </div>
 
+            {/* Quick Demo Credentials Helper */}
+            <div className="demo-helper-box" style={{ marginTop: '16px', padding: '12px 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', textAlign: 'center' }}>
+                ⚡ Quick Fill Test Accounts:
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="demo-btn-fill"
+                  onClick={handleAdminDemoFill}
+                  style={{
+                    padding: '8px 10px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    background: '#eef2ff',
+                    color: '#4f46e5',
+                    border: '1px solid #c7d2fe',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🛡️ Admin Console
+                </button>
+                <button
+                  type="button"
+                  className="demo-btn-fill"
+                  onClick={handleStudentDemoFill}
+                  style={{
+                    padding: '8px 10px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    background: '#f0fdf4',
+                    color: '#16a34a',
+                    border: '1px solid #bbf7d0',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🎓 Student Portal
+                </button>
+              </div>
+            </div>
 
-
-            {/* Back to SkillPrep Website link */}
             <div style={{ textAlign: 'center', marginTop: '16px' }}>
               <Link
                 to="/"

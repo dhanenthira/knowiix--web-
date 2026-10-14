@@ -15,6 +15,7 @@ import Assessments from './pages/Assessments';
 import BattlesMonitor from './pages/BattlesMonitor';
 import Analytics from './pages/Analytics';
 import Learning from './pages/Learning';
+import Profile from './pages/Profile';
 
 function ProtectedLayout() {
   const { admin } = useAuth();
@@ -54,6 +55,8 @@ function MainRoutes() {
       <Route path="/notes" element={<Learning />} />
       <Route path="/student/learning" element={<Learning />} />
       <Route path="/learning-notes" element={<Learning />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/student/profile" element={<Profile />} />
 
       {/* Protected Routes with Unified Layout (Uses Outlet, eliminating descendant Routes warning) */}
       <Route element={<ProtectedLayout />}>

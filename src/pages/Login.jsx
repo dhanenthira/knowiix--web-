@@ -412,14 +412,12 @@ export default function Login() {
             {/* Registration Prompt */}
             <div className="register-prompt">
               Don't have an account?{' '}
-              <a
-                href="http://localhost:5000"
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                to="/register"
                 className="register-link"
               >
-                Create an account
-              </a>
+                Create an account →
+              </Link>
             </div>
 
             <div className="auth-divider">
@@ -453,110 +451,7 @@ export default function Login() {
               <span>Your account information is securely protected.</span>
             </div>
 
-            {/* Demo Credentials Box */}
-            <div
-              className="demo-helper-box"
-              style={{
-                marginTop: '24px',
-                padding: '16px',
-                background: '#f8fafc',
-                border: '1px solid #e2e8f0',
-                borderRadius: '12px'
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: 800,
-                  fontSize: '0.85rem',
-                  color: '#0f172a',
-                  marginBottom: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <span>💡 Quick Demo Access</span>
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
-                  Click to autofill credentials
-                </span>
-              </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {/* Student Demo Option */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '8px 12px',
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  <div>
-                    <span style={{ fontWeight: 700, color: '#4f46e5' }}>🎓 Student Demo:</span>
-                    <span style={{ color: '#475569', marginLeft: '4px', fontFamily: 'monospace' }}>
-                      student@skillprep.edu
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    className="demo-btn-fill"
-                    onClick={handleStudentDemoFill}
-                    style={{
-                      background: '#eef2ff',
-                      color: '#4f46e5',
-                      border: 'none',
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Auto Fill
-                  </button>
-                </div>
-
-                {/* Admin Demo Option */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '8px 12px',
-                    background: '#ffffff',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                    fontSize: '0.8rem'
-                  }}
-                >
-                  <div>
-                    <span style={{ fontWeight: 700, color: '#10b981' }}>🛡️ Admin Demo:</span>
-                    <span style={{ color: '#475569', marginLeft: '4px', fontFamily: 'monospace' }}>
-                      admin@skillprep.edu
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    className="demo-btn-fill"
-                    onClick={handleAdminDemoFill}
-                    style={{
-                      background: '#ecfdf5',
-                      color: '#059669',
-                      border: 'none',
-                      padding: '4px 10px',
-                      borderRadius: '6px',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Auto Fill
-                  </button>
-                </div>
-              </div>
-            </div>
 
             {/* Back to SkillPrep Website link */}
             <div style={{ textAlign: 'center', marginTop: '16px' }}>

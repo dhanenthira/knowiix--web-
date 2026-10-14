@@ -1,0 +1,230 @@
+/* ==========================================================================
+   SKILLPREP REGISTER / CREATE ACCOUNT PAGE STYLES
+   ========================================================================== */
+
+/* Inherits tokens from Login.css, adds custom register enhancements */
+
+.skillprep-login-wrapper .role-selector-tabs {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 24px;
+    gap: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.skillprep-login-wrapper .role-tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skillprep-login-wrapper .role-tab-btn:hover {
+    color: #1e293b;
+}
+
+.skillprep-login-wrapper .role-tab-btn.active {
+    background: #ffffff;
+    color: #4f46e5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-weight: 700;
+}
+
+/* Two-column grid for compact inputs */
+.skillprep-login-wrapper .form-row-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 640px) {
+    .skillprep-login-wrapper .form-row-2col {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+/* Form Select Dropdown */
+.skillprep-login-wrapper .form-select {
+    width: 100% !important;
+    height: 48px !important;
+    padding: 0 16px 0 48px !important;
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    color: #0f172a !important;
+    font-size: 0.92rem !important;
+    font-family: inherit !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    background-size: 16px !important;
+}
+
+.skillprep-login-wrapper .form-select:focus {
+    border-color: #4f46e5 !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+}
+
+/* Password Strength Indicator */
+.skillprep-login-wrapper .password-strength-wrap {
+    margin-top: 8px;
+}
+
+.skillprep-login-wrapper .strength-bars {
+    display: flex;
+    gap: 6px;
+    height: 4px;
+    margin-bottom: 6px;
+}
+
+.skillprep-login-wrapper .strength-segment {
+    flex: 1;
+    height: 100%;
+    border-radius: 4px;
+    background: #e2e8f0;
+    transition: background 0.25s ease;
+}
+
+.skillprep-login-wrapper .strength-segment.active-weak {
+    background: #ef4444;
+}
+
+.skillprep-login-wrapper .strength-segment.active-medium {
+    background: #f59e0b;
+}
+
+.skillprep-login-wrapper .strength-segment.active-strong {
+    background: #10b981;
+}
+
+.skillprep-login-wrapper .strength-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Quick Fill Demo Bar */
+.skillprep-login-wrapper .quick-demo-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+}
+
+.skillprep-login-wrapper .btn-quick-fill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1px dashed #a5b4fc;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.skillprep-login-wrapper .btn-quick-fill:hover {
+    background: #e0e7ff;
+    border-color: #6366f1;
+    transform: translateY(-1px);
+}
+
+/* Perks List in Left Panel */
+.skillprep-login-wrapper .preview-perks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.skillprep-login-wrapper .preview-perk-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.skillprep-login-wrapper .preview-perk-card:hover {
+    transform: translateX(4px);
+    border-color: rgba(99, 102, 241, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.skillprep-login-wrapper .perk-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.skillprep-login-wrapper .perk-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.skillprep-login-wrapper .perk-desc {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+/* Company Badges Strip */
+.skillprep-login-wrapper .company-strip-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-top: 28px;
+    margin-bottom: 12px;
+}
+
+.skillprep-login-wrapper .company-badges-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skillprep-login-wrapper .company-badge-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #e2e8f0;
+}

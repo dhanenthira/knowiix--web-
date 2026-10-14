@@ -13,8 +13,8 @@ import {
   Sparkles,
   ExternalLink,
   Globe,
-  GraduationCap,
-  X
+  X,
+  BookOpen
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
@@ -26,10 +26,10 @@ export default function Sidebar() {
 
   const navItems = [
     { name: 'Admin Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Student Dashboard', path: '/student', icon: GraduationCap },
     { name: 'Students', path: '/students', icon: Users },
     { name: 'Question Bank', path: '/questions', icon: HelpCircle },
     { name: 'Coding Problems', path: '/coding', icon: Code2 },
+    { name: 'Learning & Notes', path: '/learning', icon: BookOpen },
     { name: 'Assessments', path: '/assessments', icon: ClipboardCheck },
     { name: 'Battle Rooms', path: '/battles', icon: Swords },
     { name: 'Analytics', path: '/analytics', icon: BarChart3 },
@@ -152,29 +152,7 @@ export default function Sidebar() {
           <ExternalLink size={14} />
         </button>
 
-        <button
-          onClick={() => {
-            const savedUrl = localStorage.getItem('student_portal_url') || 'http://localhost:5000';
-            window.open(savedUrl, '_blank');
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '10px 14px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(59, 130, 246, 0.12)',
-            color: 'var(--primary-light)',
-            fontSize: '12px',
-            fontWeight: 600,
-            border: '1px solid rgba(59, 130, 246, 0.25)',
-            cursor: 'pointer',
-            textAlign: 'left'
-          }}
-        >
-          <span>Open Student Portal</span>
-          <ExternalLink size={14} />
-        </button>
+
 
         <button
           onClick={logout}

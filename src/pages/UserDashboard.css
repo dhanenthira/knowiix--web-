@@ -87,153 +87,352 @@
 /* ==========================================================================
            DASHBOARD LAYOUT WRAPPER
            ========================================================================== */
-.app-layout {
-    display: flex;
-    width: 100%;
-    min-height: 100vh;
-}
-
-/* --------------------------------------------------------------------------
-           1. SIDEBAR
-           -------------------------------------------------------------------------- */
-.sidebar {
-    width: var(--sidebar-width);
-    background: #ffffff;
-    border-right: 1px solid var(--border-subtle);
-    height: 100vh;
-    position: fixed;
+/* ==========================================================================
+   HORIZONTAL TOP NAVIGATION BAR & LAYOUT
+   ========================================================================== */
+.student-top-navbar {
+    position: sticky;
     top: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    z-index: 100;
-    transition: var(--transition);
+    z-index: 1000;
+    width: 100%;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(15, 23, 42, 0.03);
+    transition: all 0.2s ease;
 }
 
-.sidebar-brand {
-    height: var(--header-height);
-    padding: 0 24px;
+.navbar-container {
+    max-width: 1600px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--border-subtle);
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 74px;
+    gap: 16px;
 }
 
-.brand-logo {
+/* Brand */
+.navbar-brand {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 800;
-    font-size: 1.35rem;
-    color: var(--text-main);
-    letter-spacing: -0.03em;
+    text-decoration: none;
+    flex-shrink: 0;
 }
 
 .brand-icon {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, var(--primary), #6366f1);
-    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 9px;
-    box-shadow: 0 3px 10px rgba(79, 70, 229, 0.35);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-weight: 800;
+    font-size: 18px;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
 }
 
 .brand-name span {
-    color: var(--primary);
+    color: #4f46e5;
 }
 
-.sidebar-nav {
-    padding: 20px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex-grow: 1;
-    overflow-y: auto;
-}
-
-.nav-category-title {
-    font-size: 0.6875rem;
-    font-weight: 800;
+.brand-tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #10b981;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    padding: 10px 12px 6px;
+    letter-spacing: 0.06em;
 }
 
-.nav-item {
+/* Horizontal Nav Links (Matching Image) */
+.navbar-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    height: 74px;
+    flex-shrink: 0;
+}
+
+.nav-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 74px;
+    padding: 0 16px;
+    border-radius: 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    color: #475569;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+}
+
+.nav-emoji {
+    font-size: 1.05rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    filter: grayscale(0.2);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.nav-tab:hover {
+    color: #4f46e5;
+    background: transparent;
+}
+
+.nav-tab:hover .nav-emoji {
+    transform: translateY(-1px);
+    filter: none;
+}
+
+.nav-tab.active {
+    color: #4f46e5;
+    background: transparent;
+    font-weight: 800;
+}
+
+.nav-tab.active .nav-emoji {
+    filter: none;
+}
+
+/* Blue underline bar under active item (DASHBOARD) matching user's image */
+.nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 14px;
+    right: 14px;
+    height: 3.5px;
+    background: #4f46e5;
+    border-radius: 3px 3px 0 0;
+}
+
+/* Right Navbar Actions */
+.navbar-actions {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 14px;
-    border-radius: var(--radius-md);
-    font-size: 0.92rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    position: relative;
+    flex-shrink: 0;
 }
 
-.nav-item:hover {
-    background: var(--surface-alt);
-    color: var(--primary);
-}
-
-.nav-item.active {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 700;
-}
-
-.nav-item.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 20%;
-    height: 60%;
-    width: 3px;
-    background: var(--primary);
-    border-radius: 0 4px 4px 0;
-}
-
-.nav-icon {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-}
-
-.sidebar-footer {
-    padding: 16px 14px;
-    border-top: 1px solid var(--border-subtle);
+/* Placement Readiness Mini Card */
+.readiness-mini-pill {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #ffffff;
+    border: 1px solid #334155;
+    padding: 8px 14px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     gap: 4px;
+    min-width: 175px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    cursor: default;
 }
 
-.nav-item.logout:hover {
-    background: var(--accent-red-light);
-    color: var(--accent-red);
+.readiness-mini-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
 }
 
-/* --------------------------------------------------------------------------
-           MAIN CONTENT AREA
-           -------------------------------------------------------------------------- */
-.main-wrapper {
-    margin-left: var(--sidebar-width);
-    flex-grow: 1;
+.readiness-pct {
+    color: #10b981;
+    font-weight: 800;
+}
+
+.readiness-progress-track {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.readiness-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #10b981);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+/* Streak Pill */
+.streak-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #d97706;
+    padding: 7px 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Admin Console Link */
+.admin-console-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(79, 70, 229, 0.1);
+    border: 1px solid rgba(79, 70, 229, 0.25);
+    color: #4f46e5;
+    padding: 7px 13px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.admin-console-link:hover {
+    background: rgba(79, 70, 229, 0.18);
+    transform: translateY(-1px);
+}
+
+/* User Profile Pill */
+.user-profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.user-avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #eef2ff;
+    border: 2px solid #cbd5e1;
+    object-fit: cover;
+}
+
+.user-info-text {
+    text-align: left;
+}
+
+.user-display-name {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.user-level-badge {
+    font-size: 10.5px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Logout button */
+.navbar-logout-btn {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 9px;
+    width: 36px;
+    height: 36px;
+    color: #ef4444;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.navbar-logout-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    transform: scale(1.05);
+}
+
+/* Mobile Subnav Strip */
+.mobile-horizontal-subnav {
+    display: none;
+    padding: 8px 16px;
+    gap: 6px;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-top: 1px solid #f1f5f9;
+    background: #ffffff;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.mobile-horizontal-subnav::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-nav-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    color: #475569;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+}
+
+.mobile-nav-tab.active {
+    color: #4f46e5;
+    background: rgba(79, 70, 229, 0.06);
+    border-bottom: 2px solid #4f46e5;
+    font-weight: 800;
+}
+
+/* Layout container */
+.student-dashboard-body {
+    width: 100%;
+    min-height: calc(100vh - 74px);
+    background-color: #f8fafc;
+}
+
+.dashboard-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 28px 24px 60px;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    width: calc(100% - var(--sidebar-width));
+    gap: 24px;
 }
 
-/* --------------------------------------------------------------------------
-           2. TOP HEADER
-           -------------------------------------------------------------------------- */
 .top-header {
     height: var(--header-height);
     background: rgba(255, 255, 255, 0.9);
@@ -1589,81 +1788,69 @@ body {
     border-radius: 0;
 }
 
-@media (max-width: 1100px) {
-    .nav-item {
-        padding: 0 9px;
-        font-size: 0.7rem;
+/* ==========================================================================
+   RESPONSIVE NAVBAR & CONTENT
+   ========================================================================== */
+@media (max-width: 1300px) {
+    .readiness-mini-pill {
+        min-width: 145px;
+        padding: 6px 10px;
     }
-
-    .nav-item.active::before {
-        left: 9px;
-        right: 9px;
+    
+    .nav-tab {
+        padding: 8px 10px;
+        font-size: 12.5px;
+        gap: 6px;
     }
 }
 
-@media (max-width: 992px) {
-    .sidebar {
-        position: sticky;
-        transform: none;
-        min-height: 68px;
-        overflow-x: auto;
-    }
-
-    .sidebar>div:first-child {
-        min-width: max-content;
-    }
-
-    .sidebar-brand,
-    .nav-item {
-        height: 68px;
-    }
-
-    .sidebar-brand {
-        padding: 0 20px;
-    }
-
-    .sidebar-nav {
-        overflow: visible;
-    }
-
-    .mobile-menu-btn {
+@media (max-width: 1100px) {
+    .navbar-nav-links {
         display: none;
+    }
+
+    .mobile-horizontal-subnav {
+        display: flex;
+    }
+}
+
+@media (max-width: 820px) {
+    .readiness-mini-pill {
+        display: none;
+    }
+
+    .streak-pill span {
+        display: none;
+    }
+
+    .streak-pill {
+        padding: 7px;
+    }
+
+    .admin-console-link span {
+        display: none;
+    }
+
+    .admin-console-link {
+        padding: 7px;
     }
 }
 
 @media (max-width: 640px) {
-    .sidebar-brand {
+    .navbar-container {
         padding: 0 14px;
+        height: 64px;
     }
 
-    .brand-name {
+    .brand-tag {
         display: none;
     }
 
-    .nav-item {
-        padding: 0 10px;
-        font-size: 0.65rem;
-    }
-
-    .nav-item.active::before {
-        left: 10px;
-        right: 10px;
-    }
-
-    .top-header {
-        padding: 18px 20px;
-    }
-
-    .header-actions {
-        gap: 8px;
-    }
-
-    .user-profile-name,
-    .user-profile-menu svg {
+    .user-level-badge {
         display: none;
     }
 
     .dashboard-content {
-        padding: 28px 20px 48px;
+        padding: 20px 14px 48px;
     }
 }

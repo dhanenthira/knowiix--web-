@@ -85,16 +85,7 @@ export default function CodingManagement() {
       />
 
       <div className="admin-content">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Active Coding Challenges ({problems.length})
-            </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-              Supports Python 3, Node.js, C++, and Java execution
-            </p>
-          </div>
-
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '24px' }}>
           <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
             <Plus size={16} />
             <span>Add New Problem</span>

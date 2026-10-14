@@ -25,10 +25,14 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       let response;
-      try {
-        response = await axios.post('/api/v1/auth/admin/login', { email, password });
-      } catch (adminErr) {
-        // Fallback to regular student/user login
+      const isAdminAttempt = email.toLowerCase().includes('admin');
+      if (isAdminAttempt) {
+        try {
+          response = await axios.post('/api/v1/auth/admin/login', { email, password });
+        } catch (adminErr) {
+          response = await axios.post('/api/v1/auth/login', { email, password });
+        }
+      } else {
         response = await axios.post('/api/v1/auth/login', { email, password });
       }
       const { access_token, user } = response.data;
@@ -41,6 +45,25 @@ export const AuthProvider = ({ children }) => {
       setError(err.response?.data?.detail || 'Invalid credentials');
       setLoading(false);
       return { success: false, error: err.response?.data?.detail };
+    }
+  };
+
+  const register = async (userData) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post('/api/v1/auth/register', userData);
+      const { access_token, user } = response.data;
+      const registeredUser = { ...user, token: access_token };
+      setAdmin(registeredUser);
+      localStorage.setItem('codearena_admin', JSON.stringify(registeredUser));
+      setLoading(false);
+      return { success: true, user: registeredUser };
+    } catch (err) {
+      const errMsg = err.response?.data?.detail || 'Registration failed. Please check your details.';
+      setError(errMsg);
+      setLoading(false);
+      return { success: false, error: errMsg };
     }
   };
 
@@ -58,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ admin, login, logout, updateAdmin, loading, error }}>
+    <AuthContext.Provider value={{ admin, login, register, logout, updateAdmin, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

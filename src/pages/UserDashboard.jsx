@@ -68,6 +68,17 @@ export default function UserDashboard() {
     questions_solved: 426
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
+  const displayName = admin?.role === 'admin' 
+    ? 'Administrator' 
+    : (admin?.name || student.name || 'Administrator');
+
   // Chart data configurations for 7d, 30d, 3m
   const chartConfigs = {
     '7d': {
@@ -176,7 +187,7 @@ export default function UserDashboard() {
           {/* Navbar Right Actions */}
           <div className="navbar-actions">
             {/* User Profile Pill */}
-            <div className="user-profile-pill">
+            <Link to="/profile" className="user-profile-pill" title="View Profile" style={{ textDecoration: 'none', cursor: 'pointer' }}>
               <img
                 src={student.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya'}
                 alt={student.name}
@@ -186,7 +197,7 @@ export default function UserDashboard() {
                 <div className="user-display-name">{student.name}</div>
                 <div className="user-level-badge">Level 5 Achiever</div>
               </div>
-            </div>
+            </Link>
 
             {/* Logout button */}
             <button
@@ -234,6 +245,50 @@ export default function UserDashboard() {
           </Link>
         </div>
       </header>
+
+      {/* ==========================================================
+          SUB-NAVBAR GREETING BAR (EXACT SCREENSHOT MATCH)
+          ========================================================== */}
+      <div className="subnav-greeting-bar">
+        <div className="subnav-greeting-left">
+          <h2 className="subnav-greeting-title">
+            {getGreeting()}, {displayName} ! 👋
+          </h2>
+          <p className="subnav-greeting-subtitle">
+            Ready to improve your placement skills today?
+          </p>
+        </div>
+
+        <div className="subnav-greeting-right">
+          <button
+            type="button"
+            className="subnav-greeting-notif-btn"
+            onClick={() => setNotificationOpen(!notificationOpen)}
+            aria-label="Notifications"
+            title="Notifications"
+          >
+            <Bell size={18} />
+            <span className="subnav-greeting-notif-dot"></span>
+          </button>
+
+          {notificationOpen && (
+            <div className="subnav-greeting-notif-dropdown">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '6px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff' }}>Notifications</span>
+                <span style={{ fontSize: '0.7rem', color: '#38bdf8' }}>2 New</span>
+              </div>
+              <div className="subnav-greeting-notif-item">
+                <strong>📅 Daily Placement Drills Ready</strong>
+                Complete today's Aptitude &amp; Coding challenges to maintain your streak.
+              </div>
+              <div className="subnav-greeting-notif-item">
+                <strong>⚡ Assessment Score Updated</strong>
+                Your TCS NQT mock diagnostic report is now available.
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* ==========================================================
           2. MAIN CONTENT AREA (FULL-WIDTH CONTAINER)

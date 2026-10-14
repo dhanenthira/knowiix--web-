@@ -167,49 +167,14 @@ export default function UserDashboard() {
               <span>TECHNICAL</span>
             </Link>
 
-            <Link to="/questions?category=Communication" className="nav-tab">
-              <span className="nav-emoji">🗣</span>
-              <span>COMMUNICATION</span>
-            </Link>
-
             <Link to="/coding" className="nav-tab">
               <span className="nav-emoji">👨‍💻</span>
               <span>CODING</span>
             </Link>
-
-            <Link to="/profile" className="nav-tab">
-              <span className="nav-emoji">👤</span>
-              <span>PROFILE</span>
-            </Link>
-
-            {/* Admin Console option in Navigation Menu */}
-            {admin && (
-              <Link to="/" className="nav-tab" title="Admin Dashboard">
-                <span className="nav-emoji">🛡️</span>
-                <span>ADMIN CONSOLE</span>
-              </Link>
-            )}
           </nav>
 
           {/* Navbar Right Actions */}
           <div className="navbar-actions">
-            {/* Placement Readiness Pill */}
-            <div className="readiness-mini-pill" title="Keep up daily practice to reach the 85% benchmark for TCS & Infosys interviews">
-              <div className="readiness-mini-top">
-                <span className="readiness-label">Placement Readiness</span>
-                <span className="readiness-pct">75% Ready</span>
-              </div>
-              <div className="readiness-progress-track">
-                <div className="readiness-progress-fill" style={{ width: '75%' }}></div>
-              </div>
-            </div>
-
-            {/* Streak Pill */}
-            <div className="streak-pill" title="Daily Practice Streak">
-              <Flame size={16} color="#f59e0b" fill="#f59e0b" />
-              <span>{stats.streak_days || 12} Day Streak</span>
-            </div>
-
             {/* User Profile Pill */}
             <div className="user-profile-pill">
               <img
@@ -263,24 +228,10 @@ export default function UserDashboard() {
             <span className="nav-emoji">💻</span>
             <span>TECHNICAL</span>
           </Link>
-          <Link to="/questions?category=Communication" className="mobile-nav-tab">
-            <span className="nav-emoji">🗣</span>
-            <span>COMMUNICATION</span>
-          </Link>
           <Link to="/coding" className="mobile-nav-tab">
             <span className="nav-emoji">👨‍💻</span>
             <span>CODING</span>
           </Link>
-          <Link to="/profile" className="mobile-nav-tab">
-            <span className="nav-emoji">👤</span>
-            <span>PROFILE</span>
-          </Link>
-          {admin && (
-            <Link to="/" className="mobile-nav-tab" title="Admin Dashboard">
-              <span className="nav-emoji">🛡️</span>
-              <span>ADMIN CONSOLE</span>
-            </Link>
-          )}
         </div>
       </header>
 
@@ -289,50 +240,7 @@ export default function UserDashboard() {
           ========================================================== */}
       <div className="student-dashboard-body">
         <main className="dashboard-content">
-          {/* ==========================================================
-                3. QUICK STATISTICS (4 TOP CARDS)
-                ========================================================== */}
-          <section className="stats-grid">
-            {/* Today's Score */}
-            <div className="stat-card">
-              <div className="stat-icon-wrapper icon-score">📊</div>
-              <div className="stat-info">
-                <span className="stat-label">Today's Score</span>
-                <span className="stat-value">{stats.overall_accuracy ? `${Math.round(stats.overall_accuracy)}%` : '82%'}</span>
-                <span className="stat-subtext text-trend-up">↑ +4.5% vs yesterday</span>
-              </div>
-            </div>
 
-            {/* Current Streak */}
-            <div className="stat-card">
-              <div className="stat-icon-wrapper icon-streak">🔥</div>
-              <div className="stat-info">
-                <span className="stat-label">Current Streak</span>
-                <span className="stat-value">{stats.streak_days || 12} Days</span>
-                <span className="stat-subtext text-streak-fire">Keep going! 🔥</span>
-              </div>
-            </div>
-
-            {/* Total XP */}
-            <div className="stat-card">
-              <div className="stat-icon-wrapper icon-xp">⚡</div>
-              <div className="stat-info">
-                <span className="stat-label">Total XP</span>
-                <span className="stat-value">{stats.total_points ? `${stats.total_points.toLocaleString()} XP` : '2,450 XP'}</span>
-                <span className="stat-subtext text-xp-badge">Level 5 Achiever</span>
-              </div>
-            </div>
-
-            {/* Coding Solved */}
-            <div className="stat-card">
-              <div className="stat-icon-wrapper icon-code">💻</div>
-              <div className="stat-info">
-                <span className="stat-label">Coding Solved</span>
-                <span className="stat-value">{stats.coding_problems_solved || 48} Problems</span>
-                <span className="stat-subtext" style={{ color: '#64748b' }}>25 Easy • 18 Med • 5 Hard</span>
-              </div>
-            </div>
-          </section>
 
           {/* ==========================================================
                 4. DAILY PRACTICE — MAIN FOCUS

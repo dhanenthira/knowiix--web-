@@ -23,6 +23,10 @@ function ProtectedLayout() {
     return <Navigate to="/login" replace />;
   }
 
+  if (admin.role !== 'admin') {
+    return <Navigate to="/student" replace />;
+  }
+
   return (
     <UIProvider>
       <div className="admin-layout">

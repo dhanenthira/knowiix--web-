@@ -193,24 +193,10 @@ export default function Learning() {
               <span className="nav-emoji">💻</span>
               <span>TECHNICAL</span>
             </Link>
-
-            <Link to="/profile" className="nav-tab">
-              <span className="nav-emoji">👤</span>
-              <span>PROFILE</span>
-            </Link>
           </nav>
 
           {/* Right Navbar Actions */}
           <div className="navbar-actions">
-            <div className="readiness-mini-pill" title="Keep up daily practice to reach the 85% benchmark for TCS & Infosys interviews">
-              <div className="readiness-mini-top">
-                <span className="readiness-label">Placement Readiness</span>
-                <span className="readiness-pct">75% Ready</span>
-              </div>
-              <div className="readiness-mini-bar">
-                <div className="readiness-mini-fill" style={{ width: '75%' }}></div>
-              </div>
-            </div>
           </div>
         </div>
       </header>

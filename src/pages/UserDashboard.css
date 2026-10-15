@@ -1852,7 +1852,7 @@ body {
         min-width: 145px;
         padding: 6px 10px;
     }
-    
+
     .nav-tab {
         padding: 8px 10px;
         font-size: 12.5px;
@@ -2025,9 +2025,11 @@ body {
     .subnav-greeting-bar {
         padding: 14px 20px;
     }
+
     .subnav-greeting-title {
         font-size: 1.1rem;
     }
+
     .subnav-greeting-subtitle {
         font-size: 0.8rem;
     }

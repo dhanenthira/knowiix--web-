@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="favKStem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="favKRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="50%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#00A6FF" />
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="#0B1120" />
+  <g transform="translate(18, 12) scale(0.42)">
+    <path d="M48 10 C48 4.477 43.523 0 38 0 L20 0 C14.477 0 10 4.477 10 10 L10 170 C10 175.523 14.477 180 20 180 L38 180 C43.523 180 48 175.523 48 170 Z" fill="url(#favKStem)" />
+    <path d="M40 92 L108 24 C112 20 118 20 122 24 L138 40 C142 44 142 50 138 54 L72 120 Z" fill="url(#favKRibbon)" />
+    <path d="M60 90 L128 158 C132 162 138 162 142 158 L158 142 C162 138 162 132 158 128 L88 58 Z" fill="#0284C7" />
+    <path d="M10 105 C10 105 32 75 60 75 C88 75 106 100 106 100 C106 100 90 120 62 120 C34 120 10 105 10 105 Z" fill="#00A6FF" />
+  </g>
+</svg>

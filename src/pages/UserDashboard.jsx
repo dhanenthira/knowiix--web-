@@ -23,6 +23,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import KnowiixLogo from '../components/KnowiixLogo';
 import './UserDashboard.css';
 
 export default function UserDashboard() {
@@ -75,8 +76,8 @@ export default function UserDashboard() {
     return 'Good Evening';
   };
 
-  const displayName = admin?.role === 'admin' 
-    ? 'Administrator' 
+  const displayName = admin?.role === 'admin'
+    ? 'Administrator'
     : (admin?.name || student.name || 'Administrator');
 
   // Chart data configurations for 7d, 30d, 3m
@@ -131,17 +132,10 @@ export default function UserDashboard() {
           ========================================================== */}
       <header className="student-top-navbar">
         <div className="navbar-container">
-          {/* Brand Logo */}
-          <Link to="/student" className="navbar-brand">
-            <div className="brand-icon">
-              <Zap size={20} />
-            </div>
-            <div className="brand-text">
-              <span className="brand-name">
-                Skill<span>Prep</span>
-              </span>
-              <span className="brand-tag">Student Arena</span>
-            </div>
+          {/* Knowiix Brand Logo */}
+          <Link to="/student" className="navbar-brand" style={{ textDecoration: 'none' }}>
+            <KnowiixLogo size="md" />
+            <span className="brand-tag" style={{ marginLeft: '6px' }}>Student Arena</span>
           </Link>
 
           {/* Desktop Horizontal Navigation Links (Matching Image) */}
@@ -168,7 +162,7 @@ export default function UserDashboard() {
               <span>DAILY PRACTICE</span>
             </a>
 
-            <Link to="/questions?category=Aptitude" className="nav-tab">
+            <Link to="/aptitude" className="nav-tab">
               <span className="nav-emoji">🧠</span>
               <span>APTITUDE</span>
             </Link>
@@ -231,7 +225,7 @@ export default function UserDashboard() {
             <span className="nav-emoji">📅</span>
             <span>DAILY PRACTICE</span>
           </a>
-          <Link to="/questions?category=Aptitude" className="mobile-nav-tab">
+          <Link to="/aptitude" className="mobile-nav-tab">
             <span className="nav-emoji">🧠</span>
             <span>APTITUDE</span>
           </Link>
@@ -335,7 +329,7 @@ export default function UserDashboard() {
                 </div>
                 <button
                   className="btn-module-action btn-module-continue"
-                  onClick={() => navigate('/questions')}
+                  onClick={() => navigate('/aptitude')}
                 >
                   Continue
                 </button>
@@ -731,7 +725,7 @@ export default function UserDashboard() {
                     <td>86%</td>
                     <td>Today</td>
                     <td>
-                      <button className="btn-table-view" onClick={() => navigate('/assessments')}>View</button>
+                      <button className="btn-table-view" onClick={() => navigate('/aptitude?mode=mock')}>Launch</button>
                     </td>
                   </tr>
                   <tr>

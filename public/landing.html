@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillPrep — Build the Skills. Ace the Placement.</title>
+    <title>Knowiix — Build the Skills. Ace the Placement.</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="description"
-        content="SkillPrep is an affordable, comprehensive placement and interview preparation platform for college students. Practice Aptitude, Technical, Communication, and Coding daily.">
+        content="Knowiix is an affordable, comprehensive placement and interview preparation platform for college students. Practice Aptitude, Technical, Communication, and Coding daily.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -1756,6 +1757,94 @@
                 font-size: 2.1rem;
             }
         }
+            /* ==========================================
+           THEME TOGGLE & DARK MODE STYLING
+           ========================================== */
+        .theme-toggle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light-surface-2);
+            border: 1px solid var(--light-border);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-right: 4px;
+        }
+        .theme-toggle-btn:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+        .theme-toggle-btn .sun-icon { display: none; }
+        .theme-toggle-btn .moon-icon { display: block; color: #475569; }
+
+        /* Dark Theme Variables & Elements */
+        body.dark-theme, [data-theme="dark"] body {
+            background-color: var(--dark-bg) !important;
+            color: var(--dark-text) !important;
+        }
+        body.dark-theme .navbar {
+            background: rgba(15, 23, 42, 0.88) !important;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.7) !important;
+        }
+        body.dark-theme .theme-toggle-btn {
+            background: var(--dark-surface-2) !important;
+            border-color: var(--dark-border) !important;
+            color: #f8fafc !important;
+        }
+        body.dark-theme .theme-toggle-btn .sun-icon { display: block !important; color: #f59e0b !important; }
+        body.dark-theme .theme-toggle-btn .moon-icon { display: none !important; }
+
+        body.dark-theme .section-header h2,
+        body.dark-theme .hero-title,
+        body.dark-theme h1,
+        body.dark-theme h2,
+        body.dark-theme h3,
+        body.dark-theme h4 {
+            color: #f8fafc !important;
+        }
+
+        body.dark-theme .section-header p,
+        body.dark-theme .hero-description,
+        body.dark-theme p {
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-theme .card,
+        body.dark-theme .feature-card,
+        body.dark-theme .practice-module-card,
+        body.dark-theme .step-card,
+        body.dark-theme .testimonial-card,
+        body.dark-theme .pricing-card,
+        body.dark-theme .faq-item,
+        body.dark-theme .mockup-header,
+        body.dark-theme .dashboard-mockup,
+        body.dark-theme .stat-card,
+        body.dark-theme .step-number-box {
+            background-color: var(--dark-surface) !important;
+            border-color: var(--dark-border) !important;
+            color: var(--dark-text) !important;
+        }
+
+        body.dark-theme .nav-link {
+            color: #cbd5e1 !important;
+        }
+        body.dark-theme .nav-link:hover {
+            color: #60a5fa !important;
+        }
+
+        body.dark-theme .mobile-drawer {
+            background: var(--dark-surface) !important;
+            border-left: 1px solid var(--dark-border) !important;
+        }
+
+        body.dark-theme .footer {
+            background: #060911 !important;
+            border-top: 1px solid var(--dark-border) !important;
+        }
     </style>
 </head>
 
@@ -1766,13 +1855,10 @@
          ========================================== -->
     <nav class="navbar" id="navbar">
         <div class="container navbar-content">
-            <a href="#home" class="brand-logo" id="nav-brand">
-                <div class="brand-icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+            <a href="#home" class="brand-logo" id="nav-brand" style="display:flex; align-items:center; text-decoration:none;">
+                <div style="background:#ffffff; border-radius:10px; padding:4px 12px; display:flex; align-items:center; height:42px; box-shadow:0 2px 10px rgba(0,0,0,0.25);">
+                    <img src="/knowiix-logo.jpg" alt="Knowiix Logo" style="height:32px; width:auto; object-fit:contain; display:block;" />
                 </div>
-                <span class="brand-name">Skill<span>Prep</span></span>
             </a>
 
             <ul class="nav-links">
@@ -1784,6 +1870,22 @@
             </ul>
 
             <div class="nav-actions">
+                                <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle dark/light theme" title="Toggle theme">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
                 <a href="/login" target="_top" class="btn btn-ghost" id="login-btn">Login</a>
                 <a href="/login" target="_top" class="btn btn-primary" id="get-started-btn">Get Started</a>
                 <button class="mobile-menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu">
@@ -2123,7 +2225,7 @@
                     <div class="step-card">
                         <div class="step-num">01</div>
                         <h3>Create Your Account</h3>
-                        <p>Register and create your SkillPrep profile with your branch, graduation year, and target
+                        <p>Register and create your Knowiix profile with your branch, graduation year, and target
                             dream companies.</p>
                     </div>
 
@@ -2492,7 +2594,7 @@
         <div class="container">
             <div class="section-header">
                 <span class="badge badge-primary">Student Stories</span>
-                <h2>Students Are Building Their Skills With SkillPrep</h2>
+                <h2>Students Are Building Their Skills With Knowiix</h2>
                 <p>Hear from final year engineering students who cracked on-campus drives and top tech interviews.</p>
             </div>
 
@@ -2588,15 +2690,9 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <h3>
-                        <div class="brand-icon" style="width:30px; height:30px; border-radius:6px;">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" width="18"
-                                height="18">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        SkillPrep
-                    </h3>
+                    <div style="background:#ffffff; border-radius:8px; padding:4px 10px; display:inline-flex; align-items:center; height:38px; margin-bottom:12px;">
+                        <img src="/knowiix-logo.jpg" alt="Knowiix" style="height:28px; width:auto; object-fit:contain; display:block;" />
+                    </div>
                     <p>Student Skill Development Platform. Empowering college students to master Aptitude, Technical
                         Skills, Communication, and Coding.</p>
                 </div>
@@ -2631,7 +2727,7 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2026 SkillPrep. All rights reserved.</p>
+                <p>&copy; 2026 Knowiix. All rights reserved.</p>
                 <p style="color:#64748b;">Prepare smarter. Practice daily. Get placement ready.</p>
             </div>
         </div>
@@ -2664,6 +2760,32 @@
                     navbar.style.boxShadow = 'none';
                 }
             });
+            // ==========================================
+            // DARK / LIGHT THEME TOGGLE SCRIPT
+            // ==========================================
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const storedTheme = localStorage.getItem('knowiix-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+                localStorage.setItem('knowiix-theme', theme);
+            }
+
+            // Apply initially
+            applyTheme(storedTheme);
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    const isDark = document.body.classList.contains('dark-theme');
+                    applyTheme(isDark ? 'light' : 'dark');
+                });
+            }
         });
     </script>
 </body>

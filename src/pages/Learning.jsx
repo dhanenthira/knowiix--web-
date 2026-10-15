@@ -195,7 +195,7 @@ const getApiUrl = (endpoint) => {
   if (typeof window !== 'undefined') {
     const port = window.location.port;
     if (port === '5173' || port === '3000') {
-      return `http://localhost:8005${endpoint}`;
+      return `http://localhost:8000${endpoint}`;
     }
   }
   return endpoint;

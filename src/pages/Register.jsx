@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import KnowiixLogo from '../components/KnowiixLogo';
 import './Login.css';
 import './Register.css';
 
@@ -193,13 +194,8 @@ export default function Register() {
         {/* 1. LEFT SIDE: BRANDING & CAREER HIGHLIGHTS */}
         <aside className="auth-visual-panel">
           <div className="visual-header">
-            <Link to="/" className="brand-logo" title="Back to SkillPrep Home">
-              <div className="brand-icon">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span className="brand-name">Skill<span>Prep</span></span>
+            <Link to="/" style={{ textDecoration: 'none' }} title="Back to Knowiix Home">
+              <KnowiixLogo size="lg" />
             </Link>
           </div>
 
@@ -274,14 +270,9 @@ export default function Register() {
         <main className="auth-form-panel" style={{ overflowY: 'auto' }}>
           <div className="auth-card" style={{ maxWidth: '520px' }}>
             {/* Mobile Header */}
-            <div className="mobile-brand-header">
-              <Link to="/" className="brand-logo" style={{ color: 'var(--text-main)', justifyContent: 'center' }}>
-                <div className="brand-icon">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <span className="brand-name">Skill<span style={{ color: 'var(--primary)' }}>Prep</span></span>
+            <div className="mobile-brand-header" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
+              <Link to="/" style={{ textDecoration: 'none' }}>
+                <KnowiixLogo size="md" />
               </Link>
             </div>
 

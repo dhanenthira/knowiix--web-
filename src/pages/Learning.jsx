@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -46,16 +46,64 @@ const LESSON_EXERCISES = {
     explanation: "In Python, print() is the standard built-in function to display text or values to the console."
   },
   py_syntax: {
-    question: "Which of the following data types in Python is IMMUTABLE (cannot be modified after creation)?",
-    options: ["list", "tuple", "dict", "set"],
+    question: "How does Python define code blocks (such as inside if statements, loops, or functions)?",
+    options: ["Curly brackets { }", "Indentation (whitespace)", "begin and end keywords", "Semicolons ;"],
     correct: 1,
-    explanation: "Tuples are immutable in Python. Once initialized, their elements cannot be changed or reassigned."
+    explanation: "Python strictly relies on 4-space whitespace indentation to define code block scope."
   },
-  py_control: {
-    question: "Which keyword immediately skips the rest of the current loop iteration and moves to the next iteration?",
-    options: ["break", "pass", "continue", "return"],
+  py_variables: {
+    question: "Which of the following is an INVALID variable name in Python?",
+    options: ["_user_name", "user2name", "2user_name", "USER_NAME"],
     correct: 2,
-    explanation: "The continue statement rejects all remaining statements in the current iteration of the loop and moves the control back to the top."
+    explanation: "Variable names in Python cannot start with a digit. '2user_name' will raise a SyntaxError."
+  },
+  py_datatypes: {
+    question: "What is the output of type(10 / 2) in Python 3?",
+    options: ["<class 'int'>", "<class 'float'>", "<class 'number'>", "<class 'double'>"],
+    correct: 1,
+    explanation: "In Python 3, the standard division operator '/' always returns a float (5.0)."
+  },
+  py_strings: {
+    question: "What is the output of 'Python'[1:4] in Python?",
+    options: ["'Pyt'", "'yth'", "'ytho'", "'Pyth'"],
+    correct: 1,
+    explanation: "String slicing s[start:stop] starts at index 1 ('y') up to but excluding index 4 ('h'), returning 'yth'."
+  },
+  py_lists: {
+    question: "Which method adds a single element to the end of a list in O(1) amortized time?",
+    options: ["insert()", "append()", "extend()", "push()"],
+    correct: 1,
+    explanation: "append() adds an item to the end of the list in O(1) amortized time."
+  },
+  py_tuples: {
+    question: "Which of the following creates a valid single-element tuple in Python?",
+    options: ["('apple')", "('apple',)", "tuple('apple')", "['apple']"],
+    correct: 1,
+    explanation: "A trailing comma is mandatory to create a single-element tuple: ('apple',). Without the comma, Python treats it as a grouped string."
+  },
+  py_sets: {
+    question: "What is the result of {1, 2, 3} & {2, 3, 4}?",
+    options: ["{1, 4}", "{1, 2, 3, 4}", "{2, 3}", "{}"],
+    correct: 2,
+    explanation: "The & operator performs a set intersection, returning only the common elements {2, 3}."
+  },
+  py_dictionaries: {
+    question: "Which method retrieves a dictionary value safely without throwing a KeyError if the key is missing?",
+    options: ["find()", "search()", "get()", "lookup()"],
+    correct: 2,
+    explanation: "dict.get(key, default) returns None or the default value if the key does not exist."
+  },
+  py_conditions: {
+    question: "Which operator tests whether two variables point to the exact same object in memory?",
+    options: ["==", "equals", "is", "==="],
+    correct: 2,
+    explanation: "'is' tests object identity (same memory address), whereas '==' tests value equality."
+  },
+  py_loops: {
+    question: "Which statement immediately terminates the entire loop and transfers control outside?",
+    options: ["continue", "pass", "break", "return"],
+    correct: 2,
+    explanation: "break terminates the surrounding loop immediately."
   },
   py_functions: {
     question: "Which keyword is used to create a small, anonymous inline one-line function in Python?",
@@ -63,17 +111,17 @@ const LESSON_EXERCISES = {
     correct: 3,
     explanation: "lambda creates anonymous functions: e.g., square = lambda x: x * x."
   },
-  py_oop: {
+  py_classes_objects: {
     question: "What is the name of the constructor method in Python classes that initializes new object instances?",
     options: ["__init__", "__construct__", "__new__", "__main__"],
     correct: 0,
-    explanation: "__init__ is the initializer method automatically called when a new instance of a class is created."
+    explanation: "__init__ is the initializer method automatically invoked when a new instance is created."
   },
   dsa_arrays: {
     question: "What is the optimal time complexity to find a target sum pair in a sorted array using two pointers?",
     options: ["O(N^2)", "O(N log N)", "O(N)", "O(1)"],
     correct: 2,
-    explanation: "With two pointers starting at both ends of a sorted array, each step moves one pointer inward, taking O(N) linear time."
+    explanation: "With two pointers starting at opposite ends of a sorted array, each step moves one pointer inward, taking O(N) linear time."
   },
   dsa_linkedlist: {
     question: "What is the time complexity to insert a new node at the HEAD of a Singly Linked List?",
@@ -85,7 +133,7 @@ const LESSON_EXERCISES = {
     question: "Which data structure follows the First-In, First-Out (FIFO) ordering principle?",
     options: ["Stack", "Queue", "Binary Search Tree", "Max Heap"],
     correct: 1,
-    explanation: "A Queue processes elements in First-In, First-Out (FIFO) order (e.g. printer spooling, CPU task queues, BFS)."
+    explanation: "A Queue processes elements in First-In, First-Out (FIFO) order."
   },
   dsa_trees: {
     question: "Which tree traversal of a Binary Search Tree (BST) visits nodes in strictly ascending sorted order?",
@@ -128,7 +176,29 @@ const LESSON_EXERCISES = {
     options: ["20%", "25%", "15%", "12.5%"],
     correct: 1,
     explanation: "Profit = ₹100 - ₹80 = ₹20. Profit % = (Profit / Cost Price) * 100 = (20 / 80) * 100 = 25%."
+  },
+  react_47: {
+    question: "In React, what does the useState() hook return?",
+    options: ["A single state value", "An array with the current state and a updater function", "An object with get and set methods", "A reducer function"],
+    correct: 1,
+    explanation: "useState() returns an array with two elements: [currentState, setStateFunction]."
+  },
+  react_48: {
+    question: "What does an empty dependency array [] in useEffect() signify?",
+    options: ["The effect runs on every single render", "The effect runs only once when the component mounts", "The effect never runs", "The effect runs only when props change"],
+    correct: 1,
+    explanation: "Passing [] means the effect has no reactive dependencies and will run only once after initial mount."
   }
+};
+
+const getApiUrl = (endpoint) => {
+  if (typeof window !== 'undefined') {
+    const port = window.location.port;
+    if (port === '5173' || port === '3000') {
+      return `http://localhost:8005${endpoint}`;
+    }
+  }
+  return endpoint;
 };
 
 export default function Learning() {
@@ -136,21 +206,9 @@ export default function Learning() {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dbStatus, setDbStatus] = useState({ connected: false, database: 'loading...' });
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [viewMode, setViewMode] = useState('w3schools'); // 'w3schools' or 'catalog'
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
-
-  const displayName = admin?.role === 'admin' 
-    ? 'Administrator' 
-    : (admin?.name || 'Administrator');
-  
   // W3Schools Learning Studio State
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseLessons, setCourseLessons] = useState([]);
@@ -167,39 +225,33 @@ export default function Learning() {
   // Interactive Exercise State
   const [userAnswers, setUserAnswers] = useState({});
   const [exerciseResult, setExerciseResult] = useState({});
-  const [showExplanation, setShowExplanation] = useState({});
 
-  // Fetch Database Status and Learning Modules from DB
-  const loadDatabaseData = async () => {
-    setLoading(true);
-    try {
-      // 1. Check DB health
-      const statusRes = await axios.get('/db-status').catch(() => ({ data: { connected: false } }));
-      setDbStatus(statusRes.data || { connected: false });
+  // Catalog View filters
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
-      // 2. Fetch learning modules directly from MySQL
-      const modulesRes = await axios.get('/api/lessons/modules');
-      setModules(modulesRes.data || []);
-    } catch (err) {
-      console.error('Failed to load learning modules from database:', err);
-    } finally {
-      setLoading(false);
-    }
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
   };
 
-  useEffect(() => {
-    loadDatabaseData();
-  }, []);
+  const displayName = admin?.role === 'admin' 
+    ? 'Administrator' 
+    : (admin?.name || 'Administrator');
 
-  // Enter W3Schools Learning Studio for a chosen course
+  // Load a course and set its lessons dynamically from the database
   const handleOpenCourse = async (courseModule, initialTopicId = null) => {
     setSelectedCourse(courseModule);
+    setViewMode('w3schools');
     setLoadingLesson(true);
     setInteractiveOutput(null);
     setTopicSearch('');
+
     try {
-      // Fetch all full lessons for this course module from MySQL
-      const res = await axios.get(`/api/lessons/module/${courseModule.id}/lessons`);
+      // Fetch all full lessons for this course module directly from MySQL
+      const res = await axios.get(getApiUrl(`/api/lessons/module/${courseModule.id}/lessons`));
       const lessons = res.data || [];
       setCourseLessons(lessons);
 
@@ -218,7 +270,51 @@ export default function Learning() {
     }
   };
 
-  // Switch active topic in W3Schools sidebar without page navigation
+  // Fetch Database Status and Learning Modules from DB on mount
+  const loadDatabaseData = async () => {
+    setLoading(true);
+    try {
+      // 1. Check DB health
+      const statusRes = await axios.get(getApiUrl('/db-status')).catch(() => ({ data: { connected: false } }));
+      setDbStatus(statusRes.data || { connected: false });
+
+      // 2. Fetch learning modules directly from MySQL
+      const modulesRes = await axios.get(getApiUrl('/api/lessons/modules'));
+      const loadedModules = modulesRes.data || [];
+      setModules(loadedModules);
+
+      // 3. Immediately display the W3Schools learning interface
+      if (loadedModules.length > 0) {
+        const params = new URLSearchParams(window.location.search);
+        const subjectParam = params.get('subject') || params.get('course');
+        const topicParam = params.get('topic');
+
+        let targetMod = null;
+        if (subjectParam) {
+          targetMod = loadedModules.find(m => 
+            m.id.toLowerCase() === subjectParam.toLowerCase() ||
+            m.category.toLowerCase() === subjectParam.toLowerCase()
+          );
+        }
+        if (!targetMod) {
+          // Default to Python
+          targetMod = loadedModules.find(m => m.category === 'python' || m.id === 'mod_python') || loadedModules[0];
+        }
+
+        await handleOpenCourse(targetMod, topicParam);
+      }
+    } catch (err) {
+      console.error('Failed to load learning modules from database:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDatabaseData();
+  }, []);
+
+  // Switch active topic in W3Schools sidebar without page reload
   const handleSelectTopic = (lessonId) => {
     setInteractiveOutput(null);
     const existing = courseLessons.find(l => l.id === lessonId);
@@ -229,7 +325,7 @@ export default function Learning() {
     }
 
     setLoadingLesson(true);
-    axios.get(`/api/lessons/${lessonId}`)
+    axios.get(getApiUrl(`/api/lessons/${lessonId}`))
       .then(res => {
         setActiveLesson(res.data);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -238,13 +334,13 @@ export default function Learning() {
       .finally(() => setLoadingLesson(false));
   };
 
-  // Close W3Schools view and return to course selection screen
+  // Switch between W3Schools interface and Catalog overview
   const handleBackToCourses = () => {
-    setSelectedCourse(null);
-    setActiveLesson(null);
-    setCourseLessons([]);
-    setInteractiveOutput(null);
-    loadDatabaseData();
+    setViewMode('catalog');
+  };
+
+  const handleReturnToStudio = () => {
+    setViewMode('w3schools');
   };
 
   // Previous & Next navigation
@@ -267,7 +363,7 @@ export default function Learning() {
     if (!activeLesson) return;
     const newStatus = !activeLesson.is_completed;
     try {
-      await axios.post('/api/lessons/progress', {
+      await axios.post(getApiUrl('/api/lessons/progress'), {
         lesson_id: activeLesson.id,
         completed: newStatus
       });
@@ -298,7 +394,7 @@ export default function Learning() {
 
     setSubmittingNote(true);
     try {
-      const res = await axios.post(`/api/lessons/${activeLesson.id}/add-note`, {
+      const res = await axios.post(getApiUrl(`/api/lessons/${activeLesson.id}/add-note`), {
         note: newNoteText.trim()
       });
       if (res.data && res.data.notes) {
@@ -327,7 +423,7 @@ export default function Learning() {
   };
 
   const handleRunExample = (output) => {
-    setInteractiveOutput(output || "Program finished successfully with exit code 0.");
+    setInteractiveOutput(output || "Program executed successfully with exit code 0.");
   };
 
   // Exercise answer handler
@@ -343,32 +439,45 @@ export default function Learning() {
     }
   };
 
-  // Filtering modules on Course Selection Screen
-  const filteredModules = modules.filter(m => {
-    const matchesCat = selectedCategory === 'all' || m.category.toLowerCase() === selectedCategory.toLowerCase();
-    const matchesSearch = !searchQuery || 
-      m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (m.topics && m.topics.some(t => t.title.toLowerCase().includes(searchQuery.toLowerCase())));
-    return matchesCat && matchesSearch;
-  });
-
-  // Calculate totals for course screen
-  const totalLessonsInDb = modules.reduce((acc, m) => acc + (m.total_lessons || 0), 0);
-
   // Filter topics for the W3Schools left sidebar
   const filteredSidebarTopics = courseLessons.filter(topic => 
-    !topicSearch || topic.title.toLowerCase().includes(topicSearch.toLowerCase())
+    !topicSearch || 
+    topic.title.toLowerCase().includes(topicSearch.toLowerCase()) ||
+    (topic.subtopic && topic.subtopic.toLowerCase().includes(topicSearch.toLowerCase()))
   );
 
-  // Icon helper
+  // Group topics by subtopic for W3Schools sidebar
+  const subtopicGroups = useMemo(() => {
+    const groups = {};
+    filteredSidebarTopics.forEach((topic) => {
+      const groupTitle = topic.subtopic || 'General Topics';
+      if (!groups[groupTitle]) {
+        groups[groupTitle] = [];
+      }
+      groups[groupTitle].push(topic);
+    });
+    return groups;
+  }, [filteredSidebarTopics]);
+
+  // Icon helpers
   const getModuleIcon = (iconName) => {
     switch (iconName) {
-      case 'code-2': return <Code2 size={24} />;
-      case 'layers': return <Layers size={24} />;
-      case 'database': return <Database size={24} />;
-      case 'brain': return <Brain size={24} />;
-      default: return <BookOpen size={24} />;
+      case 'code-2': return <Code2 size={20} />;
+      case 'layers': return <Layers size={20} />;
+      case 'database': return <Database size={20} />;
+      case 'brain': return <Brain size={20} />;
+      default: return <BookOpen size={20} />;
+    }
+  };
+
+  const getSubjectEmoji = (category) => {
+    switch (category?.toLowerCase()) {
+      case 'python': return '🐍';
+      case 'react': return '⚛️';
+      case 'sql': return '🗄️';
+      case 'dsa': return '🧱';
+      case 'aptitude': return '🧠';
+      default: return '📘';
     }
   };
 
@@ -379,6 +488,18 @@ export default function Learning() {
     : 0;
 
   const currentExercise = activeLesson ? LESSON_EXERCISES[activeLesson.id] : null;
+
+  // Catalog filtering
+  const filteredModules = modules.filter(m => {
+    const matchesCat = selectedCategory === 'all' || m.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesSearch = !searchQuery || 
+      m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      m.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (m.topics && m.topics.some(t => t.title.toLowerCase().includes(searchQuery.toLowerCase())));
+    return matchesCat && matchesSearch;
+  });
+
+  const totalLessonsInDb = modules.reduce((acc, m) => acc + (m.total_lessons || 0), 0);
 
   return (
     <div className="learning-page-wrapper">
@@ -451,73 +572,59 @@ export default function Learning() {
         </div>
       </header>
 
-      {/* Sub-navbar greeting bar (Course Catalog view) */}
-      {!selectedCourse && (
-        <div className="subnav-greeting-bar">
-          <div className="subnav-greeting-left">
-            <h2 className="subnav-greeting-title">
-              {getGreeting()}, {displayName} ! 👋
-            </h2>
-            <p className="subnav-greeting-subtitle">
-              Ready to improve your placement skills today?
-            </p>
-          </div>
-
-          <div className="subnav-greeting-right">
-            <button
-              type="button"
-              className="subnav-greeting-notif-btn"
-              onClick={() => setNotificationOpen(!notificationOpen)}
-              aria-label="Notifications"
-              title="Notifications"
-            >
-              <Bell size={18} />
-              <span className="subnav-greeting-notif-dot"></span>
-            </button>
-
-            {notificationOpen && (
-              <div className="subnav-greeting-notif-dropdown">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '6px' }}>
-                  <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff' }}>Notifications</span>
-                  <span style={{ fontSize: '0.7rem', color: '#38bdf8' }}>2 New</span>
-                </div>
-                <div className="subnav-greeting-notif-item">
-                  <strong>📚 New W3Schools Learning Notes</strong>
-                  Python, SQL, Java and Aptitude revision sheets are up to date.
-                </div>
-                <div className="subnav-greeting-notif-item">
-                  <strong>⚡ Daily Goal Reminder</strong>
-                  Complete at least 1 study module today to maintain streak.
-                </div>
-              </div>
-            )}
-          </div>
+      {/* ==========================================================
+          2. W3SCHOOLS GLOBAL SUBJECTS BAR (Always accessible)
+          ========================================================== */}
+      <div className="w3-subjects-nav-strip">
+        <div className="w3-subjects-scroll">
+          {modules.map(mod => {
+            const isActive = selectedCourse?.id === mod.id && viewMode === 'w3schools';
+            return (
+              <button
+                key={mod.id}
+                onClick={() => handleOpenCourse(mod)}
+                className={`w3-subject-tab-btn ${isActive ? 'active' : ''}`}
+                title={mod.title}
+              >
+                <span>{getSubjectEmoji(mod.category)}</span>
+                <span>{mod.category?.toUpperCase()}</span>
+                <span className="w3-subject-tab-badge">{mod.total_lessons || (mod.topics ? mod.topics.length : 0)}</span>
+              </button>
+            );
+          })}
         </div>
-      )}
 
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {viewMode === 'w3schools' ? (
+            <button 
+              onClick={handleBackToCourses} 
+              className="w3-all-subjects-btn"
+              title="Browse all available subjects in catalog view"
+            >
+              <SlidersHorizontal size={14} />
+              <span>Catalog View</span>
+            </button>
+          ) : (
+            <button 
+              onClick={handleReturnToStudio} 
+              className="w3-all-subjects-btn"
+              title="Return to W3Schools learning studio"
+            >
+              <BookOpen size={14} />
+              <span>W3Schools Studio</span>
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* ==========================================================
-          3. CONDITIONAL RENDER: 
-             A) W3SCHOOLS LEARNING STUDIO INTERFACE (When course selected)
-             B) EXISTING COURSE SELECTION SCREEN (Default)
+          3. MAIN VIEW: W3SCHOOLS LEARNING STUDIO (Default)
           ========================================================== */}
-      {selectedCourse ? (
-        /* ==========================================================
-           W3SCHOOLS-STYLE LEARNING STUDIO VIEW
-           ========================================================== */
+      {viewMode === 'w3schools' && selectedCourse ? (
         <div className="w3-learning-studio">
           {/* Studio Top Control Strip */}
           <div className="w3-top-strip">
             <div className="w3-strip-left">
-              <button 
-                className="w3-back-btn" 
-                onClick={handleBackToCourses}
-                title="Return to all available courses"
-              >
-                <ChevronLeft size={17} />
-                <span>All Courses</span>
-              </button>
-
               <div className="w3-course-badge-pill">
                 <span className="w3-course-icon-mini">{getModuleIcon(selectedCourse.icon)}</span>
                 <span className="w3-course-title-text">{selectedCourse.title}</span>
@@ -552,7 +659,7 @@ export default function Learning() {
             <aside className={`w3-sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
               <div className="w3-sidebar-header">
                 <div className="w3-sidebar-course-title">
-                  {selectedCourse.category?.toUpperCase()} TUTORIAL
+                  {selectedCourse.category?.toUpperCase()} TOPICS
                 </div>
                 <div className="w3-sidebar-search">
                   <Search size={14} className="w3-sidebar-search-icon" />
@@ -571,31 +678,40 @@ export default function Learning() {
                 </div>
               </div>
 
-              {/* Topics Nav List */}
+              {/* Topics Nav List Grouped by Subtopics */}
               <nav className="w3-topics-menu" aria-label="Course Topics">
-                <div className="w3-topic-group-header">Core Topics &amp; Lessons</div>
-                {filteredSidebarTopics.map((topic, idx) => {
-                  const isActive = activeLesson?.id === topic.id;
-                  const isDone = topic.is_completed;
-                  return (
-                    <button
-                      key={topic.id}
-                      onClick={() => {
-                        handleSelectTopic(topic.id);
-                        if (window.innerWidth < 900) setSidebarOpen(false);
-                      }}
-                      className={`w3-topic-link ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}`}
-                    >
-                      <div className="w3-topic-left">
-                        <span className={`w3-topic-bullet ${isDone ? 'done' : ''}`}>
-                          {isDone ? '✓' : String(idx + 1).padStart(2, '0')}
-                        </span>
-                        <span className="w3-topic-name">{topic.title}</span>
-                      </div>
-                      {isDone && <span className="w3-done-badge" title="Completed">✓</span>}
-                    </button>
-                  );
-                })}
+                {Object.keys(subtopicGroups).map((subGroupTitle) => (
+                  <div key={subGroupTitle} className="w3-sidebar-subtopic-group">
+                    <div className="w3-sidebar-subtopic-title">
+                      <span>{subGroupTitle}</span>
+                      <span className="w3-subtopic-count">{subtopicGroups[subGroupTitle].length}</span>
+                    </div>
+
+                    {subtopicGroups[subGroupTitle].map((topic) => {
+                      const isActive = activeLesson?.id === topic.id;
+                      const isDone = topic.is_completed;
+                      return (
+                        <button
+                          key={topic.id}
+                          id={`topic-${topic.id}`}
+                          onClick={() => {
+                            handleSelectTopic(topic.id);
+                            if (window.innerWidth < 900) setSidebarOpen(false);
+                          }}
+                          className={`w3-topic-link ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}`}
+                        >
+                          <div className="w3-topic-left">
+                            <span className={`w3-topic-bullet ${isDone ? 'done' : ''}`}>
+                              {isDone ? '✓' : String(topic.order || 1).padStart(2, '0')}
+                            </span>
+                            <span className="w3-topic-name">{topic.title}</span>
+                          </div>
+                          {isDone && <span className="w3-done-badge" title="Completed">✓</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
 
                 {filteredSidebarTopics.length === 0 && (
                   <div className="w3-no-topics">No topics match "{topicSearch}"</div>
@@ -607,8 +723,8 @@ export default function Learning() {
                   className="w3-sidebar-footer-btn" 
                   onClick={handleBackToCourses}
                 >
-                  <ChevronLeft size={14} />
-                  <span>Choose Another Course</span>
+                  <SlidersHorizontal size={14} />
+                  <span>Browse All Subjects</span>
                 </button>
               </div>
             </aside>
@@ -648,9 +764,15 @@ export default function Learning() {
                   {/* Topic Title & Meta */}
                   <div className="w3-topic-heading-section">
                     <div className="w3-breadcrumb-strip">
-                      <span>Courses</span>
+                      <span>Subjects</span>
                       <span className="w3-bc-sep">/</span>
                       <span>{selectedCourse.title}</span>
+                      {activeLesson.subtopic && (
+                        <>
+                          <span className="w3-bc-sep">/</span>
+                          <span>{activeLesson.subtopic}</span>
+                        </>
+                      )}
                       <span className="w3-bc-sep">/</span>
                       <span className="w3-bc-current">{activeLesson.title}</span>
                     </div>
@@ -659,7 +781,12 @@ export default function Learning() {
 
                     <div className="w3-topic-meta-bar">
                       <span className="w3-meta-tag category">{activeLesson.category?.toUpperCase()}</span>
-                      <span className="w3-meta-tag lesson-num">LESSON #{activeLesson.order || (currentTopicIndex + 1)}</span>
+                      <span className="w3-meta-tag lesson-num">TOPIC #{activeLesson.order || (currentTopicIndex + 1)}</span>
+                      {activeLesson.subtopic && (
+                        <span className="w3-meta-tag subtopic" style={{ background: '#e0e7ff', color: '#4338ca', fontWeight: 600 }}>
+                          {activeLesson.subtopic}
+                        </span>
+                      )}
                       <span className="w3-meta-tag read-time">
                         <Clock size={13} />
                         <span>5 min read</span>
@@ -677,13 +804,15 @@ export default function Learning() {
                   </div>
 
                   {/* 1. Overview & Context */}
-                  <div className="w3-card-block">
-                    <h2 className="w3-card-h2">
-                      <Sparkles size={18} color="#4f46e5" />
-                      <span>Overview &amp; Context</span>
-                    </h2>
-                    <p className="w3-paragraph">{activeLesson.intro}</p>
-                  </div>
+                  {activeLesson.intro && (
+                    <div className="w3-card-block">
+                      <h2 className="w3-card-h2">
+                        <Sparkles size={18} color="#4f46e5" />
+                        <span>Overview &amp; Context</span>
+                      </h2>
+                      <p className="w3-paragraph">{activeLesson.intro}</p>
+                    </div>
+                  )}
 
                   {/* 2. Definition & Core Concepts */}
                   <div className="w3-card-block">
@@ -695,7 +824,7 @@ export default function Learning() {
                       <p className="w3-definition-text">{activeLesson.definition}</p>
                     </div>
                     {activeLesson.explanation && (
-                      <p className="w3-paragraph" style={{ marginTop: '12px' }}>
+                      <p className="w3-paragraph" style={{ marginTop: '12px', lineHeight: '1.7' }}>
                         {activeLesson.explanation}
                       </p>
                     )}
@@ -733,7 +862,7 @@ export default function Learning() {
                         <div key={sIdx} className="w3-example-box">
                           <div className="w3-example-top-bar">
                             <span className="w3-example-tag">
-                              Example ({snip.language?.toUpperCase() || 'CODE'})
+                              Example {sIdx + 1} ({snip.language?.toUpperCase() || 'CODE'})
                             </span>
                             <div className="w3-example-actions">
                               <button 
@@ -773,7 +902,7 @@ export default function Learning() {
                   <div className="w3-card-block">
                     <h2 className="w3-card-h2">
                       <Bookmark size={18} color="#d97706" />
-                      <span>Interview Notes &amp; Placement Tips (From Database)</span>
+                      <span>Interview Notes &amp; Placement Tips (Stored in Database)</span>
                     </h2>
                     <div className="w3-notes-list">
                       {activeLesson.notes && activeLesson.notes.length > 0 ? (
@@ -879,7 +1008,7 @@ export default function Learning() {
                       ) : (
                         <div className="w3-general-practice-box">
                           <p className="w3-exercise-question">
-                            Reinforce what you learned in <strong>{activeLesson.title}</strong> by solving real interview practice problems.
+                            Reinforce what you learned in <strong>{activeLesson.title}</strong> by solving real placement practice problems.
                           </p>
                         </div>
                       )}
@@ -943,7 +1072,7 @@ export default function Learning() {
         </div>
       ) : (
         /* ==========================================================
-           EXISTING COURSE SELECTION SCREEN (UNCHANGED BEHAVIOR)
+           CATALOG OVERVIEW VIEW
            ========================================================== */
         <main className="learning-container">
           {/* Header Hero */}
@@ -952,11 +1081,11 @@ export default function Learning() {
               <div>
                 <div className="header-badge-row">
                   <span className="pill-badge primary">SkillPrep Study Center</span>
-                  <span className="pill-badge success">Live DB Sync Active</span>
+                  <span className="pill-badge success">Live MySQL Sync Active</span>
                 </div>
-                <h1 className="learning-title">Learning Modules &amp; Placement Notes</h1>
+                <h1 className="learning-title">Learning Subjects &amp; Notes</h1>
                 <p className="learning-subtitle">
-                  Access structured syntax guides, interview cheat sheets, code snippets, and placement formulas retrieved dynamically from your database.
+                  Browse topics and interview notes organized by subject, topic, and subtopic stored dynamically in your database.
                 </p>
               </div>
             </div>
@@ -968,39 +1097,24 @@ export default function Learning() {
                   className={`category-pill-btn ${selectedCategory === 'all' ? 'active' : ''}`}
                   onClick={() => setSelectedCategory('all')}
                 >
-                  All Modules ({modules.length})
+                  All Subjects ({modules.length})
                 </button>
-                <button 
-                  className={`category-pill-btn ${selectedCategory === 'python' ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory('python')}
-                >
-                  Python &amp; OOP
-                </button>
-                <button 
-                  className={`category-pill-btn ${selectedCategory === 'dsa' ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory('dsa')}
-                >
-                  DSA &amp; Algorithms
-                </button>
-                <button 
-                  className={`category-pill-btn ${selectedCategory === 'sql' ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory('sql')}
-                >
-                  Database &amp; SQL
-                </button>
-                <button 
-                  className={`category-pill-btn ${selectedCategory === 'aptitude' ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory('aptitude')}
-                >
-                  Placement Aptitude
-                </button>
+                {modules.map(mod => (
+                  <button
+                    key={mod.id}
+                    className={`category-pill-btn ${selectedCategory === mod.category ? 'active' : ''}`}
+                    onClick={() => setSelectedCategory(mod.category)}
+                  >
+                    {mod.title.split(' ')[0]}
+                  </button>
+                ))}
               </div>
 
               <div className="search-input-box">
                 <Search size={16} className="search-icon-svg" />
                 <input 
                   type="text" 
-                  placeholder="Search notes, syntax, or topics..."
+                  placeholder="Search subjects or topics..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="search-input-field"
@@ -1017,7 +1131,7 @@ export default function Learning() {
               </div>
               <div>
                 <div className="stat-metric-val">{modules.length}</div>
-                <div className="stat-metric-lbl">DB Modules Loaded</div>
+                <div className="stat-metric-lbl">Subjects in DB</div>
               </div>
             </div>
 
@@ -1027,7 +1141,7 @@ export default function Learning() {
               </div>
               <div>
                 <div className="stat-metric-val">{totalLessonsInDb}</div>
-                <div className="stat-metric-lbl">Total Lessons in DB</div>
+                <div className="stat-metric-lbl">Topics &amp; Lessons</div>
               </div>
             </div>
 
@@ -1036,7 +1150,7 @@ export default function Learning() {
                 <Bookmark size={20} />
               </div>
               <div>
-                <div className="stat-metric-val">45+</div>
+                <div className="stat-metric-val">100+</div>
                 <div className="stat-metric-lbl">Study Notes &amp; Formulas</div>
               </div>
             </div>
@@ -1047,85 +1161,53 @@ export default function Learning() {
               </div>
               <div>
                 <div className="stat-metric-val">{dbStatus.connected ? 'Active' : 'Offline'}</div>
-                <div className="stat-metric-lbl">MySQL Status</div>
+                <div className="stat-metric-lbl">MySQL Database</div>
               </div>
             </div>
           </div>
 
-          {/* Modules Grid */}
-          {loading ? (
-            <div className="empty-loading-state">
-              <div className="loading-spinner"></div>
-              <p>Connecting to MySQL database and retrieving learning modules...</p>
-            </div>
-          ) : filteredModules.length === 0 ? (
-            <div className="empty-loading-state">
-              <AlertCircle size={32} color="#94a3b8" />
-              <p>No learning modules found matching your query in the database.</p>
-              <button className="category-pill-btn active" onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}>
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className="modules-grid">
-              {filteredModules.map((module) => (
-                <div key={module.id} className="module-card">
-                  <div className="module-card-top">
-                    <div className="module-icon-wrap">
-                      {getModuleIcon(module.icon)}
-                    </div>
-                    <span className="module-badge">{module.category}</span>
+          {/* Subjects Grid */}
+          <div className="modules-grid">
+            {filteredModules.map((mod) => (
+              <div key={mod.id} className="module-card">
+                <div className="module-card-header">
+                  <div className="module-icon-wrap">
+                    {getModuleIcon(mod.icon)}
                   </div>
+                  <span className="category-badge">{mod.category?.toUpperCase()}</span>
+                </div>
 
-                  <h3 className="module-title">{module.title}</h3>
-                  <p className="module-desc">{module.description}</p>
+                <h3 className="module-card-title">{mod.title}</h3>
+                <p className="module-card-desc">{mod.description}</p>
 
-                  {/* Progress Bar */}
-                  <div className="module-progress-wrap">
-                    <div className="module-progress-head">
-                      <span>Progress ({module.completed_lessons || 0}/{module.total_lessons || 0} Lessons)</span>
-                      <span>{Math.round(module.progress_percentage || 0)}%</span>
-                    </div>
-                    <div className="progress-track">
-                      <div 
-                        className="progress-fill" 
-                        style={{ width: `${Math.round(module.progress_percentage || 0)}%` }}
-                      ></div>
-                    </div>
+                <div className="module-topics-list">
+                  <div className="topics-heading">Available Topics:</div>
+                  <div className="topics-tags-wrap">
+                    {(mod.topics || []).slice(0, 6).map((t) => (
+                      <span key={t.id} className="topic-pill-tag">
+                        {t.title}
+                      </span>
+                    ))}
+                    {(mod.topics || []).length > 6 && (
+                      <span className="topic-pill-tag more">
+                        +{(mod.topics || []).length - 6} more
+                      </span>
+                    )}
                   </div>
+                </div>
 
-                  {/* Topics Preview List from DB */}
-                  {module.topics && module.topics.length > 0 && (
-                    <div className="module-topics-list">
-                      <div className="module-topics-title">Topics &amp; Notes in this Module:</div>
-                      {module.topics.map((topic) => (
-                        <div 
-                          key={topic.id} 
-                          className={`topic-item-preview ${topic.is_completed ? 'completed' : ''}`}
-                          onClick={() => handleOpenCourse(module, topic.id)}
-                          title="Click to view full notes, syntax, and examples in W3Schools Studio"
-                        >
-                          <span>{topic.title}</span>
-                          <span className={`topic-status-badge ${topic.is_completed ? 'done' : 'pending'}`}>
-                            {topic.is_completed ? 'Completed' : 'Study'}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Open Study Notes & Lessons Button - Enters W3Schools Studio */}
+                <div className="module-card-footer">
                   <button 
-                    className="module-action-btn"
-                    onClick={() => handleOpenCourse(module)}
+                    onClick={() => handleOpenCourse(mod)}
+                    className="open-w3-studio-btn"
                   >
-                    <span>Open Study Notes &amp; Lessons</span>
-                    <ChevronRight size={16} />
+                    <span>Open W3Schools Studio</span>
+                    <ArrowRight size={15} />
                   </button>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </main>
       )}
     </div>

@@ -843,6 +843,116 @@
   width: 100%;
 }
 
+/* W3Schools Global Subjects Top Bar */
+.w3-subjects-nav-strip {
+  background: #282A35;
+  border-bottom: 2px solid #04AA6D;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  overflow-x: auto;
+  position: sticky;
+  top: 72px;
+  z-index: 52;
+}
+
+.w3-subjects-scroll {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.w3-subjects-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.w3-subject-tab-btn {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  padding: 12px 18px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+}
+
+.w3-subject-tab-btn:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.w3-subject-tab-btn.active {
+  background: #04AA6D;
+  color: #ffffff;
+  border-bottom: 3px solid #04AA6D;
+}
+
+.w3-subject-tab-badge {
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.w3-all-subjects-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.w3-all-subjects-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Sidebar Subtopic Section Grouping */
+.w3-sidebar-subtopic-group {
+  margin-bottom: 12px;
+}
+
+.w3-sidebar-subtopic-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 12px 4px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.w3-subtopic-count {
+  font-size: 0.65rem;
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 1px 6px;
+  border-radius: 9999px;
+}
+
 /* Studio Top Control Strip */
 .w3-top-strip {
   background: #ffffff;

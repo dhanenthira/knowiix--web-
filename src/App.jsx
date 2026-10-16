@@ -17,6 +17,8 @@ import Analytics from './pages/Analytics';
 import Learning from './pages/Learning';
 import Profile from './pages/Profile';
 import Aptitude from './pages/Aptitude';
+import CodingPractice from './pages/CodingPractice';
+import CodingWorkspace from './pages/CodingWorkspace';
 
 function ProtectedLayout() {
   const { admin } = useAuth();
@@ -61,6 +63,17 @@ function MainRoutes() {
       <Route path="/aptitude" element={<Aptitude />} />
       <Route path="/student/aptitude" element={<Aptitude />} />
       <Route path="/aptitude/test" element={<Aptitude />} />
+
+      {/* Student Coding Practice & Two-Panel Workspace */}
+      <Route path="/coding/practice" element={<CodingPractice />} />
+      <Route path="/coding/problem/:id" element={<CodingWorkspace />} />
+      <Route path="/student/coding" element={<CodingPractice />} />
+      <Route path="/student/coding/:id" element={<CodingWorkspace />} />
+      <Route path="/practice/coding" element={<CodingPractice />} />
+      <Route path="/practice/coding/:id" element={<CodingWorkspace />} />
+      {(!admin || admin?.role !== 'admin') && (
+        <Route path="/coding" element={<CodingPractice />} />
+      )}
 
       {/* Protected Routes with Unified Layout (Uses Outlet, eliminating descendant Routes warning) */}
       <Route element={<ProtectedLayout />}>

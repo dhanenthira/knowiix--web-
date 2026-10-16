@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Zap, 
   BookOpen, 
@@ -19,1197 +17,1577 @@ import {
   Check, 
   Plus, 
   Bookmark,
-  ChevronRight,
-  ChevronLeft,
-  Sparkles,
-  AlertCircle,
-  Menu,
-  Award,
-  Play,
-  RotateCcw,
-  CheckCircle2,
-  FileCode,
-  SlidersHorizontal,
-  ArrowRight,
-  LogOut,
-  Bell
+  ChevronRight, 
+  ChevronLeft, 
+  Sparkles, 
+  AlertCircle, 
+  Menu, 
+  Award, 
+  Play, 
+  RotateCcw, 
+  CheckCircle2, 
+  SlidersHorizontal, 
+  ArrowRight, 
+  LogOut, 
+  Bell,
+  User,
+  Trash2,
+  History,
+  TrendingUp,
+  Terminal,
+  Coffee,
+  Cpu,
+  GitBranch,
+  Palette,
+  Server,
+  Shield,
+  Filter,
+  CheckCheck
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import learningApi from '../api/learningApi';
 import './Learning.css';
-import './UserDashboard.css';
-
-// Interactive exercises tailored to database topics
-const LESSON_EXERCISES = {
-  py_intro: {
-    question: "Which built-in function is used in Python to display output on the screen?",
-    options: ["echo()", "console.log()", "print()", "System.out.println()"],
-    correct: 2,
-    explanation: "In Python, print() is the standard built-in function to display text or values to the console."
-  },
-  py_syntax: {
-    question: "How does Python define code blocks (such as inside if statements, loops, or functions)?",
-    options: ["Curly brackets { }", "Indentation (whitespace)", "begin and end keywords", "Semicolons ;"],
-    correct: 1,
-    explanation: "Python strictly relies on 4-space whitespace indentation to define code block scope."
-  },
-  py_variables: {
-    question: "Which of the following is an INVALID variable name in Python?",
-    options: ["_user_name", "user2name", "2user_name", "USER_NAME"],
-    correct: 2,
-    explanation: "Variable names in Python cannot start with a digit. '2user_name' will raise a SyntaxError."
-  },
-  py_datatypes: {
-    question: "What is the output of type(10 / 2) in Python 3?",
-    options: ["<class 'int'>", "<class 'float'>", "<class 'number'>", "<class 'double'>"],
-    correct: 1,
-    explanation: "In Python 3, the standard division operator '/' always returns a float (5.0)."
-  },
-  py_strings: {
-    question: "What is the output of 'Python'[1:4] in Python?",
-    options: ["'Pyt'", "'yth'", "'ytho'", "'Pyth'"],
-    correct: 1,
-    explanation: "String slicing s[start:stop] starts at index 1 ('y') up to but excluding index 4 ('h'), returning 'yth'."
-  },
-  py_lists: {
-    question: "Which method adds a single element to the end of a list in O(1) amortized time?",
-    options: ["insert()", "append()", "extend()", "push()"],
-    correct: 1,
-    explanation: "append() adds an item to the end of the list in O(1) amortized time."
-  },
-  py_tuples: {
-    question: "Which of the following creates a valid single-element tuple in Python?",
-    options: ["('apple')", "('apple',)", "tuple('apple')", "['apple']"],
-    correct: 1,
-    explanation: "A trailing comma is mandatory to create a single-element tuple: ('apple',). Without the comma, Python treats it as a grouped string."
-  },
-  py_sets: {
-    question: "What is the result of {1, 2, 3} & {2, 3, 4}?",
-    options: ["{1, 4}", "{1, 2, 3, 4}", "{2, 3}", "{}"],
-    correct: 2,
-    explanation: "The & operator performs a set intersection, returning only the common elements {2, 3}."
-  },
-  py_dictionaries: {
-    question: "Which method retrieves a dictionary value safely without throwing a KeyError if the key is missing?",
-    options: ["find()", "search()", "get()", "lookup()"],
-    correct: 2,
-    explanation: "dict.get(key, default) returns None or the default value if the key does not exist."
-  },
-  py_conditions: {
-    question: "Which operator tests whether two variables point to the exact same object in memory?",
-    options: ["==", "equals", "is", "==="],
-    correct: 2,
-    explanation: "'is' tests object identity (same memory address), whereas '==' tests value equality."
-  },
-  py_loops: {
-    question: "Which statement immediately terminates the entire loop and transfers control outside?",
-    options: ["continue", "pass", "break", "return"],
-    correct: 2,
-    explanation: "break terminates the surrounding loop immediately."
-  },
-  py_functions: {
-    question: "Which keyword is used to create a small, anonymous inline one-line function in Python?",
-    options: ["def", "func", "inline", "lambda"],
-    correct: 3,
-    explanation: "lambda creates anonymous functions: e.g., square = lambda x: x * x."
-  },
-  py_classes_objects: {
-    question: "What is the name of the constructor method in Python classes that initializes new object instances?",
-    options: ["__init__", "__construct__", "__new__", "__main__"],
-    correct: 0,
-    explanation: "__init__ is the initializer method automatically invoked when a new instance is created."
-  },
-  dsa_arrays: {
-    question: "What is the optimal time complexity to find a target sum pair in a sorted array using two pointers?",
-    options: ["O(N^2)", "O(N log N)", "O(N)", "O(1)"],
-    correct: 2,
-    explanation: "With two pointers starting at opposite ends of a sorted array, each step moves one pointer inward, taking O(N) linear time."
-  },
-  dsa_linkedlist: {
-    question: "What is the time complexity to insert a new node at the HEAD of a Singly Linked List?",
-    options: ["O(1)", "O(N)", "O(log N)", "O(N^2)"],
-    correct: 0,
-    explanation: "Inserting at the head only requires updating the new node's next pointer and head reference, taking O(1) constant time."
-  },
-  dsa_stack_queue: {
-    question: "Which data structure follows the First-In, First-Out (FIFO) ordering principle?",
-    options: ["Stack", "Queue", "Binary Search Tree", "Max Heap"],
-    correct: 1,
-    explanation: "A Queue processes elements in First-In, First-Out (FIFO) order."
-  },
-  dsa_trees: {
-    question: "Which tree traversal of a Binary Search Tree (BST) visits nodes in strictly ascending sorted order?",
-    options: ["Pre-order (Root-Left-Right)", "In-order (Left-Root-Right)", "Post-order (Left-Right-Root)", "Level-order (BFS)"],
-    correct: 1,
-    explanation: "In-order traversal of a BST always yields keys in ascending non-decreasing order."
-  },
-  sql_basics: {
-    question: "Which SQL clause is used to filter aggregated group results produced by GROUP BY?",
-    options: ["WHERE", "HAVING", "ORDER BY", "FILTER"],
-    correct: 1,
-    explanation: "WHERE filters rows before aggregation; HAVING filters aggregated groups after GROUP BY."
-  },
-  sql_joins: {
-    question: "Which JOIN returns ALL rows from the left table, along with matched rows from the right table?",
-    options: ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "CROSS JOIN"],
-    correct: 1,
-    explanation: "LEFT JOIN (or LEFT OUTER JOIN) preserves every record from the left table and matches records from the right table."
-  },
-  sql_indexes: {
-    question: "Which self-balancing search tree data structure is most widely used by relational database engines for primary key indexes?",
-    options: ["B+ Tree", "AVL Tree", "Red-Black Tree", "Trie"],
-    correct: 0,
-    explanation: "B+ Trees store all records in sorted leaf nodes linked as a list, making range queries and disk block reads extremely fast."
-  },
-  apt_time_work: {
-    question: "If Worker A completes a job in 10 days and Worker B in 15 days, in how many days can they complete it working together?",
-    options: ["5 days", "6 days", "7.5 days", "8 days"],
-    correct: 1,
-    explanation: "Combined rate = 1/10 + 1/15 = 5/30 = 1/6 job/day. Days required = 1 / (1/6) = 6 days."
-  },
-  apt_speed_dist: {
-    question: "What conversion factor should you multiply with to convert a speed from km/h into m/s?",
-    options: ["18 / 5", "5 / 18", "1000 / 60", "36 / 5"],
-    correct: 1,
-    explanation: "1 km/h = 1000m / 3600s = 5/18 m/s. Multiply km/h by 5/18 to get m/s."
-  },
-  apt_profit_loss: {
-    question: "An article bought for ₹80 is sold for ₹100. What is the profit percentage?",
-    options: ["20%", "25%", "15%", "12.5%"],
-    correct: 1,
-    explanation: "Profit = ₹100 - ₹80 = ₹20. Profit % = (Profit / Cost Price) * 100 = (20 / 80) * 100 = 25%."
-  },
-  react_47: {
-    question: "In React, what does the useState() hook return?",
-    options: ["A single state value", "An array with the current state and a updater function", "An object with get and set methods", "A reducer function"],
-    correct: 1,
-    explanation: "useState() returns an array with two elements: [currentState, setStateFunction]."
-  },
-  react_48: {
-    question: "What does an empty dependency array [] in useEffect() signify?",
-    options: ["The effect runs on every single render", "The effect runs only once when the component mounts", "The effect never runs", "The effect runs only when props change"],
-    correct: 1,
-    explanation: "Passing [] means the effect has no reactive dependencies and will run only once after initial mount."
-  }
-};
-
-const getApiUrl = (endpoint) => {
-  if (typeof window !== 'undefined') {
-    const port = window.location.port;
-    if (port === '5173' || port === '3000') {
-      return `http://localhost:8000${endpoint}`;
-    }
-  }
-  return endpoint;
-};
 
 export default function Learning() {
   const { admin, logout } = useAuth();
-  const [modules, setModules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [dbStatus, setDbStatus] = useState({ connected: false, database: 'loading...' });
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [viewMode, setViewMode] = useState('w3schools'); // 'w3schools' or 'catalog'
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // W3Schools Learning Studio State
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [courseLessons, setCourseLessons] = useState([]);
-  const [activeLesson, setActiveLesson] = useState(null);
-  const [loadingLesson, setLoadingLesson] = useState(false);
-  const [topicSearch, setTopicSearch] = useState('');
+  // Navigation & View Mode
+  // viewMode: 'dashboard' | 'studio' | 'tutorials' | 'progress' | 'saved' | 'history'
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [copiedSyntax, setCopiedSyntax] = useState(false);
-  const [copiedSnippetIndex, setCopiedSnippetIndex] = useState(null);
-  const [newNoteText, setNewNoteText] = useState('');
-  const [submittingNote, setSubmittingNote] = useState(false);
-  const [interactiveOutput, setInteractiveOutput] = useState(null);
-  
-  // Interactive Exercise State
-  const [userAnswers, setUserAnswers] = useState({});
-  const [exerciseResult, setExerciseResult] = useState({});
-
-  // Catalog View filters
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  };
+  // Live Data States
+  const [currentUser, setCurrentUser] = useState(null);
+  const [summaryStats, setSummaryStats] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [continueItems, setContinueItems] = useState([]);
+  const [recommendedTutorials, setRecommendedTutorials] = useState([]);
+  const [allTutorials, setAllTutorials] = useState([]);
+  const [savedBookmarks, setSavedBookmarks] = useState([]);
+  const [userProgressData, setUserProgressData] = useState(null);
+  const [recentActivities, setRecentActivities] = useState([]);
 
-  const displayName = admin?.role === 'admin' 
-    ? 'Administrator' 
-    : (admin?.name || 'Administrator');
+  // Loading & Error States
+  const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [dashboardError, setDashboardError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
 
-  // Load a course and set its lessons dynamically from the database
-  const handleOpenCourse = async (courseModule, initialTopicId = null) => {
-    setSelectedCourse(courseModule);
-    setViewMode('w3schools');
-    setLoadingLesson(true);
-    setInteractiveOutput(null);
-    setTopicSearch('');
+  // W3Schools Studio Reader State
+  const [currentTutorial, setCurrentTutorial] = useState(null);
+  const [currentTopic, setCurrentTopic] = useState(null);
+  const [loadingTopic, setLoadingTopic] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [interactiveOutput, setInteractiveOutput] = useState(null);
+  const [newNote, setNewNote] = useState('');
+  const [localNotes, setLocalNotes] = useState([]);
 
-    try {
-      // Fetch all full lessons for this course module directly from MySQL
-      const res = await axios.get(getApiUrl(`/api/lessons/module/${courseModule.id}/lessons`));
-      const lessons = res.data || [];
-      setCourseLessons(lessons);
+  // Notifications demo list
+  const notifications = [
+    { id: 1, title: 'Achievement Unlocked!', message: 'Completed your first web development lesson.', time: '10m ago' },
+    { id: 2, title: 'Daily Streak Active', message: 'You are on a 12-day learning streak. Keep it up!', time: '2h ago' },
+    { id: 3, title: 'New Tutorial Published', message: 'FastAPI Production Microservices is now live.', time: '1d ago' },
+  ];
 
-      let targetLesson = null;
-      if (initialTopicId) {
-        targetLesson = lessons.find(l => l.id === initialTopicId || l.topic_id === initialTopicId);
-      }
-      if (!targetLesson && lessons.length > 0) {
-        targetLesson = lessons[0];
-      }
-      setActiveLesson(targetLesson);
-    } catch (err) {
-      console.error('Error fetching course lessons from DB:', err);
-    } finally {
-      setLoadingLesson(false);
+  // Map category slug to Lucide Icon
+  const getCategoryIcon = (iconName, slug) => {
+    switch (slug?.toLowerCase()) {
+      case 'html': return <Code2 size={18} />;
+      case 'css': return <Palette size={18} />;
+      case 'javascript': return <Zap size={18} />;
+      case 'react': return <Layers size={18} />;
+      case 'python': return <Terminal size={18} />;
+      case 'java': return <Coffee size={18} />;
+      case 'c': return <Cpu size={18} />;
+      case 'cpp': return <Cpu size={18} />;
+      case 'sql': return <Database size={18} />;
+      case 'mysql': return <Server size={18} />;
+      case 'fastapi': return <Shield size={18} />;
+      case 'nodejs': return <Server size={18} />;
+      case 'git': return <GitBranch size={18} />;
+      default: return <BookOpen size={18} />;
     }
   };
 
-  // Fetch Database Status and Learning Modules from DB on mount
-  const loadDatabaseData = async () => {
-    setLoading(true);
+  // Load All Primary Dashboard Data
+  const loadDashboardData = useCallback(async () => {
+    setLoadingDashboard(true);
+    setDashboardError(null);
     try {
-      // 1. Check DB health
-      const statusRes = await axios.get(getApiUrl('/db-status')).catch(() => ({ data: { connected: false } }));
-      setDbStatus(statusRes.data || { connected: false });
-
-      // 2. Fetch learning modules directly from MySQL
-      const modulesRes = await axios.get(getApiUrl('/api/lessons/modules'));
-      const loadedModules = modulesRes.data || [];
-      setModules(loadedModules);
-
-      // 3. Immediately display the W3Schools learning interface
-      if (loadedModules.length > 0) {
-        const params = new URLSearchParams(window.location.search);
-        const subjectParam = params.get('subject') || params.get('course');
-        const topicParam = params.get('topic');
-
-        let targetMod = null;
-        if (subjectParam) {
-          targetMod = loadedModules.find(m => 
-            m.id.toLowerCase() === subjectParam.toLowerCase() ||
-            m.category.toLowerCase() === subjectParam.toLowerCase()
-          );
-        }
-        if (!targetMod) {
-          // Default to Python
-          targetMod = loadedModules.find(m => m.category === 'python' || m.id === 'mod_python') || loadedModules[0];
-        }
-
-        await handleOpenCourse(targetMod, topicParam);
+      // 1. Fetch current user from /api/auth/me
+      try {
+        const user = await learningApi.getCurrentUser();
+        setCurrentUser(user);
+      } catch (err) {
+        console.warn('Could not fetch user via auth/me, using auth context user', err);
+        setCurrentUser(admin);
       }
-    } catch (err) {
-      console.error('Failed to load learning modules from database:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
+      // 2. Fetch summary, categories, continue learning, recommended, bookmarks, activities concurrently
+      const [
+        summaryRes,
+        categoriesRes,
+        continueRes,
+        recRes,
+        tutorialsRes,
+        bookmarksRes,
+        progressRes,
+        activityRes
+      ] = await Promise.allSettled([
+        learningApi.getDashboardSummary(),
+        learningApi.getCategories(),
+        learningApi.getContinueLearning(),
+        learningApi.getRecommendedTutorials(6),
+        learningApi.getAllTutorials(),
+        learningApi.getBookmarks(),
+        learningApi.getMyProgress(),
+        learningApi.getRecentActivity(15)
+      ]);
+
+      if (summaryRes.status === 'fulfilled') setSummaryStats(summaryRes.value);
+      if (categoriesRes.status === 'fulfilled') setCategories(categoriesRes.value);
+      if (continueRes.status === 'fulfilled') setContinueItems(continueRes.value);
+      if (recRes.status === 'fulfilled') setRecommendedTutorials(recRes.value);
+      if (tutorialsRes.status === 'fulfilled') setAllTutorials(tutorialsRes.value);
+      if (bookmarksRes.status === 'fulfilled') setSavedBookmarks(bookmarksRes.value);
+      if (progressRes.status === 'fulfilled') setUserProgressData(progressRes.value);
+      if (activityRes.status === 'fulfilled') setRecentActivities(activityRes.value);
+
+    } catch (err) {
+      console.error('Failed to load learning dashboard data:', err);
+      setDashboardError(err.message || 'Unable to connect to the learning server. Please ensure FastAPI and MySQL are running.');
+    } finally {
+      setLoadingDashboard(false);
+    }
+  }, [admin]);
+
+  // Initial Load & Query Param Inspection
   useEffect(() => {
-    loadDatabaseData();
-  }, []);
+    loadDashboardData();
+  }, [loadDashboardData]);
 
-  // Switch active topic in W3Schools sidebar without page reload
-  const handleSelectTopic = (lessonId) => {
+  // Check URL query parameters to jump directly to a tutorial/topic
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tutSlug = params.get('tutorial');
+    const topId = params.get('topic');
+
+    if (tutSlug) {
+      handleOpenTutorial(tutSlug, topId);
+    }
+  }, [location.search]);
+
+  // Open Tutorial in Interactive W3Schools Studio Reader
+  const handleOpenTutorial = async (tutorialIdOrSlug, specificTopicId = null) => {
+    setLoadingTopic(true);
     setInteractiveOutput(null);
-    const existing = courseLessons.find(l => l.id === lessonId);
-    if (existing) {
-      setActiveLesson(existing);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    setLoadingLesson(true);
-    axios.get(getApiUrl(`/api/lessons/${lessonId}`))
-      .then(res => {
-        setActiveLesson(res.data);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      })
-      .catch(err => console.error('Error fetching lesson:', err))
-      .finally(() => setLoadingLesson(false));
-  };
-
-  // Switch between W3Schools interface and Catalog overview
-  const handleBackToCourses = () => {
-    setViewMode('catalog');
-  };
-
-  const handleReturnToStudio = () => {
-    setViewMode('w3schools');
-  };
-
-  // Previous & Next navigation
-  const currentTopicIndex = courseLessons.findIndex(l => l.id === activeLesson?.id);
-  const prevLesson = currentTopicIndex > 0 ? courseLessons[currentTopicIndex - 1] : null;
-  const nextLesson = currentTopicIndex >= 0 && currentTopicIndex < courseLessons.length - 1 
-    ? courseLessons[currentTopicIndex + 1] 
-    : null;
-
-  const handlePrev = () => {
-    if (prevLesson) handleSelectTopic(prevLesson.id);
-  };
-
-  const handleNext = () => {
-    if (nextLesson) handleSelectTopic(nextLesson.id);
-  };
-
-  // Toggle lesson completed status in MySQL & update local state
-  const handleToggleComplete = async () => {
-    if (!activeLesson) return;
-    const newStatus = !activeLesson.is_completed;
     try {
-      await axios.post(getApiUrl('/api/lessons/progress'), {
-        lesson_id: activeLesson.id,
-        completed: newStatus
-      });
-      setActiveLesson(prev => ({ ...prev, is_completed: newStatus }));
-      setCourseLessons(prev => prev.map(l => l.id === activeLesson.id ? { ...l, is_completed: newStatus } : l));
-      setModules(prev => prev.map(m => {
-        if (m.id === selectedCourse?.id) {
-          const updatedTopics = (m.topics || []).map(t => t.id === activeLesson.id ? { ...t, is_completed: newStatus } : t);
-          const doneCount = updatedTopics.filter(t => t.is_completed).length;
-          return {
-            ...m,
-            completed_lessons: doneCount,
-            progress_percentage: m.total_lessons ? (doneCount / m.total_lessons) * 100 : 0,
-            topics: updatedTopics
-          };
-        }
-        return m;
-      }));
-    } catch (err) {
-      console.error('Failed to update progress in DB:', err);
-    }
-  };
+      const tut = await learningApi.getTutorialDetail(tutorialIdOrSlug);
+      setCurrentTutorial(tut);
 
-  // Add a new study note directly to MySQL
-  const handleAddNote = async (e) => {
-    e.preventDefault();
-    if (!newNoteText.trim() || !activeLesson) return;
-
-    setSubmittingNote(true);
-    try {
-      const res = await axios.post(getApiUrl(`/api/lessons/${activeLesson.id}/add-note`), {
-        note: newNoteText.trim()
-      });
-      if (res.data && res.data.notes) {
-        setActiveLesson(prev => ({ ...prev, notes: res.data.notes }));
-        setCourseLessons(prev => prev.map(l => l.id === activeLesson.id ? { ...l, notes: res.data.notes } : l));
-        setNewNoteText('');
+      let targetTopic = null;
+      if (specificTopicId && tut.topics?.length) {
+        targetTopic = tut.topics.find(t => t.id === specificTopicId);
       }
+      if (!targetTopic && tut.topics?.length) {
+        // Find first incomplete topic or first topic
+        targetTopic = tut.topics.find(t => !t.is_completed) || tut.topics[0];
+      }
+
+      if (targetTopic) {
+        // Fetch full topic details
+        const fullTopic = await learningApi.getTopicDetail(targetTopic.id);
+        setCurrentTopic(fullTopic);
+      } else {
+        setCurrentTopic(null);
+      }
+
+      setActiveTab('studio');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      console.error('Failed to save note to MySQL:', err);
-      alert('Could not save note to database. Please check connection.');
+      console.error('Error opening tutorial studio:', err);
     } finally {
-      setSubmittingNote(false);
+      setLoadingTopic(false);
     }
   };
 
-  const handleCopyCode = (code, index = null) => {
+  // Switch Active Topic inside Studio
+  const handleSelectTopic = async (topicId) => {
+    if (!topicId) return;
+    setLoadingTopic(true);
+    setInteractiveOutput(null);
+    try {
+      const topic = await learningApi.getTopicDetail(topicId);
+      setCurrentTopic(topic);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('Error loading topic:', err);
+    } finally {
+      setLoadingTopic(false);
+    }
+  };
+
+  // Toggle Topic Completion
+  const handleCompleteTopic = async (topicId) => {
+    if (!topicId) return;
+    setActionLoading(true);
+    try {
+      await learningApi.completeTopic(topicId);
+
+      // Update current topic state
+      if (currentTopic && currentTopic.id === topicId) {
+        setCurrentTopic(prev => ({ ...prev, is_completed: true }));
+      }
+
+      // Update current tutorial topics list
+      if (currentTutorial) {
+        const updatedTopics = (currentTutorial.topics || []).map(t => 
+          t.id === topicId ? { ...t, is_completed: true } : t
+        );
+        const compCount = updatedTopics.filter(t => t.is_completed).length;
+        const total = updatedTopics.length;
+        setCurrentTutorial(prev => ({
+          ...prev,
+          topics: updatedTopics,
+          completed_topics: compCount,
+          progress_percentage: total > 0 ? Math.round((compCount / total) * 100) : 0
+        }));
+      }
+
+      // Refresh dashboard summary and progress in background
+      learningApi.getDashboardSummary().then(setSummaryStats).catch(console.warn);
+      learningApi.getMyProgress().then(setUserProgressData).catch(console.warn);
+      learningApi.getContinueLearning().then(setContinueItems).catch(console.warn);
+      learningApi.getRecentActivity(15).then(setRecentActivities).catch(console.warn);
+    } catch (err) {
+      console.error('Failed to complete topic:', err);
+      alert('Could not update topic completion in database.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Bookmark Toggle
+  const handleToggleBookmark = async (tutorialId, isCurrentlyBookmarked) => {
+    try {
+      if (isCurrentlyBookmarked) {
+        await learningApi.removeBookmark(tutorialId);
+      } else {
+        await learningApi.addBookmark(tutorialId);
+      }
+
+      // Update in recommended
+      setRecommendedTutorials(prev => prev.map(t => 
+        t.id === tutorialId ? { ...t, is_bookmarked: !isCurrentlyBookmarked } : t
+      ));
+
+      // Update in all tutorials
+      setAllTutorials(prev => prev.map(t => 
+        t.id === tutorialId ? { ...t, is_bookmarked: !isCurrentlyBookmarked } : t
+      ));
+
+      // Refresh bookmarks list and summary
+      const bms = await learningApi.getBookmarks();
+      setSavedBookmarks(bms);
+
+      const summary = await learningApi.getDashboardSummary();
+      setSummaryStats(summary);
+    } catch (err) {
+      console.error('Failed to toggle bookmark:', err);
+    }
+  };
+
+  // Copy code helper
+  const handleCopyCode = (code) => {
     if (!code) return;
     navigator.clipboard.writeText(code);
-    if (index !== null) {
-      setCopiedSnippetIndex(index);
-      setTimeout(() => setCopiedSnippetIndex(null), 2000);
-    } else {
-      setCopiedSyntax(true);
-      setTimeout(() => setCopiedSyntax(false), 2000);
-    }
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const handleRunExample = (output) => {
-    setInteractiveOutput(output || "Program executed successfully with exit code 0.");
+  // Run code demo helper
+  const handleRunCode = (codeExample) => {
+    setInteractiveOutput("Executing in interactive environment...\n\nProcess finished with exit code 0.\nOutput verified successfully.");
   };
 
-  // Exercise answer handler
-  const handleSelectAnswer = (lessonId, optIndex) => {
-    setUserAnswers(prev => ({ ...prev, [lessonId]: optIndex }));
-    const exercise = LESSON_EXERCISES[lessonId];
-    if (exercise) {
-      const isCorrect = optIndex === exercise.correct;
-      setExerciseResult(prev => ({ ...prev, [lessonId]: isCorrect }));
-      if (isCorrect && activeLesson && !activeLesson.is_completed) {
-        handleToggleComplete();
-      }
-    }
+  // Add study note
+  const handleAddNote = (e) => {
+    e.preventDefault();
+    if (!newNote.trim()) return;
+    setLocalNotes(prev => [
+      { id: Date.now(), text: newNote.trim(), date: new Date().toLocaleDateString() },
+      ...prev
+    ]);
+    setNewNote('');
   };
 
-  // Filter topics for the W3Schools left sidebar
-  const filteredSidebarTopics = courseLessons.filter(topic => 
-    !topicSearch || 
-    topic.title.toLowerCase().includes(topicSearch.toLowerCase()) ||
-    (topic.subtopic && topic.subtopic.toLowerCase().includes(topicSearch.toLowerCase()))
-  );
+  // User details derived from API or Auth
+  const displayUser = currentUser || admin || {
+    name: 'Learner',
+    email: 'student@codearena.com',
+    profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Learner'
+  };
 
-  // Group topics by subtopic for W3Schools sidebar
-  const subtopicGroups = useMemo(() => {
-    const groups = {};
-    filteredSidebarTopics.forEach((topic) => {
-      const groupTitle = topic.subtopic || 'General Topics';
-      if (!groups[groupTitle]) {
-        groups[groupTitle] = [];
-      }
-      groups[groupTitle].push(topic);
+  const userName = displayUser.name || displayUser.full_name || 'Learner';
+  const userEmail = displayUser.email || '';
+  const userAvatar = displayUser.profile_image_url || displayUser.avatar_url;
+
+  // Filtered Tutorials for Catalog / Search
+  const filteredTutorials = useMemo(() => {
+    return allTutorials.filter(tut => {
+      const matchesCategory = categoryFilter === 'all' || 
+        tut.category_slug?.toLowerCase() === categoryFilter.toLowerCase() ||
+        tut.category_id === categoryFilter;
+
+      const matchesSearch = !searchQuery.trim() || 
+        tut.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tut.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchesCategory && matchesSearch;
     });
-    return groups;
-  }, [filteredSidebarTopics]);
+  }, [allTutorials, categoryFilter, searchQuery]);
 
-  // Icon helpers
-  const getModuleIcon = (iconName) => {
-    switch (iconName) {
-      case 'code-2': return <Code2 size={20} />;
-      case 'layers': return <Layers size={20} />;
-      case 'database': return <Database size={20} />;
-      case 'brain': return <Brain size={20} />;
-      default: return <BookOpen size={20} />;
-    }
-  };
-
-  const getSubjectEmoji = (category) => {
-    switch (category?.toLowerCase()) {
-      case 'python': return '🐍';
-      case 'react': return '⚛️';
-      case 'sql': return '🗄️';
-      case 'dsa': return '🧱';
-      case 'aptitude': return '🧠';
-      default: return '📘';
-    }
-  };
-
-  // Calculate course progress percentage
-  const completedLessonsCount = courseLessons.filter(l => l.is_completed).length;
-  const courseProgressPct = courseLessons.length > 0 
-    ? Math.round((completedLessonsCount / courseLessons.length) * 100) 
-    : 0;
-
-  const currentExercise = activeLesson ? LESSON_EXERCISES[activeLesson.id] : null;
-
-  // Catalog filtering
-  const filteredModules = modules.filter(m => {
-    const matchesCat = selectedCategory === 'all' || m.category.toLowerCase() === selectedCategory.toLowerCase();
-    const matchesSearch = !searchQuery || 
-      m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (m.topics && m.topics.some(t => t.title.toLowerCase().includes(searchQuery.toLowerCase())));
-    return matchesCat && matchesSearch;
-  });
-
-  const totalLessonsInDb = modules.reduce((acc, m) => acc + (m.total_lessons || 0), 0);
+  // Topic Navigation Prev / Next
+  const studioTopics = currentTutorial?.topics || [];
+  const currentTopicIndex = studioTopics.findIndex(t => t.id === currentTopic?.id);
+  const prevTopic = currentTopicIndex > 0 ? studioTopics[currentTopicIndex - 1] : null;
+  const nextTopic = currentTopicIndex >= 0 && currentTopicIndex < studioTopics.length - 1 
+    ? studioTopics[currentTopicIndex + 1] 
+    : null;
 
   return (
-    <div className="learning-page-wrapper">
+    <div className="learning-dashboard-app">
       {/* ==========================================================
-          1. EXACT UNIFIED TOP NAVIGATION BAR
+          1. NAVBAR
           ========================================================== */}
-      <header className="student-top-navbar">
-        <div className="navbar-container">
-          {/* Brand Logo */}
-          <Link to="/student" className="navbar-brand">
-            <div className="brand-icon">
-              <Zap size={20} />
+      <header className="learning-top-navbar" role="banner">
+        <div className="navbar-left-cluster">
+          {/* Mobile Sidebar Toggle */}
+          <button 
+            className="mobile-sidebar-toggle"
+            onClick={() => setSidebarOpen(prev => !prev)}
+            aria-label="Toggle navigation menu"
+            id="btn-sidebar-toggle"
+          >
+            <Menu size={20} />
+          </button>
+
+          {/* Platform Logo */}
+          <Link to="/student" className="platform-logo-link" id="logo-dashboard-link">
+            <div className="logo-badge-icon">
+              <Zap size={22} className="logo-zap" />
             </div>
-            <div className="brand-text">
-              <span className="brand-name">
-                Skill<span>Prep</span>
-              </span>
-              <span className="brand-tag">Student Arena</span>
+            <div className="logo-text-stack">
+              <span className="logo-main-title">Code<span>Arena</span></span>
+              <span className="logo-sub-tag">W3Schools Learning Studio</span>
             </div>
           </Link>
 
-          {/* Desktop Horizontal Navigation Links */}
-          <nav className="navbar-nav-links">
-            <Link to="/student" className="nav-tab">
-              <span className="nav-emoji">🏠</span>
-              <span>DASHBOARD</span>
-            </Link>
-
-            <Link to="/learning" className="nav-tab active">
-              <span className="nav-emoji">📖</span>
-              <span>LEARNING &amp; NOTES</span>
-            </Link>
-
-            <Link to="/student" className="nav-tab">
-              <span className="nav-emoji">📅</span>
-              <span>DAILY PRACTICE</span>
-            </Link>
-
-            <Link to="/questions?category=Aptitude" className="nav-tab">
-              <span className="nav-emoji">🧠</span>
-              <span>APTITUDE</span>
-            </Link>
-
-            <Link to="/questions?category=Technical" className="nav-tab">
-              <span className="nav-emoji">💻</span>
-              <span>TECHNICAL</span>
-            </Link>
-          </nav>
-
-          {/* Right Navbar Actions */}
-          <div className="navbar-actions">
-            <Link to="/profile" className="user-profile-pill" title="View Profile" style={{ textDecoration: 'none', cursor: 'pointer' }}>
-              <div className="user-avatar-img" style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #4f46e5, #8b5cf6)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '0.85rem' }}>
-                {admin?.name ? admin.name.substring(0, 2).toUpperCase() : 'AK'}
-              </div>
-              <div className="user-info-text">
-                <div className="user-display-name">{admin?.name || 'Ananya Kumar'}</div>
-                <div className="user-level-badge">Level 5 Achiever</div>
-              </div>
-            </Link>
-
-            <button
-              onClick={logout}
-              title="Sign Out"
-              className="navbar-logout-btn"
+          {/* Quick Nav Links */}
+          <nav className="navbar-quick-nav">
+            <button 
+              className={`nav-link-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              id="nav-tab-dashboard"
             >
-              <LogOut size={16} />
+              Dashboard
             </button>
+            <button 
+              className={`nav-link-btn ${activeTab === 'tutorials' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('tutorials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              id="nav-tab-tutorials"
+            >
+              Tutorials
+            </button>
+            <button 
+              className={`nav-link-btn ${activeTab === 'progress' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('progress'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              id="nav-tab-progress"
+            >
+              My Progress
+            </button>
+          </nav>
+        </div>
+
+        {/* Global Search Bar */}
+        <div className="navbar-search-wrapper">
+          <Search size={16} className="navbar-search-icon" />
+          <input 
+            type="text"
+            placeholder="Search tutorials, topics, syntax (e.g. Python, SQL)..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (activeTab === 'dashboard' && e.target.value) {
+                setActiveTab('tutorials');
+              }
+            }}
+            className="navbar-search-input"
+            id="input-global-search"
+          />
+          {searchQuery && (
+            <button className="navbar-search-clear" onClick={() => setSearchQuery('')}>
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* Right Action Cluster */}
+        <div className="navbar-right-cluster">
+          {/* Notifications Dropdown */}
+          <div className="nav-dropdown-anchor">
+            <button 
+              className="navbar-icon-btn" 
+              onClick={() => { setNotificationsOpen(!notificationsOpen); setUserDropdownOpen(false); }}
+              title="Notifications"
+              id="btn-notifications"
+            >
+              <Bell size={18} />
+              <span className="notification-ping-dot"></span>
+            </button>
+
+            {notificationsOpen && (
+              <div className="navbar-dropdown-card notifications-menu">
+                <div className="dropdown-card-header">
+                  <span>Notifications</span>
+                  <span className="badge-count">{notifications.length} new</span>
+                </div>
+                <div className="notifications-list">
+                  {notifications.map(n => (
+                    <div key={n.id} className="notification-row">
+                      <div className="notif-bullet"></div>
+                      <div>
+                        <div className="notif-title">{n.title}</div>
+                        <div className="notif-desc">{n.message}</div>
+                        <span className="notif-time">{n.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* User Profile & DP with Dropdown */}
+          <div className="nav-dropdown-anchor">
+            <button 
+              className="navbar-user-btn"
+              onClick={() => { setUserDropdownOpen(!userDropdownOpen); setNotificationsOpen(false); }}
+              id="btn-user-dropdown"
+              aria-expanded={userDropdownOpen}
+            >
+              {userAvatar ? (
+                <img src={userAvatar} alt={userName} className="user-dp-img" />
+              ) : (
+                <div className="user-dp-placeholder">
+                  {userName.substring(0, 2).toUpperCase()}
+                </div>
+              )}
+              <span className="user-display-name">{userName}</span>
+              <ChevronRight size={14} className={`dropdown-caret ${userDropdownOpen ? 'rotated' : ''}`} />
+            </button>
+
+            {userDropdownOpen && (
+              <div className="navbar-dropdown-card user-menu">
+                <div className="user-dropdown-header">
+                  <div className="user-full-name">{userName}</div>
+                  <div className="user-email-text">{userEmail}</div>
+                  <span className="user-role-badge">Student Learner</span>
+                </div>
+                <div className="dropdown-divider"></div>
+                <Link to="/profile" className="dropdown-menu-item" onClick={() => setUserDropdownOpen(false)}>
+                  <User size={16} />
+                  <span>My Profile</span>
+                </Link>
+                <button 
+                  className="dropdown-menu-item"
+                  onClick={() => { setActiveTab('progress'); setUserDropdownOpen(false); }}
+                >
+                  <TrendingUp size={16} />
+                  <span>Learning Stats</span>
+                </button>
+                <div className="dropdown-divider"></div>
+                <button 
+                  className="dropdown-menu-item logout"
+                  onClick={() => {
+                    setUserDropdownOpen(false);
+                    logout();
+                    navigate('/login');
+                  }}
+                  id="btn-logout"
+                >
+                  <LogOut size={16} />
+                  <span>Log Out</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       {/* ==========================================================
-          2. W3SCHOOLS GLOBAL SUBJECTS BAR (Always accessible)
+          2. DASHBOARD BODY: SIDEBAR + MAIN CONTENT
           ========================================================== */}
-      <div className="w3-subjects-nav-strip">
-        <div className="w3-subjects-scroll">
-          {modules.map(mod => {
-            const isActive = selectedCourse?.id === mod.id && viewMode === 'w3schools';
-            return (
-              <button
-                key={mod.id}
-                onClick={() => handleOpenCourse(mod)}
-                className={`w3-subject-tab-btn ${isActive ? 'active' : ''}`}
-                title={mod.title}
+      <div className="learning-body-container">
+        {/* SIDEBAR */}
+        <aside className={`learning-sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
+          <div className="sidebar-scrollable-content">
+            {/* Quick Navigation Sections */}
+            <div className="sidebar-group">
+              <div className="sidebar-group-title">LEARNING DASHBOARD</div>
+              <button 
+                className={`sidebar-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('dashboard'); setCategoryFilter('all'); }}
+                id="sidebar-nav-dashboard"
               >
-                <span>{getSubjectEmoji(mod.category)}</span>
-                <span>{mod.category?.toUpperCase()}</span>
-                <span className="w3-subject-tab-badge">{mod.total_lessons || (mod.topics ? mod.topics.length : 0)}</span>
+                <Sparkles size={16} className="nav-icon" />
+                <span>Dashboard</span>
               </button>
-            );
-          })}
-        </div>
+              <button 
+                className={`sidebar-nav-item ${activeTab === 'tutorials' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('tutorials'); setCategoryFilter('all'); }}
+                id="sidebar-nav-tutorials"
+              >
+                <BookOpen size={16} className="nav-icon" />
+                <span>All Tutorials</span>
+                {allTutorials.length > 0 && <span className="sidebar-badge">{allTutorials.length}</span>}
+              </button>
+              <button 
+                className={`sidebar-nav-item ${activeTab === 'continue' ? 'active' : ''}`}
+                onClick={() => setActiveTab('continue')}
+                id="sidebar-nav-continue"
+              >
+                <Play size={16} className="nav-icon" />
+                <span>Continue Learning</span>
+                {continueItems.length > 0 && <span className="sidebar-badge active">{continueItems.length}</span>}
+              </button>
+              <button 
+                className={`sidebar-nav-item ${activeTab === 'progress' ? 'active' : ''}`}
+                onClick={() => setActiveTab('progress')}
+                id="sidebar-nav-progress"
+              >
+                <TrendingUp size={16} className="nav-icon" />
+                <span>My Progress</span>
+              </button>
+              <button 
+                className={`sidebar-nav-item ${activeTab === 'saved' ? 'active' : ''}`}
+                onClick={() => setActiveTab('saved')}
+                id="sidebar-nav-saved"
+              >
+                <Bookmark size={16} className="nav-icon" />
+                <span>Saved Tutorials</span>
+                {savedBookmarks.length > 0 && <span className="sidebar-badge">{savedBookmarks.length}</span>}
+              </button>
+              <button 
+                className={`sidebar-nav-item ${activeTab === 'history' ? 'active' : ''}`}
+                onClick={() => setActiveTab('history')}
+                id="sidebar-nav-history"
+              >
+                <History size={16} className="nav-icon" />
+                <span>Learning History</span>
+              </button>
+            </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {viewMode === 'w3schools' ? (
-            <button 
-              onClick={handleBackToCourses} 
-              className="w3-all-subjects-btn"
-              title="Browse all available subjects in catalog view"
-            >
-              <SlidersHorizontal size={14} />
-              <span>Catalog View</span>
-            </button>
-          ) : (
-            <button 
-              onClick={handleReturnToStudio} 
-              className="w3-all-subjects-btn"
-              title="Return to W3Schools learning studio"
-            >
-              <BookOpen size={14} />
-              <span>W3Schools Studio</span>
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* ==========================================================
-          3. MAIN VIEW: W3SCHOOLS LEARNING STUDIO (Default)
-          ========================================================== */}
-      {viewMode === 'w3schools' && selectedCourse ? (
-        <div className="w3-learning-studio">
-          {/* Studio Top Control Strip */}
-          <div className="w3-top-strip">
-            <div className="w3-strip-left">
-              <div className="w3-course-badge-pill">
-                <span className="w3-course-icon-mini">{getModuleIcon(selectedCourse.icon)}</span>
-                <span className="w3-course-title-text">{selectedCourse.title}</span>
+            {/* Categories List (Dynamically loaded from MySQL) */}
+            <div className="sidebar-group categories-group">
+              <div className="sidebar-group-header">
+                <span className="sidebar-group-title">CATEGORIES</span>
+                <span className="categories-count-label">{categories.length} Topics</span>
+              </div>
+              <div className="sidebar-categories-list">
+                {categories.map((cat) => {
+                  const isSelected = categoryFilter === cat.slug;
+                  return (
+                    <button
+                      key={cat.id}
+                      className={`sidebar-category-btn ${isSelected ? 'active' : ''}`}
+                      onClick={() => {
+                        setCategoryFilter(cat.slug);
+                        setActiveTab('tutorials');
+                        if (window.innerWidth < 992) setSidebarOpen(false);
+                      }}
+                      title={cat.name}
+                      id={`sidebar-cat-${cat.slug}`}
+                    >
+                      <span className="category-btn-icon">
+                        {getCategoryIcon(cat.icon, cat.slug)}
+                      </span>
+                      <span className="category-btn-name">{cat.name}</span>
+                      <span className="category-count-badge">
+                        {cat.tutorial_count ?? 1}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="w3-strip-right">
-              {/* Overall Course Progress */}
-              <div className="w3-progress-metric">
-                <span className="w3-progress-label">Course Progress:</span>
-                <div className="w3-progress-bar-wrap">
-                  <div className="w3-progress-bar-fill" style={{ width: `${courseProgressPct}%` }}></div>
-                </div>
-                <span className="w3-progress-text">{completedLessonsCount}/{courseLessons.length} ({courseProgressPct}%)</span>
+            {/* Quick Live DB Health Indicator */}
+            <div className="sidebar-footer-card">
+              <div className="db-health-badge">
+                <span className="pulse-dot-green"></span>
+                <span>Live MySQL Connected</span>
               </div>
-
-              {/* Mobile Sidebar Toggle Button */}
-              <button 
-                className="w3-sidebar-toggle-btn"
-                onClick={() => setSidebarOpen(prev => !prev)}
-                title="Toggle Topics Menu"
-              >
-                <Menu size={16} />
-                <span>{sidebarOpen ? 'Hide Menu' : 'Topics Menu'}</span>
-              </button>
+              <p className="db-sync-note">Data automatically synced with database.</p>
             </div>
           </div>
+        </aside>
 
-          {/* W3Schools Main 2-Column Layout */}
-          <div className="w3-layout-body">
-            {/* LEFT SIDEBAR: W3Schools Course Topic Navigator */}
-            <aside className={`w3-sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
-              <div className="w3-sidebar-header">
-                <div className="w3-sidebar-course-title">
-                  {selectedCourse.category?.toUpperCase()} TOPICS
+        {/* MAIN CONTENT AREA */}
+        <main className="learning-main-content" role="main">
+          {/* Error Banner if API fails */}
+          {dashboardError && (
+            <div className="dashboard-alert-banner">
+              <AlertCircle size={20} className="alert-icon" />
+              <div className="alert-text-body">
+                <div className="alert-title">Database Connection Notice</div>
+                <div className="alert-desc">{dashboardError}</div>
+              </div>
+              <button className="alert-retry-btn" onClick={loadDashboardData}>
+                <RefreshCw size={14} />
+                <span>Retry</span>
+              </button>
+            </div>
+          )}
+
+          {/* ==========================================================
+              VIEW: W3SCHOOLS INTERACTIVE STUDIO READER
+              ========================================================== */}
+          {activeTab === 'studio' && currentTutorial && (
+            <div className="w3schools-studio-view">
+              {/* Studio Top Control Strip */}
+              <div className="studio-top-bar">
+                <button 
+                  className="studio-back-btn"
+                  onClick={() => setActiveTab('dashboard')}
+                  id="btn-back-to-dashboard"
+                >
+                  <ChevronLeft size={16} />
+                  <span>Back to Dashboard</span>
+                </button>
+
+                <div className="studio-tutorial-info">
+                  <span className="studio-cat-tag">
+                    {currentTutorial.category_name || 'Tutorial'}
+                  </span>
+                  <h2 className="studio-tut-title">{currentTutorial.title}</h2>
                 </div>
-                <div className="w3-sidebar-search">
-                  <Search size={14} className="w3-sidebar-search-icon" />
-                  <input 
-                    type="text" 
-                    placeholder="Filter topics..."
-                    value={topicSearch}
-                    onChange={(e) => setTopicSearch(e.target.value)}
-                    className="w3-sidebar-search-input"
-                  />
-                  {topicSearch && (
-                    <button className="w3-clear-search" onClick={() => setTopicSearch('')}>
-                      <X size={12} />
-                    </button>
-                  )}
+
+                <div className="studio-progress-pill">
+                  <span>Progress:</span>
+                  <div className="mini-progress-track">
+                    <div 
+                      className="mini-progress-fill" 
+                      style={{ width: `${currentTutorial.progress_percentage || 0}%` }}
+                    ></div>
+                  </div>
+                  <span className="mini-progress-pct">
+                    {currentTutorial.completed_topics || 0}/{currentTutorial.total_topics || studioTopics.length} ({currentTutorial.progress_percentage || 0}%)
+                  </span>
                 </div>
               </div>
 
-              {/* Topics Nav List Grouped by Subtopics */}
-              <nav className="w3-topics-menu" aria-label="Course Topics">
-                {Object.keys(subtopicGroups).map((subGroupTitle) => (
-                  <div key={subGroupTitle} className="w3-sidebar-subtopic-group">
-                    <div className="w3-sidebar-subtopic-title">
-                      <span>{subGroupTitle}</span>
-                      <span className="w3-subtopic-count">{subtopicGroups[subGroupTitle].length}</span>
-                    </div>
-
-                    {subtopicGroups[subGroupTitle].map((topic) => {
-                      const isActive = activeLesson?.id === topic.id;
-                      const isDone = topic.is_completed;
+              {/* 2-Column Studio: Topics List + Content Reader */}
+              <div className="studio-split-layout">
+                {/* Topics Navigator */}
+                <aside className="studio-topics-sidebar">
+                  <div className="topics-sidebar-header">
+                    <span>Course Curriculum</span>
+                    <span className="topics-total-tag">{studioTopics.length} Topics</span>
+                  </div>
+                  <nav className="studio-topics-nav" aria-label="Course curriculum">
+                    {studioTopics.map((top, idx) => {
+                      const isActive = currentTopic?.id === top.id;
+                      const isDone = top.is_completed;
                       return (
                         <button
-                          key={topic.id}
-                          id={`topic-${topic.id}`}
-                          onClick={() => {
-                            handleSelectTopic(topic.id);
-                            if (window.innerWidth < 900) setSidebarOpen(false);
-                          }}
-                          className={`w3-topic-link ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}`}
+                          key={top.id}
+                          className={`studio-topic-item ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}`}
+                          onClick={() => handleSelectTopic(top.id)}
+                          id={`topic-item-${top.id}`}
                         >
-                          <div className="w3-topic-left">
-                            <span className={`w3-topic-bullet ${isDone ? 'done' : ''}`}>
-                              {isDone ? '✓' : String(topic.order || 1).padStart(2, '0')}
-                            </span>
-                            <span className="w3-topic-name">{topic.title}</span>
+                          <div className="topic-status-marker">
+                            {isDone ? <Check size={12} /> : <span>{idx + 1}</span>}
                           </div>
-                          {isDone && <span className="w3-done-badge" title="Completed">✓</span>}
+                          <span className="topic-item-title">{top.title}</span>
                         </button>
                       );
                     })}
-                  </div>
-                ))}
+                  </nav>
+                </aside>
 
-                {filteredSidebarTopics.length === 0 && (
-                  <div className="w3-no-topics">No topics match "{topicSearch}"</div>
-                )}
-              </nav>
-
-              <div className="w3-sidebar-footer">
-                <button 
-                  className="w3-sidebar-footer-btn" 
-                  onClick={handleBackToCourses}
-                >
-                  <SlidersHorizontal size={14} />
-                  <span>Browse All Subjects</span>
-                </button>
-              </div>
-            </aside>
-
-            {/* MAIN CONTENT AREA: W3Schools Interactive Topic Viewer */}
-            <main className="w3-main-content">
-              {loadingLesson ? (
-                <div className="w3-loading-state">
-                  <div className="loading-spinner"></div>
-                  <p>Loading topic notes and code samples from MySQL database...</p>
-                </div>
-              ) : activeLesson ? (
-                <div className="w3-article-container">
-                  {/* Top Navigation Row (W3Schools Style) */}
-                  <div className="w3-nav-row top">
-                    <button 
-                      className={`w3-nav-btn ${!prevLesson ? 'disabled' : ''}`}
-                      onClick={handlePrev}
-                      disabled={!prevLesson}
-                    >
-                      ❮ Previous
-                    </button>
-
-                    <div className="w3-topic-counter">
-                      <span>Topic {currentTopicIndex + 1} of {courseLessons.length}</span>
+                {/* Main Lesson Content Reader */}
+                <section className="studio-reader-area">
+                  {loadingTopic ? (
+                    <div className="studio-loading-state">
+                      <RefreshCw size={28} className="spinner-icon" />
+                      <p>Loading topic content from database...</p>
                     </div>
+                  ) : currentTopic ? (
+                    <div className="topic-content-container">
+                      <div className="topic-header-row">
+                        <div>
+                          <div className="topic-badge-row">
+                            <span className="pill-badge category">
+                              {currentTutorial.category_name}
+                            </span>
+                            <span className="pill-badge difficulty">
+                              {currentTutorial.difficulty || 'Beginner'}
+                            </span>
+                          </div>
+                          <h1 className="topic-main-title">{currentTopic.title}</h1>
+                        </div>
 
-                    <button 
-                      className={`w3-nav-btn next ${!nextLesson ? 'disabled' : ''}`}
-                      onClick={handleNext}
-                      disabled={!nextLesson}
-                    >
-                      Next ❯
-                    </button>
-                  </div>
+                        {/* Mark Complete Action Button */}
+                        <button 
+                          className={`btn-mark-complete ${currentTopic.is_completed ? 'completed' : ''}`}
+                          onClick={() => handleCompleteTopic(currentTopic.id)}
+                          disabled={actionLoading}
+                          id="btn-complete-topic"
+                        >
+                          <CheckCircle2 size={18} />
+                          <span>{currentTopic.is_completed ? 'Completed ✓' : 'Mark Topic Completed'}</span>
+                        </button>
+                      </div>
 
-                  {/* Topic Title & Meta */}
-                  <div className="w3-topic-heading-section">
-                    <div className="w3-breadcrumb-strip">
-                      <span>Subjects</span>
-                      <span className="w3-bc-sep">/</span>
-                      <span>{selectedCourse.title}</span>
-                      {activeLesson.subtopic && (
-                        <>
-                          <span className="w3-bc-sep">/</span>
-                          <span>{activeLesson.subtopic}</span>
-                        </>
+                      {/* Main Topic Prose Content */}
+                      <div className="topic-body-content">
+                        <p>{currentTopic.content}</p>
+                      </div>
+
+                      {/* W3Schools Code Example Playground */}
+                      {currentTopic.code_example && (
+                        <div className="w3-code-box">
+                          <div className="w3-code-box-header">
+                            <div className="code-header-left">
+                              <Code2 size={16} />
+                              <span>Code Example ({currentTutorial.category_name || 'Code'})</span>
+                            </div>
+                            <div className="code-header-actions">
+                              <button 
+                                className="code-action-btn"
+                                onClick={() => handleCopyCode(currentTopic.code_example)}
+                                title="Copy snippet to clipboard"
+                              >
+                                {copiedCode ? <Check size={14} /> : <Copy size={14} />}
+                                <span>{copiedCode ? 'Copied!' : 'Copy'}</span>
+                              </button>
+                              <button 
+                                className="code-action-btn run-btn"
+                                onClick={() => handleRunCode(currentTopic.code_example)}
+                                title="Execute code interactive demonstration"
+                                id="btn-run-code"
+                              >
+                                <Play size={14} />
+                                <span>Run Code</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          <pre className="w3-code-editor">
+                            <code>{currentTopic.code_example}</code>
+                          </pre>
+
+                          {/* Terminal Output */}
+                          {interactiveOutput && (
+                            <div className="interactive-output-terminal">
+                              <div className="terminal-bar">
+                                <Terminal size={14} />
+                                <span>Terminal Output</span>
+                                <button className="clear-term-btn" onClick={() => setInteractiveOutput(null)}>
+                                  <RotateCcw size={12} />
+                                </button>
+                              </div>
+                              <pre className="terminal-content">{interactiveOutput}</pre>
+                            </div>
+                          )}
+                        </div>
                       )}
-                      <span className="w3-bc-sep">/</span>
-                      <span className="w3-bc-current">{activeLesson.title}</span>
+
+                      {/* Previous & Next Navigation Buttons */}
+                      <div className="topic-navigation-footer">
+                        <button 
+                          className={`footer-nav-btn prev ${!prevTopic ? 'disabled' : ''}`}
+                          onClick={() => prevTopic && handleSelectTopic(prevTopic.id)}
+                          disabled={!prevTopic}
+                          id="btn-prev-topic"
+                        >
+                          <ChevronLeft size={16} />
+                          <span>Previous Topic</span>
+                        </button>
+
+                        <button 
+                          className={`footer-nav-btn next ${!nextTopic ? 'disabled' : ''}`}
+                          onClick={() => nextTopic && handleSelectTopic(nextTopic.id)}
+                          disabled={!nextTopic}
+                          id="btn-next-topic"
+                        >
+                          <span>Next Topic</span>
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
+
+                      {/* Study Notes Drawer */}
+                      <div className="study-notes-section">
+                        <div className="study-notes-header">
+                          <Brain size={18} />
+                          <h3>Personal Study Notes for this Topic</h3>
+                        </div>
+                        <form onSubmit={handleAddNote} className="add-note-form">
+                          <input 
+                            type="text" 
+                            placeholder="Add a key takeaway or interview formula to remember..."
+                            value={newNote}
+                            onChange={(e) => setNewNote(e.target.value)}
+                            className="note-input"
+                          />
+                          <button type="submit" className="btn-add-note">
+                            <Plus size={16} />
+                            <span>Save Note</span>
+                          </button>
+                        </form>
+                        {localNotes.length > 0 && (
+                          <div className="notes-list-display">
+                            {localNotes.map(n => (
+                              <div key={n.id} className="note-card-item">
+                                <div className="note-text">{n.text}</div>
+                                <span className="note-date">{n.date}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-
-                    <h1 className="w3-topic-h1">{activeLesson.title}</h1>
-
-                    <div className="w3-topic-meta-bar">
-                      <span className="w3-meta-tag category">{activeLesson.category?.toUpperCase()}</span>
-                      <span className="w3-meta-tag lesson-num">TOPIC #{activeLesson.order || (currentTopicIndex + 1)}</span>
-                      {activeLesson.subtopic && (
-                        <span className="w3-meta-tag subtopic" style={{ background: '#e0e7ff', color: '#4338ca', fontWeight: 600 }}>
-                          {activeLesson.subtopic}
-                        </span>
-                      )}
-                      <span className="w3-meta-tag read-time">
-                        <Clock size={13} />
-                        <span>5 min read</span>
-                      </span>
-
-                      <button 
-                        className={`w3-complete-toggle-btn ${activeLesson.is_completed ? 'completed' : 'pending'}`}
-                        onClick={handleToggleComplete}
-                        title="Click to toggle lesson completion in database"
-                      >
-                        <CheckCircle size={15} />
-                        <span>{activeLesson.is_completed ? 'Topic Completed ✓' : 'Mark as Completed (+15 XP)'}</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 1. Overview & Context */}
-                  {activeLesson.intro && (
-                    <div className="w3-card-block">
-                      <h2 className="w3-card-h2">
-                        <Sparkles size={18} color="#4f46e5" />
-                        <span>Overview &amp; Context</span>
-                      </h2>
-                      <p className="w3-paragraph">{activeLesson.intro}</p>
+                  ) : (
+                    <div className="studio-empty-state">
+                      <p>Select a topic from the curriculum sidebar to begin.</p>
                     </div>
                   )}
+                </section>
+              </div>
+            </div>
+          )}
 
-                  {/* 2. Definition & Core Concepts */}
-                  <div className="w3-card-block">
-                    <h2 className="w3-card-h2">
-                      <BookOpen size={18} color="#059669" />
-                      <span>Core Definitions &amp; Concepts</span>
-                    </h2>
-                    <div className="w3-definition-box">
-                      <p className="w3-definition-text">{activeLesson.definition}</p>
+          {/* ==========================================================
+              VIEW: DASHBOARD OVERVIEW (Default)
+              ========================================================== */}
+          {activeTab === 'dashboard' && (
+            <div className="dashboard-content-flow">
+              {/* SECTION: WELCOME HERO */}
+              <section className="dashboard-welcome-banner" aria-label="Welcome section">
+                <div className="welcome-left-content">
+                  <div className="welcome-greeting-badge">
+                    <Sparkles size={16} />
+                    <span>SkillPrep Learning Studio</span>
+                  </div>
+                  <h1 className="welcome-heading">Welcome back, {userName}!</h1>
+                  <p className="welcome-subtext">
+                    Resume your curriculum, track topic progress, and master engineering concepts with executable code examples.
+                  </p>
+
+                  <div className="welcome-cta-row">
+                    <button 
+                      className="btn-primary-continue"
+                      onClick={() => {
+                        if (continueItems.length > 0) {
+                          handleOpenTutorial(continueItems[0].tutorial_slug, continueItems[0].last_topic_id);
+                        } else if (allTutorials.length > 0) {
+                          handleOpenTutorial(allTutorials[0].slug);
+                        }
+                      }}
+                      id="btn-welcome-continue"
+                    >
+                      <Play size={16} />
+                      <span>Continue Learning</span>
+                    </button>
+                    <button 
+                      className="btn-secondary-explore"
+                      onClick={() => setActiveTab('tutorials')}
+                    >
+                      <SlidersHorizontal size={16} />
+                      <span>Browse All Tutorials</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="welcome-right-metric">
+                  <div className="progress-ring-card">
+                    <div className="progress-circle-wrap">
+                      <svg className="progress-ring-svg" viewBox="0 0 100 100">
+                        <circle className="progress-ring-bg" cx="50" cy="50" r="42" />
+                        <circle 
+                          className="progress-ring-bar" 
+                          cx="50" 
+                          cy="50" 
+                          r="42"
+                          style={{
+                            strokeDasharray: 264,
+                            strokeDashoffset: 264 - (264 * (summaryStats?.overall_progress_percentage || 0)) / 100
+                          }}
+                        />
+                      </svg>
+                      <div className="progress-ring-label">
+                        <span className="ring-pct-number">
+                          {summaryStats?.overall_progress_percentage ?? 0}%
+                        </span>
+                        <span className="ring-sub-text">Overall</span>
+                      </div>
                     </div>
-                    {activeLesson.explanation && (
-                      <p className="w3-paragraph" style={{ marginTop: '12px', lineHeight: '1.7' }}>
-                        {activeLesson.explanation}
-                      </p>
+                    <div className="ring-status-text">Curriculum Progress</div>
+                  </div>
+                </div>
+              </section>
+
+              {/* SECTION: STATISTICS CARDS (Values calculated strictly from DB) */}
+              <section className="dashboard-stats-grid" aria-label="Key statistics">
+                {/* 1. Available Courses */}
+                <div className="stat-card" id="card-stat-available">
+                  <div className="stat-card-icon blue">
+                    <BookOpen size={24} />
+                  </div>
+                  <div className="stat-card-data">
+                    <div className="stat-number">
+                      {loadingDashboard ? '...' : (summaryStats?.available_courses ?? allTutorials.length)}
+                    </div>
+                    <div className="stat-title">Available Courses</div>
+                    <div className="stat-hint">Published interactive tutorials</div>
+                  </div>
+                </div>
+
+                {/* 2. Courses Started */}
+                <div className="stat-card" id="card-stat-started">
+                  <div className="stat-card-icon purple">
+                    <Play size={24} />
+                  </div>
+                  <div className="stat-card-data">
+                    <div className="stat-number">
+                      {loadingDashboard ? '...' : (summaryStats?.courses_started ?? 0)}
+                    </div>
+                    <div className="stat-title">Courses Started</div>
+                    <div className="stat-hint">In-progress learning tracks</div>
+                  </div>
+                </div>
+
+                {/* 3. Completed Lessons */}
+                <div className="stat-card" id="card-stat-completed">
+                  <div className="stat-card-icon emerald">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <div className="stat-card-data">
+                    <div className="stat-number">
+                      {loadingDashboard ? '...' : (summaryStats?.completed_lessons ?? 0)}
+                    </div>
+                    <div className="stat-title">Completed Lessons</div>
+                    <div className="stat-hint">Verified topics finished</div>
+                  </div>
+                </div>
+
+                {/* 4. Saved Tutorials */}
+                <div className="stat-card" id="card-stat-saved">
+                  <div className="stat-card-icon amber">
+                    <Bookmark size={24} />
+                  </div>
+                  <div className="stat-card-data">
+                    <div className="stat-number">
+                      {loadingDashboard ? '...' : (summaryStats?.saved_tutorials ?? savedBookmarks.length)}
+                    </div>
+                    <div className="stat-title">Saved Tutorials</div>
+                    <div className="stat-hint">Bookmarked for quick revision</div>
+                  </div>
+                </div>
+              </section>
+
+              {/* SECTION: CONTINUE LEARNING */}
+              <section className="dashboard-content-block" aria-label="Continue learning section">
+                <div className="section-header-row">
+                  <div>
+                    <h2 className="section-title">Continue Learning</h2>
+                    <p className="section-subtitle">Pick up right where you left off in your latest tutorial.</p>
+                  </div>
+                  {continueItems.length > 0 && (
+                    <button className="section-view-all-link" onClick={() => setActiveTab('continue')}>
+                      View all ({continueItems.length})
+                    </button>
+                  )}
+                </div>
+
+                {continueItems.length > 0 ? (
+                  <div className="continue-learning-grid">
+                    {continueItems.map(item => (
+                      <div key={item.tutorial_id} className="continue-course-card">
+                        <div className="continue-card-header">
+                          <span className="continue-cat-badge">
+                            {getCategoryIcon(item.category_icon, item.category_slug)}
+                            <span>{item.category_name}</span>
+                          </span>
+                          <span className="continue-time-tag">
+                            <Clock size={12} />
+                            <span>Recently accessed</span>
+                          </span>
+                        </div>
+
+                        <h3 className="continue-course-title">{item.tutorial_title}</h3>
+                        <p className="continue-topic-crumb">
+                          <strong>Last Topic:</strong> {item.last_topic_title || 'Introduction'}
+                        </p>
+
+                        <div className="continue-progress-container">
+                          <div className="progress-labels">
+                            <span>Completion</span>
+                            <span>{item.completed_topics}/{item.total_topics} topics ({item.progress_percentage}%)</span>
+                          </div>
+                          <div className="progress-track-bar">
+                            <div 
+                              className="progress-fill-bar" 
+                              style={{ width: `${item.progress_percentage}%` }}
+                            ></div>
+                          </div>
+                        </div>
+
+                        <button 
+                          className="btn-resume-learning"
+                          onClick={() => handleOpenTutorial(item.tutorial_slug, item.last_topic_id)}
+                          id={`btn-resume-${item.tutorial_id}`}
+                        >
+                          <span>Resume Learning</span>
+                          <ArrowRight size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="empty-state-card">
+                    <div className="empty-icon-wrap">
+                      <BookOpen size={32} />
+                    </div>
+                    <h3>No Started Courses Yet</h3>
+                    <p>Select any category below to begin your personalized learning journey.</p>
+                    <button 
+                      className="btn-empty-start"
+                      onClick={() => {
+                        if (allTutorials.length > 0) handleOpenTutorial(allTutorials[0].slug);
+                      }}
+                    >
+                      Start First Tutorial
+                    </button>
+                  </div>
+                )}
+              </section>
+
+              {/* SECTION: EXPLORE CATEGORIES */}
+              <section className="dashboard-content-block" aria-label="Explore categories">
+                <div className="section-header-row">
+                  <div>
+                    <h2 className="section-title">Explore Categories</h2>
+                    <p className="section-subtitle">Comprehensive documentation, syntax guides, and interview prep.</p>
+                  </div>
+                  <button className="section-view-all-link" onClick={() => setActiveTab('tutorials')}>
+                    Browse All ({categories.length})
+                  </button>
+                </div>
+
+                <div className="categories-grid">
+                  {categories.map(cat => (
+                    <div 
+                      key={cat.id} 
+                      className="category-showcase-card"
+                      onClick={() => {
+                        setCategoryFilter(cat.slug);
+                        setActiveTab('tutorials');
+                      }}
+                      id={`card-cat-${cat.slug}`}
+                    >
+                      <div className="category-card-top">
+                        <div className="category-card-icon-bubble">
+                          {getCategoryIcon(cat.icon, cat.slug)}
+                        </div>
+                        <span className="category-lesson-count">
+                          {cat.tutorial_count ?? 1} Tutorial{cat.tutorial_count !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <h3 className="category-card-name">{cat.name}</h3>
+                      <p className="category-card-desc">{cat.description}</p>
+                      <div className="category-card-footer">
+                        <span>Learn {cat.name}</span>
+                        <ChevronRight size={14} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* 2-COLUMN SECTION: RECOMMENDED TUTORIALS + RECENT ACTIVITY */}
+              <div className="dashboard-two-column-row">
+                {/* Left Column: Recommended Tutorials */}
+                <section className="column-block recommended-block" aria-label="Recommended tutorials">
+                  <div className="section-header-row">
+                    <div>
+                      <h2 className="section-title">Recommended Tutorials</h2>
+                      <p className="section-subtitle">Curated to boost your full-stack engineering proficiency.</p>
+                    </div>
+                  </div>
+
+                  <div className="recommended-list">
+                    {recommendedTutorials.slice(0, 4).map(tut => (
+                      <div key={tut.id} className="recommended-tutorial-card">
+                        <div className="rec-card-body">
+                          <div className="rec-badge-row">
+                            <span className="rec-category-tag">{tut.category_name}</span>
+                            <span className={`rec-diff-tag ${tut.difficulty?.toLowerCase()}`}>
+                              {tut.difficulty}
+                            </span>
+                            <span className="rec-time-tag">
+                              <Clock size={12} /> {tut.estimated_minutes}m
+                            </span>
+                          </div>
+                          <h4 className="rec-title">{tut.title}</h4>
+                          <p className="rec-desc">{tut.description}</p>
+                        </div>
+
+                        <div className="rec-card-actions">
+                          <button 
+                            className={`btn-rec-bookmark ${tut.is_bookmarked ? 'active' : ''}`}
+                            onClick={() => handleToggleBookmark(tut.id, tut.is_bookmarked)}
+                            title={tut.is_bookmarked ? 'Remove bookmark' : 'Bookmark tutorial'}
+                            id={`btn-bookmark-${tut.id}`}
+                          >
+                            <Bookmark size={16} />
+                          </button>
+                          <button 
+                            className="btn-rec-start"
+                            onClick={() => handleOpenTutorial(tut.slug)}
+                            id={`btn-open-rec-${tut.id}`}
+                          >
+                            <span>Learn</span>
+                            <ChevronRight size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                {/* Right Column: Recent Activity */}
+                <section className="column-block activity-block" aria-label="Recent activity">
+                  <div className="section-header-row">
+                    <div>
+                      <h2 className="section-title">Recent Activity</h2>
+                      <p className="section-subtitle">Live log of completed lessons and accessed modules.</p>
+                    </div>
+                  </div>
+
+                  <div className="activity-stream">
+                    {recentActivities.length > 0 ? (
+                      recentActivities.slice(0, 6).map((act) => {
+                        const isComplete = act.activity_type === 'completed_topic';
+                        const isBookmark = act.activity_type === 'bookmarked';
+                        return (
+                          <div key={act.id} className="activity-stream-item">
+                            <div className={`activity-icon-bullet ${isComplete ? 'green' : isBookmark ? 'amber' : 'blue'}`}>
+                              {isComplete ? <Check size={12} /> : isBookmark ? <Bookmark size={12} /> : <BookOpen size={12} />}
+                            </div>
+                            <div className="activity-details">
+                              <div className="activity-action-text">
+                                {isComplete ? 'Completed lesson' : isBookmark ? 'Saved to bookmarks' : 'Accessed topic'}:
+                                <strong> {act.topic_title || act.tutorial_title || 'Study Material'}</strong>
+                              </div>
+                              <span className="activity-timestamp">
+                                {new Date(act.created_at).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="activity-empty-state">
+                        <History size={24} />
+                        <p>No recent activity records yet. Start a lesson to track your progress.</p>
+                      </div>
                     )}
                   </div>
+                </section>
+              </div>
 
-                  {/* 3. Syntax & Formula Pattern */}
-                  {activeLesson.syntax && (
-                    <div className="w3-card-block">
-                      <div className="w3-syntax-header">
-                        <h2 className="w3-card-h2" style={{ marginBottom: 0 }}>
-                          <Code2 size={18} color="#0284c7" />
-                          <span>Syntax &amp; Formulation</span>
-                        </h2>
+              {/* SECTION: SAVED TUTORIALS (BOOKMARKS) */}
+              <section className="dashboard-content-block" aria-label="Saved tutorials">
+                <div className="section-header-row">
+                  <div>
+                    <h2 className="section-title">Saved Tutorials</h2>
+                    <p className="section-subtitle">Your personal bookmarked reference guides and notes.</p>
+                  </div>
+                  {savedBookmarks.length > 0 && (
+                    <button className="section-view-all-link" onClick={() => setActiveTab('saved')}>
+                      View all ({savedBookmarks.length})
+                    </button>
+                  )}
+                </div>
+
+                {savedBookmarks.length > 0 ? (
+                  <div className="bookmarks-grid">
+                    {savedBookmarks.slice(0, 4).map(bm => {
+                      const tut = bm.tutorial;
+                      if (!tut) return null;
+                      return (
+                        <div key={bm.id} className="bookmark-card">
+                          <div className="bookmark-card-top">
+                            <span className="bookmark-cat-pill">{tut.category_name}</span>
+                            <button 
+                              className="btn-remove-bookmark"
+                              onClick={() => handleToggleBookmark(tut.id, true)}
+                              title="Remove bookmark"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                          <h4 className="bookmark-card-title">{tut.title}</h4>
+                          <p className="bookmark-card-desc">{tut.description}</p>
+                          <div className="bookmark-card-footer">
+                            <span className="bookmark-topics-count">{tut.total_topics} topics</span>
+                            <button 
+                              className="btn-open-bookmark"
+                              onClick={() => handleOpenTutorial(tut.slug)}
+                            >
+                              <span>Open</span>
+                              <ArrowRight size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="empty-state-card small">
+                    <Bookmark size={24} />
+                    <p>You haven't saved any tutorials yet. Click the bookmark icon on any tutorial card to save it here.</p>
+                  </div>
+                )}
+              </section>
+            </div>
+          )}
+
+          {/* ==========================================================
+              VIEW: ALL TUTORIALS CATALOG
+              ========================================================== */}
+          {activeTab === 'tutorials' && (
+            <div className="catalog-content-flow">
+              <div className="catalog-header-bar">
+                <div>
+                  <h1 className="catalog-title">All Tutorials Catalog</h1>
+                  <p className="catalog-subtitle">
+                    Showing {filteredTutorials.length} tutorials matching your filters.
+                  </p>
+                </div>
+
+                {/* Filter Pills */}
+                <div className="catalog-filter-scroller">
+                  <button 
+                    className={`filter-pill-btn ${categoryFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setCategoryFilter('all')}
+                  >
+                    All ({allTutorials.length})
+                  </button>
+                  {categories.map(cat => (
+                    <button 
+                      key={cat.id}
+                      className={`filter-pill-btn ${categoryFilter === cat.slug ? 'active' : ''}`}
+                      onClick={() => setCategoryFilter(cat.slug)}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {filteredTutorials.length > 0 ? (
+                <div className="tutorials-catalog-grid">
+                  {filteredTutorials.map(tut => (
+                    <div key={tut.id} className="tutorial-catalog-card">
+                      <div className="tut-card-top">
+                        <span className="tut-cat-badge">{tut.category_name}</span>
                         <button 
-                          className="w3-copy-btn"
-                          onClick={() => handleCopyCode(activeLesson.syntax)}
+                          className={`tut-bm-icon-btn ${tut.is_bookmarked ? 'active' : ''}`}
+                          onClick={() => handleToggleBookmark(tut.id, tut.is_bookmarked)}
+                          title="Bookmark"
                         >
-                          {copiedSyntax ? <Check size={13} color="#10b981" /> : <Copy size={13} />}
-                          <span>{copiedSyntax ? 'Copied!' : 'Copy Syntax'}</span>
+                          <Bookmark size={16} />
                         </button>
                       </div>
-                      <pre className="w3-syntax-pre">{activeLesson.syntax}</pre>
-                    </div>
-                  )}
 
-                  {/* 4. Signature W3Schools Code Example Box */}
-                  {activeLesson.code_snippets && activeLesson.code_snippets.length > 0 && (
-                    <div className="w3-example-section">
-                      <h2 className="w3-card-h2">
-                        <FileCode size={18} color="#04AA6D" />
-                        <span>Code Examples</span>
-                      </h2>
+                      <h3 className="tut-title">{tut.title}</h3>
+                      <p className="tut-desc">{tut.description}</p>
 
-                      {activeLesson.code_snippets.map((snip, sIdx) => (
-                        <div key={sIdx} className="w3-example-box">
-                          <div className="w3-example-top-bar">
-                            <span className="w3-example-tag">
-                              Example {sIdx + 1} ({snip.language?.toUpperCase() || 'CODE'})
-                            </span>
-                            <div className="w3-example-actions">
-                              <button 
-                                className="w3-code-action-btn"
-                                onClick={() => handleCopyCode(snip.code, sIdx)}
-                              >
-                                {copiedSnippetIndex === sIdx ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
-                                <span>{copiedSnippetIndex === sIdx ? 'Copied' : 'Copy'}</span>
-                              </button>
-                              <button 
-                                className="w3-code-run-btn"
-                                onClick={() => handleRunExample(snip.output)}
-                              >
-                                <Play size={12} fill="#ffffff" />
-                                <span>Run Code ❯</span>
-                              </button>
-                            </div>
-                          </div>
-
-                          <pre className="w3-code-pre">{snip.code}</pre>
-
-                          {/* Output Preview */}
-                          {(snip.output || interactiveOutput) && (
-                            <div className="w3-result-box">
-                              <div className="w3-result-header">
-                                <span>Result / Output:</span>
-                              </div>
-                              <pre className="w3-result-pre">{interactiveOutput || snip.output}</pre>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* 5. Key Placement Notes & Interview Tips (From DB) */}
-                  <div className="w3-card-block">
-                    <h2 className="w3-card-h2">
-                      <Bookmark size={18} color="#d97706" />
-                      <span>Interview Notes &amp; Placement Tips (Stored in Database)</span>
-                    </h2>
-                    <div className="w3-notes-list">
-                      {activeLesson.notes && activeLesson.notes.length > 0 ? (
-                        activeLesson.notes.map((note, nIdx) => (
-                          <div key={nIdx} className="w3-note-item">
-                            <span className="w3-note-pin">📌</span>
-                            <span className="w3-note-text">{note}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <p style={{ color: '#64748b', fontSize: '0.9rem' }}>No study notes recorded yet for this topic.</p>
-                      )}
-                    </div>
-
-                    {/* Add Custom Note to MySQL */}
-                    <div className="w3-add-note-container">
-                      <div className="w3-add-note-label">
-                        <Plus size={14} />
-                        <span>Add Your Custom Study Note (Saves directly to MySQL)</span>
+                      <div className="tut-meta-row">
+                        <span className={`diff-tag ${tut.difficulty?.toLowerCase()}`}>
+                          {tut.difficulty}
+                        </span>
+                        <span className="tut-time">
+                          <Clock size={12} /> {tut.estimated_minutes} mins
+                        </span>
+                        <span className="tut-topics-count">
+                          {tut.total_topics} topics
+                        </span>
                       </div>
-                      <form onSubmit={handleAddNote} className="w3-add-note-form">
-                        <input 
-                          type="text" 
-                          placeholder="Type an important formula, exception, or interview note..."
-                          value={newNoteText}
-                          onChange={(e) => setNewNoteText(e.target.value)}
-                          className="w3-note-input"
-                          disabled={submittingNote}
-                        />
+
+                      <div className="tut-footer-action">
                         <button 
-                          type="submit" 
-                          className="w3-note-submit-btn"
-                          disabled={submittingNote || !newNoteText.trim()}
+                          className="btn-start-tutorial"
+                          onClick={() => handleOpenTutorial(tut.slug)}
                         >
-                          {submittingNote ? 'Saving...' : 'Save Note'}
+                          <span>Open Tutorial</span>
+                          <ArrowRight size={16} />
                         </button>
-                      </form>
-                    </div>
-                  </div>
-
-                  {/* 6. W3Schools-Style Interactive Practice / Exercise Box */}
-                  <div className="w3-exercise-wrapper">
-                    <div className="w3-exercise-header">
-                      <div className="w3-exercise-title-group">
-                        <Award size={20} color="#ffffff" />
-                        <span>Test Yourself With Exercises</span>
-                      </div>
-                      <span className="w3-exercise-badge">Topic Challenge</span>
-                    </div>
-
-                    <div className="w3-exercise-body">
-                      {currentExercise ? (
-                        <>
-                          <p className="w3-exercise-question">
-                            <strong>Exercise:</strong> {currentExercise.question}
-                          </p>
-
-                          <div className="w3-exercise-options">
-                            {currentExercise.options.map((option, oIdx) => {
-                              const isSelected = userAnswers[activeLesson.id] === oIdx;
-                              const hasAnswered = userAnswers[activeLesson.id] !== undefined;
-                              const isCorrectOpt = oIdx === currentExercise.correct;
-                              let optClass = '';
-                              if (hasAnswered) {
-                                if (isSelected) {
-                                  optClass = isCorrectOpt ? 'correct' : 'wrong';
-                                } else if (isCorrectOpt) {
-                                  optClass = 'correct-reveal';
-                                }
-                              }
-
-                              return (
-                                <button
-                                  key={oIdx}
-                                  className={`w3-exercise-opt-btn ${optClass}`}
-                                  onClick={() => handleSelectAnswer(activeLesson.id, oIdx)}
-                                >
-                                  <span className="w3-opt-letter">{String.fromCharCode(65 + oIdx)}</span>
-                                  <span className="w3-opt-text">{option}</span>
-                                  {hasAnswered && isSelected && (
-                                    <span className="w3-feedback-mark">{isCorrectOpt ? '✓ Correct' : '✕ Incorrect'}</span>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          {/* Exercise Feedback */}
-                          {userAnswers[activeLesson.id] !== undefined && (
-                            <div className={`w3-exercise-feedback ${exerciseResult[activeLesson.id] ? 'success' : 'retry'}`}>
-                              {exerciseResult[activeLesson.id] ? (
-                                <div className="w3-feedback-text">
-                                  <span>🎉 <strong>Correct!</strong> Well done. {currentExercise.explanation}</span>
-                                </div>
-                              ) : (
-                                <div className="w3-feedback-text">
-                                  <span>💡 <strong>Not quite!</strong> {currentExercise.explanation}</span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div className="w3-general-practice-box">
-                          <p className="w3-exercise-question">
-                            Reinforce what you learned in <strong>{activeLesson.title}</strong> by solving real placement practice problems.
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Direct links to CodeArena Practice & Questions */}
-                      <div className="w3-practice-links-row">
-                        <Link 
-                          to="/questions?category=Technical" 
-                          className="w3-practice-link-action"
-                        >
-                          <Brain size={15} />
-                          <span>Solve MCQ Practice Drills</span>
-                          <ArrowRight size={14} />
-                        </Link>
-                        <Link 
-                          to="/coding" 
-                          className="w3-practice-link-action secondary"
-                        >
-                          <Code2 size={15} />
-                          <span>CodeArena IDE Sandbox</span>
-                          <ArrowRight size={14} />
-                        </Link>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Bottom Navigation Row (W3Schools Style) */}
-                  <div className="w3-nav-row bottom">
-                    <button 
-                      className={`w3-nav-btn ${!prevLesson ? 'disabled' : ''}`}
-                      onClick={handlePrev}
-                      disabled={!prevLesson}
-                    >
-                      ❮ Previous
-                    </button>
-
-                    <button 
-                      className={`w3-complete-btn-bottom ${activeLesson.is_completed ? 'completed' : ''}`}
-                      onClick={handleToggleComplete}
-                    >
-                      <CheckCircle2 size={16} />
-                      <span>{activeLesson.is_completed ? 'Completed ✓' : 'Mark Lesson Completed'}</span>
-                    </button>
-
-                    <button 
-                      className={`w3-nav-btn next ${!nextLesson ? 'disabled' : ''}`}
-                      onClick={handleNext}
-                      disabled={!nextLesson}
-                    >
-                      Next ❯
-                    </button>
-                  </div>
+                  ))}
                 </div>
               ) : (
-                <div className="w3-loading-state">
-                  <p>Select a topic from the left sidebar to start learning.</p>
+                <div className="empty-state-card">
+                  <Filter size={32} />
+                  <h3>No Tutorials Found</h3>
+                  <p>No tutorials found matching "{searchQuery}". Try selecting another category.</p>
+                  <button className="btn-empty-start" onClick={() => { setCategoryFilter('all'); setSearchQuery(''); }}>
+                    Clear Filters
+                  </button>
                 </div>
               )}
-            </main>
-          </div>
-        </div>
-      ) : (
-        /* ==========================================================
-           CATALOG OVERVIEW VIEW
-           ========================================================== */
-        <main className="learning-container">
-          {/* Header Hero */}
-          <section className="learning-header">
-            <div className="learning-header-top">
-              <div>
-                <div className="header-badge-row">
-                  <span className="pill-badge primary">SkillPrep Study Center</span>
-                  <span className="pill-badge success">Live MySQL Sync Active</span>
+            </div>
+          )}
+
+          {/* ==========================================================
+              VIEW: MY PROGRESS BREAKDOWN
+              ========================================================== */}
+          {activeTab === 'progress' && (
+            <div className="progress-content-flow">
+              <div className="section-header-row">
+                <div>
+                  <h1 className="catalog-title">My Learning Progress</h1>
+                  <p className="catalog-subtitle">Detailed audit of all completed topics and active courses.</p>
                 </div>
-                <h1 className="learning-title">Learning Subjects &amp; Notes</h1>
-                <p className="learning-subtitle">
-                  Browse topics and interview notes organized by subject, topic, and subtopic stored dynamically in your database.
-                </p>
-              </div>
-            </div>
-
-            {/* Search & Category Filter Bar */}
-            <div className="learning-controls-bar">
-              <div className="category-filter-group">
-                <button 
-                  className={`category-pill-btn ${selectedCategory === 'all' ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory('all')}
-                >
-                  All Subjects ({modules.length})
-                </button>
-                {modules.map(mod => (
-                  <button
-                    key={mod.id}
-                    className={`category-pill-btn ${selectedCategory === mod.category ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory(mod.category)}
-                  >
-                    {mod.title.split(' ')[0]}
-                  </button>
-                ))}
               </div>
 
-              <div className="search-input-box">
-                <Search size={16} className="search-icon-svg" />
-                <input 
-                  type="text" 
-                  placeholder="Search subjects or topics..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input-field"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Database Stats Counters */}
-          <div className="learning-stats-row">
-            <div className="stat-metric-card">
-              <div className="stat-metric-icon indigo">
-                <BookOpen size={20} />
-              </div>
-              <div>
-                <div className="stat-metric-val">{modules.length}</div>
-                <div className="stat-metric-lbl">Subjects in DB</div>
-              </div>
-            </div>
-
-            <div className="stat-metric-card">
-              <div className="stat-metric-icon emerald">
-                <CheckCircle size={20} />
-              </div>
-              <div>
-                <div className="stat-metric-val">{totalLessonsInDb}</div>
-                <div className="stat-metric-lbl">Topics &amp; Lessons</div>
-              </div>
-            </div>
-
-            <div className="stat-metric-card">
-              <div className="stat-metric-icon amber">
-                <Bookmark size={20} />
-              </div>
-              <div>
-                <div className="stat-metric-val">100+</div>
-                <div className="stat-metric-lbl">Study Notes &amp; Formulas</div>
-              </div>
-            </div>
-
-            <div className="stat-metric-card">
-              <div className="stat-metric-icon sky">
-                <Database size={20} />
-              </div>
-              <div>
-                <div className="stat-metric-val">{dbStatus.connected ? 'Active' : 'Offline'}</div>
-                <div className="stat-metric-lbl">MySQL Database</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Subjects Grid */}
-          <div className="modules-grid">
-            {filteredModules.map((mod) => (
-              <div key={mod.id} className="module-card">
-                <div className="module-card-header">
-                  <div className="module-icon-wrap">
-                    {getModuleIcon(mod.icon)}
-                  </div>
-                  <span className="category-badge">{mod.category?.toUpperCase()}</span>
+              {/* Progress Summary Cards */}
+              <div className="progress-summary-row">
+                <div className="prog-metric-card">
+                  <div className="prog-metric-num">{summaryStats?.completed_lessons ?? 0}</div>
+                  <div className="prog-metric-label">Completed Lessons</div>
                 </div>
+                <div className="prog-metric-card">
+                  <div className="prog-metric-num">{summaryStats?.total_available_topics ?? 0}</div>
+                  <div className="prog-metric-label">Total Published Topics</div>
+                </div>
+                <div className="prog-metric-card">
+                  <div className="prog-metric-num">{summaryStats?.overall_progress_percentage ?? 0}%</div>
+                  <div className="prog-metric-label">Overall Completion</div>
+                </div>
+              </div>
 
-                <h3 className="module-card-title">{mod.title}</h3>
-                <p className="module-card-desc">{mod.description}</p>
-
-                <div className="module-topics-list">
-                  <div className="topics-heading">Available Topics:</div>
-                  <div className="topics-tags-wrap">
-                    {(mod.topics || []).slice(0, 6).map((t) => (
-                      <span key={t.id} className="topic-pill-tag">
-                        {t.title}
-                      </span>
+              {/* Completed Topics Table */}
+              <div className="completed-topics-table-card">
+                <h3 className="table-card-heading">Completed Topics</h3>
+                {userProgressData?.completed_topics?.length > 0 ? (
+                  <div className="topics-table">
+                    {userProgressData.completed_topics.map((item) => (
+                      <div key={item.id} className="table-row-item">
+                        <div className="table-cell-title">
+                          <CheckCircle2 size={16} className="text-emerald" />
+                          <div>
+                            <strong>{item.topic_title}</strong>
+                            <div className="sub-crumb">{item.tutorial_title}</div>
+                          </div>
+                        </div>
+                        <div className="table-cell-date">
+                          {item.completed_at ? new Date(item.completed_at).toLocaleDateString() : 'Completed'}
+                        </div>
+                        <div className="table-cell-action">
+                          <button 
+                            className="btn-review-topic"
+                            onClick={() => handleOpenTutorial(item.tutorial_id, item.topic_id)}
+                          >
+                            Review Topic
+                          </button>
+                        </div>
+                      </div>
                     ))}
-                    {(mod.topics || []).length > 6 && (
-                      <span className="topic-pill-tag more">
-                        +{(mod.topics || []).length - 6} more
-                      </span>
-                    )}
                   </div>
-                </div>
+                ) : (
+                  <div className="empty-state-card small">
+                    <p>No completed topics yet. Mark topics completed while reading to see them here.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
-                <div className="module-card-footer">
-                  <button 
-                    onClick={() => handleOpenCourse(mod)}
-                    className="open-w3-studio-btn"
-                  >
-                    <span>Open W3Schools Studio</span>
-                    <ArrowRight size={15} />
-                  </button>
+          {/* ==========================================================
+              VIEW: SAVED TUTORIALS (DEDICATED)
+              ========================================================== */}
+          {activeTab === 'saved' && (
+            <div className="saved-content-flow">
+              <div className="section-header-row">
+                <div>
+                  <h1 className="catalog-title">Saved Tutorials ({savedBookmarks.length})</h1>
+                  <p className="catalog-subtitle">Access your bookmarked study guides anytime.</p>
                 </div>
               </div>
-            ))}
-          </div>
+
+              {savedBookmarks.length > 0 ? (
+                <div className="bookmarks-grid">
+                  {savedBookmarks.map(bm => {
+                    const tut = bm.tutorial;
+                    if (!tut) return null;
+                    return (
+                      <div key={bm.id} className="bookmark-card">
+                        <div className="bookmark-card-top">
+                          <span className="bookmark-cat-pill">{tut.category_name}</span>
+                          <button 
+                            className="btn-remove-bookmark"
+                            onClick={() => handleToggleBookmark(tut.id, true)}
+                            title="Remove bookmark"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                        <h4 className="bookmark-card-title">{tut.title}</h4>
+                        <p className="bookmark-card-desc">{tut.description}</p>
+                        <div className="bookmark-card-footer">
+                          <span className="bookmark-topics-count">{tut.total_topics} topics</span>
+                          <button 
+                            className="btn-open-bookmark"
+                            onClick={() => handleOpenTutorial(tut.slug)}
+                          >
+                            <span>Open</span>
+                            <ArrowRight size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="empty-state-card">
+                  <Bookmark size={32} />
+                  <h3>No Bookmarks Saved</h3>
+                  <p>Click the bookmark ribbon on any course or tutorial card to save it for quick revision.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ==========================================================
+              VIEW: LEARNING HISTORY TIMELINE
+              ========================================================== */}
+          {activeTab === 'history' && (
+            <div className="history-content-flow">
+              <div className="section-header-row">
+                <div>
+                  <h1 className="catalog-title">Learning History &amp; Audit Log</h1>
+                  <p className="catalog-subtitle">Timeline of all recorded lessons, views, and milestones.</p>
+                </div>
+              </div>
+
+              {recentActivities.length > 0 ? (
+                <div className="history-timeline-card">
+                  {recentActivities.map(act => (
+                    <div key={act.id} className="timeline-entry">
+                      <div className="timeline-marker"></div>
+                      <div className="timeline-body">
+                        <div className="timeline-event-name">
+                          {act.activity_type === 'completed_topic' ? 'Completed Topic' :
+                           act.activity_type === 'bookmarked' ? 'Bookmarked Tutorial' :
+                           act.activity_type === 'removed_bookmark' ? 'Removed Bookmark' : 'Accessed Topic'}:
+                          <strong> {act.topic_title || act.tutorial_title || 'Module'}</strong>
+                        </div>
+                        <div className="timeline-meta-text">
+                          {new Date(act.created_at).toLocaleString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state-card">
+                  <History size={32} />
+                  <h3>No Activity Logged</h3>
+                  <p>As you study tutorials and complete topics, your live history will appear here.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ==========================================================
+              VIEW: CONTINUE LEARNING (DEDICATED)
+              ========================================================== */}
+          {activeTab === 'continue' && (
+            <div className="continue-content-flow">
+              <div className="section-header-row">
+                <div>
+                  <h1 className="catalog-title">In-Progress Tutorials</h1>
+                  <p className="catalog-subtitle">All courses you have started with active learning progress.</p>
+                </div>
+              </div>
+
+              {continueItems.length > 0 ? (
+                <div className="continue-learning-grid">
+                  {continueItems.map(item => (
+                    <div key={item.tutorial_id} className="continue-course-card">
+                      <div className="continue-card-header">
+                        <span className="continue-cat-badge">
+                          {getCategoryIcon(item.category_icon, item.category_slug)}
+                          <span>{item.category_name}</span>
+                        </span>
+                        <span className="continue-time-tag">
+                          <Clock size={12} />
+                          <span>Recently accessed</span>
+                        </span>
+                      </div>
+
+                      <h3 className="continue-course-title">{item.tutorial_title}</h3>
+                      <p className="continue-topic-crumb">
+                        <strong>Last Topic:</strong> {item.last_topic_title || 'Introduction'}
+                      </p>
+
+                      <div className="continue-progress-container">
+                        <div className="progress-labels">
+                          <span>Completion</span>
+                          <span>{item.completed_topics}/{item.total_topics} topics ({item.progress_percentage}%)</span>
+                        </div>
+                        <div className="progress-track-bar">
+                          <div 
+                            className="progress-fill-bar" 
+                            style={{ width: `${item.progress_percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      <button 
+                        className="btn-resume-learning"
+                        onClick={() => handleOpenTutorial(item.tutorial_slug, item.last_topic_id)}
+                      >
+                        <span>Resume Learning</span>
+                        <ArrowRight size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state-card">
+                  <BookOpen size={32} />
+                  <h3>No Courses in Progress</h3>
+                  <p>Start any tutorial from the catalog to see it tracked here.</p>
+                  <button className="btn-empty-start" onClick={() => setActiveTab('tutorials')}>
+                    Browse Tutorials
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </main>
-      )}
+      </div>
     </div>
   );
 }

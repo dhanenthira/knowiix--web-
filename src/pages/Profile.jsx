@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/navbar';
 import './Profile.css';
 
 export default function Profile() {
@@ -357,94 +358,9 @@ export default function Profile() {
   return (
     <div className="profile-page-wrapper">
       {/* ==================================================================
-          1. TOP HEADER NAVBAR WITH BACK TO DASHBOARD
+          1. BOLTSHIFT UNIFIED NAVBAR
           ================================================================== */}
-      <header className="profile-top-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
-          {/* Brand Logo */}
-          <Link to="/student" className="profile-brand-logo" title="Back to Dashboard">
-            <div className="profile-brand-icon">⚡</div>
-            <div className="profile-brand-name">Skill<span>Prep</span></div>
-          </Link>
-
-          <div className="profile-header-divider"></div>
-
-          {/* Prominent Back to Dashboard Button */}
-          <Link to="/student" className="profile-btn-back-dashboard" id="btn-back-to-dashboard">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span>Back to Dashboard</span>
-          </Link>
-        </div>
-
-        <div className="profile-header-actions">
-          {/* Notification Bell with Dropdown */}
-          <div style={{ position: 'relative' }}>
-            <button
-              className="profile-btn-icon"
-              id="notif-btn"
-              aria-label="Notifications"
-              onClick={() => setIsNotifOpen((prev) => !prev)}
-            >
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              {notifications.some((n) => n.unread) && <span className="profile-notif-badge-dot"></span>}
-            </button>
-
-            {isNotifOpen && (
-              <div className="profile-notif-dropdown">
-                <div className="profile-notif-header">
-                  <span>Notifications ({notifications.filter((n) => n.unread).length})</span>
-                  <button
-                    type="button"
-                    style={{ color: 'var(--primary)', fontSize: '0.75rem', fontWeight: '700', background: 'none', border: 'none', cursor: 'pointer' }}
-                    onClick={() => {
-                      setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
-                      showToast('All notifications marked as read.', 'info');
-                    }}
-                  >
-                    Mark read
-                  </button>
-                </div>
-                {notifications.map((notif) => (
-                  <div key={notif.id} className={`profile-notif-item ${notif.unread ? 'unread' : ''}`}>
-                    <div>
-                      <div style={{ fontWeight: '700' }}>{notif.title}</div>
-                      <div>{notif.desc}</div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>{notif.time}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Header User Profile Pill */}
-          <div className="profile-user-menu" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="profile-avatar-circle">
-              {profile.avatar && profile.avatar.length <= 2 ? profile.avatar : getInitials(profile.fullName)}
-            </div>
-            <span className="profile-user-name">{profile.fullName}</span>
-          </div>
-
-          {/* Logout Button */}
-          <button
-            className="profile-btn-secondary"
-            onClick={() => {
-              if (window.confirm('Are you sure you want to log out of SkillPrep?')) {
-                logout();
-                navigate('/login');
-              }
-            }}
-            style={{ padding: '7px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <span>🚪</span>
-            <span>Logout</span>
-          </button>
-        </div>
-      </header>
+      <Navbar variant="user" />
 
       {/* ==================================================================
           2. MAIN PROFILE CONTAINER

@@ -66,13 +66,60 @@
 }
 
 /* ==========================================================================
-   SPLIT SCREEN LAYOUT
+   SPLIT SCREEN / CENTERED AUTH LAYOUT
    ========================================================================== */
 .skillprep-login-wrapper .auth-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     min-height: 100vh;
     width: 100%;
+}
+
+/* Centered single-column layout for login page */
+.skillprep-login-wrapper.login-page .auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 48px 20px;
+    background: #F8F9FA;
+}
+
+.skillprep-login-wrapper.login-page .auth-form-panel {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 480px;
+    padding: 0;
+}
+
+.skillprep-login-wrapper.login-page .auth-card {
+    width: 100%;
+    background: #FFFFFF;
+    border: 1px solid #DADCE0;
+    border-radius: 20px;
+    padding: 40px 36px;
+    box-shadow: 0 4px 24px -2px rgba(60, 64, 67, 0.08), 0 1px 3px rgba(60, 64, 67, 0.04);
+}
+
+.skillprep-login-wrapper.login-page .auth-brand-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.skillprep-login-wrapper.login-page .auth-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.skillprep-login-wrapper.login-page .auth-header h1 {
+    justify-content: center;
 }
 
 /* LEFT SIDE: BRANDING & DASHBOARD VISUAL */

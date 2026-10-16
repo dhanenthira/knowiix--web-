@@ -1,0 +1,539 @@
+/* ==========================================================================
+   OFFICIAL FLOATING CAPSULE NAVBAR ("BAKSIDE" FLOATING PILL CONTAINER)
+   Matches the Reference Design:
+   - Floating white pill container with 9999px rounded ends
+   - Recessed light grey capsule track (#F1F3F4)
+   - Active white pill (#FFFFFF) with subtle drop shadow & medium (500) font
+   - Circular Search button, Bell notification, and Avatar with chevron caret
+   - Design System Tokens: Black (#000000), White (#FFFFFF), Grey (#F8F9FA),
+     Text (#202124), Muted (#5F6368), Border (#DADCE0), Accent (#4285F4)
+   ========================================================================== */
+
+/* Outer sticky header wrapper (floating over the light grey page background) */
+.bolt-navbar-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  padding: 12px 24px;
+  background: transparent;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.bolt-navbar-header * {
+  box-sizing: border-box;
+}
+
+/* Floating White Capsule Card (The "Bakside" Pill) */
+.bolt-navbar-container {
+  max-width: 1540px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px 6px 18px;
+  height: 64px;
+  background: var(--color-secondary, #FFFFFF);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 9999px;
+  box-shadow: 0 4px 20px -2px rgba(60, 64, 67, 0.08), 0 1px 3px rgba(60, 64, 67, 0.04);
+  gap: 16px;
+  pointer-events: auto;
+  transition: all 0.25s ease;
+  font-family: var(--font-nav, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.bolt-navbar-container:hover {
+  box-shadow: 0 6px 24px -2px rgba(60, 64, 67, 0.12), 0 2px 6px rgba(60, 64, 67, 0.06);
+}
+
+/* ================= 1. BRAND SECTION (LEFT) ================= */
+.bolt-navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.bolt-brand-logo-box {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  transition: transform 0.18s ease;
+}
+
+.bolt-brand-logo-box:hover {
+  transform: scale(1.04);
+}
+
+.bolt-brand-logo-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  mix-blend-mode: multiply;
+  border-radius: 6px;
+}
+
+.bolt-brand-title {
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: #1A73E8;
+  letter-spacing: -0.03em;
+  display: inline-block;
+  line-height: 1;
+}
+
+.bolt-brand-tag {
+  font-size: 11px;
+  font-weight: var(--font-weight-heading, 500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 9999px;
+}
+
+.bolt-brand-tag.admin-badge {
+  background: #E8F0FE;
+  color: var(--color-accent, #4285F4);
+  border: 1px solid #D2E3FC;
+}
+
+.bolt-brand-tag.user-badge {
+  background: var(--color-bg, #F8F9FA);
+  color: var(--color-text, #202124);
+  border: 1px solid var(--color-border, #DADCE0);
+}
+
+/* ================= 2. SEGMENTED CAPSULE TRACK (CENTER) ================= */
+.bolt-nav-track-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  max-width: 900px;
+}
+
+.bolt-nav-track {
+  display: inline-flex;
+  align-items: center;
+  background: #F1F3F4;
+  padding: 3px;
+  border-radius: 9999px;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bolt-nav-track::-webkit-scrollbar {
+  display: none;
+}
+
+.bolt-nav-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 18px;
+  border-radius: 9999px;
+  font-family: var(--font-nav, 'Inter', sans-serif);
+  font-size: 13.5px;
+  font-weight: var(--font-weight-body, 400);
+  color: var(--color-muted-text, #5F6368);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.bolt-nav-pill-btn:hover {
+  color: var(--color-text, #202124);
+  background: rgba(32, 33, 36, 0.04);
+}
+
+/* Active White Capsule Pill (Matching Image Dashboard Button) */
+.bolt-nav-pill-btn.active {
+  background: var(--color-secondary, #FFFFFF);
+  color: var(--color-text, #202124);
+  font-weight: var(--font-weight-heading, 500);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12), 0 1px 2px rgba(60, 64, 67, 0.08);
+}
+
+.bolt-nav-pill-btn.active:hover {
+  background: var(--color-secondary, #FFFFFF);
+  color: var(--color-text, #202124);
+}
+
+/* ================= 3. RIGHT ACTIONS CLUSTER ================= */
+.bolt-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Circular Icon Action Button (Search, Bell) */
+.bolt-action-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-bg, #F8F9FA);
+  border: 1px solid transparent;
+  color: var(--color-muted-text, #5F6368);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.18s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.bolt-action-icon-btn:hover {
+  background: #ECEFF1;
+  color: var(--color-text, #202124);
+  transform: translateY(-1px);
+}
+
+/* Notification Alert Dot */
+.bolt-notif-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent, #4285F4);
+  border: 1.5px solid var(--color-secondary, #FFFFFF);
+}
+
+/* Quick Search Dropdown */
+.bolt-quick-search-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 320px;
+  background: var(--color-secondary, #FFFFFF);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(60, 64, 67, 0.15);
+  padding: 8px;
+  z-index: 1050;
+  animation: boltDropdownSlide 0.15s ease-out;
+}
+
+.bolt-search-input-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--color-bg, #F8F9FA);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 10px;
+}
+
+.bolt-quick-search-input {
+  border: none;
+  background: transparent;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: 13.5px;
+  color: var(--color-text, #202124);
+  outline: none;
+  width: 100%;
+}
+
+.bolt-search-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-muted-text, #5F6368);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* User Profile Avatar with Caret (Matching Reference Image) */
+.bolt-profile-avatar-capsule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px 2px 2px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.bolt-profile-avatar-capsule:hover {
+  background: var(--color-bg, #F8F9FA);
+}
+
+.bolt-avatar-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #E8F0FE;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12);
+}
+
+.bolt-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bolt-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  background: var(--color-hover, #303134);
+  color: var(--color-secondary, #FFFFFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-heading, 500);
+  font-size: 12px;
+}
+
+.bolt-profile-caret {
+  color: var(--color-muted-text, #5F6368);
+  transition: transform 0.2s ease, color 0.15s ease;
+}
+
+.bolt-profile-caret.open {
+  transform: rotate(180deg);
+  color: var(--color-text, #202124);
+}
+
+/* ================= 4. POPUP DROPDOWNS ================= */
+.bolt-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 240px;
+  background: var(--color-secondary, #FFFFFF);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(60, 64, 67, 0.15);
+  padding: 8px;
+  z-index: 1050;
+  animation: boltDropdownSlide 0.15s ease-out;
+}
+
+@keyframes boltDropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bolt-dropdown-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border, #DADCE0);
+  margin-bottom: 4px;
+}
+
+.bolt-dropdown-user-name {
+  font-size: 14px;
+  font-weight: var(--font-weight-heading, 500);
+  color: var(--color-text, #202124);
+}
+
+.bolt-dropdown-user-email {
+  font-size: 12px;
+  color: var(--color-muted-text, #5F6368);
+  font-weight: var(--font-weight-body, 400);
+  margin-top: 1px;
+}
+
+.bolt-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: var(--font-weight-body, 400);
+  color: var(--color-text, #202124);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.bolt-dropdown-item:hover {
+  background: var(--color-bg, #F8F9FA);
+  color: var(--color-hover, #303134);
+}
+
+.bolt-dropdown-item.danger {
+  color: #D93025;
+}
+
+.bolt-dropdown-item.danger:hover {
+  background: #FCE8E6;
+  color: #C5221F;
+}
+
+.bolt-dropdown-divider {
+  height: 1px;
+  background: var(--color-border, #DADCE0);
+  margin: 6px 0;
+}
+
+/* Notification list dropdown */
+.bolt-notif-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 48px;
+  width: 320px;
+  background: var(--color-secondary, #FFFFFF);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(60, 64, 67, 0.15);
+  padding: 12px;
+  z-index: 1050;
+  animation: boltDropdownSlide 0.15s ease-out;
+}
+
+.bolt-notif-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border, #DADCE0);
+  font-size: 13.5px;
+  font-weight: var(--font-weight-heading, 500);
+  color: var(--color-text, #202124);
+}
+
+.bolt-notif-item {
+  padding: 10px 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  display: flex;
+  gap: 10px;
+}
+
+.bolt-notif-item:hover {
+  background: var(--color-bg, #F8F9FA);
+}
+
+.bolt-notif-bullet {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-accent, #4285F4);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.bolt-notif-title {
+  font-size: 13px;
+  font-weight: var(--font-weight-heading, 500);
+  color: var(--color-text, #202124);
+}
+
+.bolt-notif-desc {
+  font-size: 12px;
+  font-weight: var(--font-weight-body, 400);
+  color: var(--color-muted-text, #5F6368);
+  margin-top: 2px;
+}
+
+/* Mobile Toggle Hamburger Button */
+.bolt-mobile-menu-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 8px;
+  padding: 6px;
+  color: var(--color-text, #202124);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ================= 5. RESPONSIVE BREAKPOINTS ================= */
+@media (max-width: 1200px) {
+  .bolt-navbar-header {
+    padding: 10px 16px;
+  }
+  .bolt-nav-pill-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .bolt-navbar-header {
+    padding: 8px 12px;
+  }
+  .bolt-navbar-container {
+    padding: 4px 12px;
+    height: 58px;
+  }
+  .bolt-nav-track-wrapper {
+    display: none;
+  }
+  .bolt-mobile-menu-btn {
+    display: flex;
+  }
+}
+
+/* Mobile Overlay Drawer */
+.bolt-mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 76px;
+  left: 16px;
+  right: 16px;
+  background: var(--color-secondary, #FFFFFF);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(60, 64, 67, 0.15);
+  z-index: 999;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.bolt-mobile-drawer.open {
+  display: flex;
+}
+
+.bolt-mobile-drawer .bolt-nav-pill-btn {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 10px 16px;
+  border-radius: 8px;
+}
+
+.bolt-mobile-drawer .bolt-nav-pill-btn.active {
+  background: #F1F3F4;
+  color: var(--color-text, #202124);
+  font-weight: var(--font-weight-heading, 500);
+}

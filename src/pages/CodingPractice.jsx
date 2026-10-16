@@ -24,6 +24,7 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/navbar';
 import codingApi from '../api/codingApi';
 import './CodingPractice.css';
 
@@ -144,32 +145,7 @@ export default function CodingPractice() {
   return (
     <div className="coding-dashboard-container">
       {/* 1. TOP NAVBAR */}
-      <header className="coding-top-nav">
-        <div className="coding-nav-left">
-          <Link to="/coding/practice" className="coding-brand-badge">
-            <div className="hr-icon-box">H</div>
-            <span>Coding Practice</span>
-          </Link>
-          <nav className="coding-nav-links">
-            <Link to="/student" className="coding-nav-link">Dashboard</Link>
-            <Link to="/learning" className="coding-nav-link">Learning Notes</Link>
-            <Link to="/aptitude" className="coding-nav-link">Aptitude</Link>
-            <Link to="/coding/practice" className="coding-nav-link active">Practice Arena</Link>
-          </nav>
-        </div>
-
-        <div className="coding-nav-right">
-          <div className="user-streak-pill" title="Daily coding streak">
-            <Flame size={16} color="#ea580c" />
-            <span>{stats.current_streak || 1} Day Streak</span>
-          </div>
-
-          <Link to="/student" className="btn-back-dashboard">
-            <LayoutDashboard size={15} />
-            <span>My Dashboard</span>
-          </Link>
-        </div>
-      </header>
+      <Navbar />
 
       {/* 2. MAIN BODY */}
       <main className="coding-main-body">

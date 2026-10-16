@@ -142,115 +142,14 @@ export default function Login() {
   };
 
   return (
-    <div className="skillprep-login-wrapper">
+    <div className="skillprep-login-wrapper login-page">
       <div className="auth-container">
-        {/* 1. LEFT SIDE: BRANDING & DASHBOARD VISUAL */}
-        <aside className="auth-visual-panel">
-          <div className="visual-header">
-            <Link to="/" style={{ textDecoration: 'none' }} title="Back to Knowiix Home">
-              <KnowiixLogo size="lg" />
-            </Link>
-          </div>
-
-          <div className="visual-body">
-            <h2 className="visual-headline">
-              Your Placement Preparation<br />
-              <span className="gradient-text">Starts Here.</span>
-            </h2>
-            <p className="visual-subtext">
-              Practice smarter, build your skills and get ready for your dream placement with our structured daily readiness engine.
-            </p>
-
-            {/* Modern Dashboard Visual Preview */}
-            <div className="preview-dashboard">
-              <div className="preview-header">
-                <div className="student-profile-mini">
-                  <div className="student-avatar">AK</div>
-                  <div>
-                    <div className="student-name-text">Ananya Kumar</div>
-                    <div className="student-sub-text">CS Batch '26 • Placement Score 88/100</div>
-                  </div>
-                </div>
-                <div className="streak-tag">
-                  <span>🔥</span> 12 Day Streak
-                </div>
-              </div>
-
-              <div className="preview-metrics-grid">
-                <div className="preview-metric-card">
-                  <div className="preview-metric-title">
-                    <span>Aptitude</span>
-                    <span style={{ color: '#38bdf8', fontWeight: 700 }}>85%</span>
-                  </div>
-                  <div className="preview-metric-val">124 Qs</div>
-                  <div className="progress-bar-bg">
-                    <div className="progress-bar-fill fill-blue" style={{ width: '85%' }}></div>
-                  </div>
-                </div>
-
-                <div className="preview-metric-card">
-                  <div className="preview-metric-title">
-                    <span>Technical (DSA)</span>
-                    <span style={{ color: '#818cf8', fontWeight: 700 }}>92%</span>
-                  </div>
-                  <div className="preview-metric-val">186 Qs</div>
-                  <div className="progress-bar-bg">
-                    <div className="progress-bar-fill fill-indigo" style={{ width: '92%' }}></div>
-                  </div>
-                </div>
-
-                <div className="preview-metric-card">
-                  <div className="preview-metric-title">
-                    <span>Coding Solved</span>
-                    <span style={{ color: '#34d399', fontWeight: 700 }}>142</span>
-                  </div>
-                  <div className="preview-metric-val">142 Problems</div>
-                  <div className="progress-bar-bg">
-                    <div className="progress-bar-fill fill-emerald" style={{ width: '88%' }}></div>
-                  </div>
-                </div>
-
-                <div className="preview-metric-card">
-                  <div className="preview-metric-title">
-                    <span>Communication</span>
-                    <span style={{ color: '#fbbf24', fontWeight: 700 }}>88%</span>
-                  </div>
-                  <div className="preview-metric-val">Top 5%</div>
-                  <div className="progress-bar-bg">
-                    <div className="progress-bar-fill fill-amber" style={{ width: '88%' }}></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="floating-pill">
-                <span style={{ color: '#10b981', fontWeight: 'bold' }}>✓</span>
-                <span>TCS &amp; Infosys Ready</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="visual-footer">
-            <div className="visual-footer-item">
-              <span className="check">✓</span> Aptitude
-            </div>
-            <div className="visual-footer-item">
-              <span className="check">✓</span> Technical
-            </div>
-            <div className="visual-footer-item">
-              <span className="check">✓</span> Communication
-            </div>
-            <div className="visual-footer-item">
-              <span className="check">✓</span> Coding
-            </div>
-          </div>
-        </aside>
-
-        {/* 2. RIGHT SIDE: LOGIN FORM */}
+        {/* LOGIN FORM PANEL */}
         <main className="auth-form-panel">
           <div className="auth-card">
-            {/* Mobile Header */}
-            <div className="mobile-brand-header" style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.25rem' }}>
-              <Link to="/" style={{ textDecoration: 'none' }}>
+            {/* Knowiix Brand Logo Header */}
+            <div className="auth-brand-header">
+              <Link to="/" style={{ textDecoration: 'none' }} title="Back to Knowiix Home">
                 <KnowiixLogo size="md" />
               </Link>
             </div>

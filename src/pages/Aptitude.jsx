@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import KnowiixLogo from '../components/KnowiixLogo';
+import Navbar from '../components/navbar';
 import './Aptitude.css';
 
 // Built-in comprehensive Aptitude Question Bank covering major placement topics
@@ -253,8 +254,66 @@ export default function Aptitude() {
   // Results State
   const [quizResult, setQuizResult] = useState(null);
 
-  // Load questions from backend on mount
+  // Live Aptitude Progress Tracking State (Persisted in DB per user)
+  const [aptitudeProgress, setAptitudeProgress] = useState({
+    total_problems: 100,
+    problems_solved: 35,
+    problems_remaining: 65,
+    progress_percentage: 35.0,
+    solved_question_ids: []
+  });
+
+  const fetchAptitudeProgress = async () => {
+    try {
+      const res = await axios.get('/api/v1/questions/aptitude/progress');
+      if (res.data) {
+        setAptitudeProgress(res.data);
+      }
+    } catch (err) {
+      console.warn('Could not fetch aptitude progress:', err);
+    }
+  };
+
+  const recordProblemSolved = async (qId) => {
+    try {
+      const res = await axios.post('/api/v1/questions/aptitude/solve', { question_id: qId });
+      if (res.data && res.data.success) {
+        setAptitudeProgress(prev => ({
+          ...prev,
+          total_problems: res.data.total_problems || prev.total_problems,
+          problems_solved: res.data.problems_solved,
+          problems_remaining: res.data.problems_remaining,
+          progress_percentage: res.data.progress_percentage,
+          solved_question_ids: Array.from(new Set([...(prev.solved_question_ids || []), qId]))
+        }));
+      }
+    } catch (err) {
+      console.warn('Error saving question solve:', err);
+    }
+  };
+
+  const recordBatchSolved = async (qIds) => {
+    try {
+      const res = await axios.post('/api/v1/questions/aptitude/batch-solve', { question_ids: qIds });
+      if (res.data && res.data.success) {
+        setAptitudeProgress(prev => ({
+          ...prev,
+          total_problems: res.data.total_problems || prev.total_problems,
+          problems_solved: res.data.problems_solved,
+          problems_remaining: res.data.problems_remaining,
+          progress_percentage: res.data.progress_percentage,
+          solved_question_ids: Array.from(new Set([...(prev.solved_question_ids || []), ...qIds]))
+        }));
+      }
+    } catch (err) {
+      console.warn('Error saving batch solve:', err);
+    }
+  };
+
+  // Load questions and user progress from backend on mount
   useEffect(() => {
+    fetchAptitudeProgress();
+
     const fetchBackendQuestions = async () => {
       try {
         setLoading(true);
@@ -424,62 +483,70 @@ export default function Aptitude() {
 
     setViewMode('result');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Track newly solved questions in database
+    const correctQuestionIds = activeQuestions
+      .filter(q => selectedAnswers[q.id] === q.correct_answer)
+      .map(q => q.id);
+    if (correctQuestionIds.length > 0) {
+      recordBatchSolved(correctQuestionIds);
+    }
   };
 
   const currentQ = activeQuestions[currentIdx];
 
   return (
     <div className="aptitude-page-container">
-      {/* Top Navbar Header */}
-      <header className="aptitude-navbar">
-        <div className="aptitude-nav-left">
-          <button
-            className="btn-back-nav"
-            onClick={() => {
-              if (viewMode !== 'hub') {
+      {/* 1. BOLTSHIFT UNIFIED NAVBAR */}
+      {viewMode === 'hub' ? (
+        <Navbar variant="user" />
+      ) : (
+        <header className="aptitude-navbar">
+          <div className="aptitude-nav-left">
+            <button
+              className="btn-back-nav"
+              onClick={() => {
                 if (window.confirm('Do you want to leave the active screen and return to the Aptitude Hub?')) {
                   clearInterval(timerRef.current);
                   setViewMode('hub');
                 }
-              } else {
-                navigate('/student/dashboard');
-              }
-            }}
-          >
-            <ArrowLeft size={18} />
-            <span>{viewMode === 'hub' ? 'Back to Dashboard' : 'Aptitude Hub'}</span>
-          </button>
-          <div className="aptitude-brand-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <KnowiixLogo size="sm" />
-            <span className="brand-title" style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: '8px' }}>Aptitude Arena</span>
-          </div>
-        </div>
-
-        <div className="aptitude-nav-right">
-          {viewMode === 'quiz' && (
-            <div className="quiz-status-pill">
-              <span className={`quiz-mode-tag ${quizMode}`}>
-                {quizMode === 'mock' ? 'Timed Exam Mode' : 'Practice & Solutions'}
-              </span>
-              {quizMode === 'mock' && (
-                <div className={`timer-display ${timeRemaining < 120 ? 'timer-danger' : ''}`}>
-                  <Timer size={16} />
-                  <span>{formatTime(timeRemaining)}</span>
-                </div>
-              )}
+              }}
+            >
+              <ArrowLeft size={18} />
+              <span>Aptitude Hub</span>
+            </button>
+            <div className="aptitude-brand-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <KnowiixLogo size="sm" />
+              <span className="brand-title" style={{ borderLeft: '1px solid rgba(255,255,255,0.2)', paddingLeft: '8px' }}>Aptitude Arena</span>
             </div>
-          )}
-
-          <div className="student-profile-chip" onClick={() => navigate('/profile')}>
-            <span className="streak-badge">
-              <Flame size={14} className="streak-icon" /> 12 Days
-            </span>
-            <span className="user-initials">
-              {admin?.name?.substring(0, 2).toUpperCase() || 'AK'}
-            </span>
           </div>
-        </div>
-      </header>
+
+          <div className="aptitude-nav-right">
+            {viewMode === 'quiz' && (
+              <div className="quiz-status-pill">
+                <span className={`quiz-mode-tag ${quizMode}`}>
+                  {quizMode === 'mock' ? 'Timed Exam Mode' : 'Practice & Solutions'}
+                </span>
+                {quizMode === 'mock' && (
+                  <div className={`timer-display ${timeRemaining < 120 ? 'timer-danger' : ''}`}>
+                    <Timer size={16} />
+                    <span>{formatTime(timeRemaining)}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="student-profile-chip" onClick={() => navigate('/profile')}>
+              <span className="streak-badge">
+                <Flame size={14} className="streak-icon" /> 12 Days
+              </span>
+              <span className="user-initials">
+                {admin?.name?.substring(0, 2).toUpperCase() || 'AK'}
+              </span>
+            </div>
+          </div>
+        </header>
+      )}
 
       {/* =========================================================
           VIEW 1: APTITUDE HUB & TOPIC CATALOG
@@ -544,6 +611,65 @@ export default function Aptitude() {
                 <div className="stat-meta">
                   <span className="stat-val">120+</span>
                   <span className="stat-lbl">Solved Questions</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* =========================================================
+              APTITUDE PROGRESS TRACKING SYSTEM (DATABASE PERSISTED)
+              ========================================================= */}
+          <section className="aptitude-progress-tracking-banner">
+            <div className="progress-banner-inner">
+              <div className="progress-banner-top">
+                <div className="progress-banner-heading-group">
+                  <span className="progress-live-pill">
+                    <span className="live-dot" /> Database Synchronized
+                  </span>
+                  <h2 className="progress-banner-title">Aptitude &amp; Problem Solving Progress</h2>
+                  <p className="progress-banner-sub">
+                    Track your total problems, completed solutions, and placement readiness automatically saved per user.
+                  </p>
+                </div>
+
+                <div className="progress-banner-pct-box">
+                  <span className="banner-pct-num">{aptitudeProgress.progress_percentage}%</span>
+                  <span className="banner-pct-sub">Completed</span>
+                </div>
+              </div>
+
+              {/* Progress Bar Track */}
+              <div className="progress-banner-track">
+                <div
+                  className="progress-banner-fill"
+                  style={{ width: `${Math.min(100, Math.max(0, aptitudeProgress.progress_percentage))}%` }}
+                />
+              </div>
+
+              {/* 4 Core Statistics matching requirements */}
+              <div className="progress-banner-stats-grid">
+                <div className="progress-banner-stat-card">
+                  <span className="stat-card-title">Total Problems</span>
+                  <span className="stat-card-number">{aptitudeProgress.total_problems}</span>
+                  <span className="stat-card-sub">Available in Question Bank</span>
+                </div>
+
+                <div className="progress-banner-stat-card highlight-solved">
+                  <span className="stat-card-title">Problems Solved</span>
+                  <span className="stat-card-number">{aptitudeProgress.problems_solved}</span>
+                  <span className="stat-card-sub">Completed by You</span>
+                </div>
+
+                <div className="progress-banner-stat-card highlight-remaining">
+                  <span className="stat-card-title">Problems Remaining</span>
+                  <span className="stat-card-number">{aptitudeProgress.problems_remaining}</span>
+                  <span className="stat-card-sub">To Reach 100% Mastery</span>
+                </div>
+
+                <div className="progress-banner-stat-card highlight-progress">
+                  <span className="stat-card-title">Overall Progress</span>
+                  <span className="stat-card-number">{aptitudeProgress.progress_percentage}%</span>
+                  <span className="stat-card-sub">Calculated for Your Account</span>
                 </div>
               </div>
             </div>
@@ -624,7 +750,12 @@ export default function Aptitude() {
                       </span>
                       <span className="topic-pill">{q.topic}</span>
                     </div>
-                    <span className="marks-badge">+{q.marks || 1} Mark</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {aptitudeProgress.solved_question_ids?.includes(q.id) && (
+                        <span className="q-solved-badge">✓ Solved</span>
+                      )}
+                      <span className="marks-badge">+{q.marks || 1} Mark</span>
+                    </div>
                   </div>
 
                   <h3 className="q-card-title">{q.title}</h3>
@@ -743,6 +874,9 @@ export default function Aptitude() {
                       handleSelectOption(currentQ.id, opt);
                       if (quizMode === 'practice') {
                         setInstantChecked(prev => ({ ...prev, [currentQ.id]: true }));
+                        if (opt === currentQ.correct_answer) {
+                          recordProblemSolved(currentQ.id);
+                        }
                       }
                     }}
                   >

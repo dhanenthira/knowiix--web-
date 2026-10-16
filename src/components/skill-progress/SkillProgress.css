@@ -1,0 +1,378 @@
+/* ==========================================================================
+   SKILL PROGRESS CARD & SECTION (EXACT REFERENCE DESIGN)
+   Matching the Reference Design:
+   - Pure white card container (#FFFFFF)
+   - 22px smooth rounded corners & subtle border
+   - Top row: Date/label on left, 3-dots action on right
+   - Status tag pill: "Working", "In Progress", "Mastering" in soft pastel tint
+   - Bold skill title & clean subtitle
+   - Progress bar with label & percentage accent
+   - Bottom row: Overlapping peer avatars + deadline badge pill ("4 Days Left")
+   - Interactive hover elevation
+   ========================================================================== */
+
+.skill-progress-section {
+  width: 100%;
+  margin: 28px 0;
+  box-sizing: border-box;
+}
+
+.skill-progress-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.skill-progress-section-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.skill-progress-section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text, #202124);
+  letter-spacing: -0.02em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skill-progress-section-subtitle {
+  font-size: 13.5px;
+  color: var(--color-muted-text, #5F6368);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.skill-progress-readiness-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #E8F0FE;
+  color: var(--color-accent, #4285F4);
+  border: 1px solid #D2E3FC;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ================= GRID OF CARDS (3 COLUMNS - NO PEOPLE IMAGES) ================= */
+.skill-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+@media (max-width: 1080px) {
+  .skill-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .skill-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ================= INDIVIDUAL SKILL PROGRESS CARD ================= */
+.skill-card {
+  background: var(--color-secondary, #FFFFFF);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 22px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-shadow: 0 4px 18px -2px rgba(60, 64, 67, 0.05), 0 1px 3px rgba(60, 64, 67, 0.03);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+}
+
+.skill-card:hover {
+  transform: translateY(-3px);
+  border-color: #C7D2FE;
+  box-shadow: 0 12px 28px -4px rgba(99, 102, 241, 0.12), 0 2px 6px rgba(60, 64, 67, 0.06);
+}
+
+/* Top Row: Date & 3 Dots */
+.skill-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.skill-card-date {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-muted-text, #5F6368);
+  letter-spacing: -0.01em;
+}
+
+.skill-card-more-btn {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.skill-card-more-btn:hover {
+  background: var(--color-bg, #F8F9FA);
+  color: var(--color-text, #202124);
+}
+
+/* Tag Pill: "Working", "In Progress", etc. */
+.skill-card-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  width: fit-content;
+  margin-bottom: 14px;
+}
+
+.skill-card-tag.tag-purple {
+  background: #F3E8FF;
+  color: #7C3AED;
+}
+
+.skill-card-tag.tag-blue {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.skill-card-tag.tag-emerald {
+  background: #ECFDF5;
+  color: #059669;
+}
+
+.skill-card-tag.tag-amber {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+/* Title & Subtitle */
+.skill-card-body {
+  margin-bottom: 22px;
+}
+
+.skill-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text, #202124);
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin: 0 0 6px 0;
+  transition: color 0.18s ease;
+}
+
+.skill-card:hover .skill-card-title {
+  color: var(--color-accent, #4285F4);
+}
+
+.skill-card-subtitle {
+  font-size: 13px;
+  color: var(--color-muted-text, #5F6368);
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Progress Section */
+.skill-card-progress-section {
+  margin-bottom: 22px;
+}
+
+.skill-card-progress-labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.skill-card-progress-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text, #202124);
+}
+
+.skill-card-progress-pct {
+  font-size: 13px;
+  font-weight: 700;
+  color: #7C3AED;
+}
+
+.skill-card-progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: #EDE9FE;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.skill-card-progress-bar-fill {
+  height: 100%;
+  background: #8B5CF6;
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Color theme variations */
+.skill-card.theme-blue .skill-card-progress-pct {
+  color: #2563EB;
+}
+.skill-card.theme-blue .skill-card-progress-bar-track {
+  background: #DBEAFE;
+}
+.skill-card.theme-blue .skill-card-progress-bar-fill {
+  background: #3B82F6;
+}
+
+.skill-card.theme-emerald .skill-card-progress-pct {
+  color: #059669;
+}
+.skill-card.theme-emerald .skill-card-progress-bar-track {
+  background: #D1FAE5;
+}
+.skill-card.theme-emerald .skill-card-progress-bar-fill {
+  background: #10B981;
+}
+
+.skill-card.theme-amber .skill-card-progress-pct {
+  color: #D97706;
+}
+.skill-card.theme-amber .skill-card-progress-bar-track {
+  background: #FEF3C7;
+}
+.skill-card.theme-amber .skill-card-progress-bar-fill {
+  background: #F59E0B;
+}
+
+/* ================= BOTTOM FOOTER ROW ================= */
+.skill-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+}
+
+/* ================= 3-STAT METRICS STRIP (TOTAL, SOLVED, REMAINING) ================= */
+.skill-card-stats-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F8F9FA;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.skill-card-stat-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-text, #5F6368);
+}
+
+.stat-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text, #202124);
+}
+
+.stat-value.text-solved {
+  color: #10B981;
+}
+
+.stat-value.text-remaining {
+  color: #7C3AED;
+}
+
+.skill-card.theme-blue .stat-value.text-remaining {
+  color: #2563EB;
+}
+
+.skill-card-stat-divider {
+  width: 1px;
+  height: 22px;
+  background: #DADCE0;
+}
+
+/* Progress count in footer */
+.skill-card-progress-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--color-muted-text, #5F6368);
+}
+
+.count-highlight {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text, #202124);
+}
+
+.count-muted {
+  font-size: 12.5px;
+  color: var(--color-muted-text, #5F6368);
+}
+
+/* Days Left / Deadline Badge */
+.skill-card-deadline-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #F5F3FF;
+  color: #7C3AED;
+  letter-spacing: -0.01em;
+}
+
+.skill-card.theme-blue .skill-card-deadline-badge {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.skill-card.theme-emerald .skill-card-deadline-badge {
+  background: #ECFDF5;
+  color: #059669;
+}
+
+.skill-card.theme-amber .skill-card-deadline-badge {
+  background: #FFFBEB;
+  color: #D97706;
+}

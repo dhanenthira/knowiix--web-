@@ -19,6 +19,7 @@ import Profile from './pages/Profile';
 import Aptitude from './pages/Aptitude';
 import CodingPractice from './pages/CodingPractice';
 import CodingWorkspace from './pages/CodingWorkspace';
+import Navbar from './components/navbar';
 
 function ProtectedLayout() {
   const { admin } = useAuth();
@@ -33,9 +34,12 @@ function ProtectedLayout() {
 
   return (
     <UIProvider>
-      <div className="admin-layout">
-        <Sidebar />
-        <Outlet />
+      <div className="admin-app-wrapper" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg, #f8fafc)' }}>
+        <Navbar variant="admin" />
+        <div className="admin-layout" style={{ flex: 1, display: 'flex' }}>
+          <Sidebar />
+          <Outlet />
+        </div>
       </div>
     </UIProvider>
   );

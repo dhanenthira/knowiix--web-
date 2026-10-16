@@ -45,6 +45,7 @@ import {
   CheckCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Navbar from '../components/navbar';
 import learningApi from '../api/learningApi';
 import './Learning.css';
 
@@ -362,10 +363,13 @@ export default function Learning() {
 
   return (
     <div className="learning-dashboard-app">
+      {/* 1. BOLTSHIFT UNIFIED NAVBAR */}
+      <Navbar variant="user" />
+
       {/* ==========================================================
-          1. NAVBAR
+          2. STUDIO SUBHEADER TOOLBAR
           ========================================================== */}
-      <header className="learning-top-navbar" role="banner">
+      <header className="learning-top-navbar" role="banner" style={{ top: '68px', zIndex: 90 }}>
         <div className="navbar-left-cluster">
           {/* Mobile Sidebar Toggle */}
           <button 

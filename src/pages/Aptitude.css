@@ -4,9 +4,11 @@
 
 .aptitude-page-container {
   min-height: 100vh;
-  background-color: var(--bg-color, #0B1120);
-  color: var(--text-primary, #F9FAFB);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--color-bg, #F8F9FA);
+  color: var(--color-text, #202124);
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-body, 400);
   display: flex;
   flex-direction: column;
 }
@@ -1579,6 +1581,187 @@
     display: inline-flex;
   }
   .result-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================================
+   APTITUDE PROGRESS TRACKING BANNER & STATS
+   ======================================================== */
+.aptitude-progress-tracking-banner {
+  margin-bottom: 2rem;
+}
+
+.progress-banner-inner {
+  background: var(--color-secondary, #FFFFFF);
+  border: 1px solid var(--color-border, #DADCE0);
+  border-radius: 20px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 20px -2px rgba(60, 64, 67, 0.06);
+}
+
+.progress-banner-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.progress-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #F3E8FF;
+  color: #7C3AED;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  margin-bottom: 8px;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: #7C3AED;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #7C3AED;
+}
+
+.progress-banner-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text, #202124);
+  margin: 0 0 4px 0;
+  letter-spacing: -0.02em;
+}
+
+.progress-banner-sub {
+  font-size: 13.5px;
+  color: var(--color-muted-text, #5F6368);
+  margin: 0;
+}
+
+.progress-banner-pct-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.banner-pct-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: #7C3AED;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.banner-pct-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted-text, #5F6368);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.progress-banner-track {
+  width: 100%;
+  height: 10px;
+  background: #EDE9FE;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.progress-banner-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8B5CF6, #6366F1);
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-banner-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.progress-banner-stat-card {
+  background: #F8F9FA;
+  border: 1px solid #E8EAED;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.progress-banner-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #DADCE0;
+}
+
+.stat-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted-text, #5F6368);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.stat-card-number {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text, #202124);
+  line-height: 1.2;
+}
+
+.stat-card-sub {
+  font-size: 11.5px;
+  color: var(--color-muted-text, #5F6368);
+  margin-top: 4px;
+}
+
+.progress-banner-stat-card.highlight-solved .stat-card-number {
+  color: #10B981;
+}
+
+.progress-banner-stat-card.highlight-remaining .stat-card-number {
+  color: #7C3AED;
+}
+
+.progress-banner-stat-card.highlight-progress .stat-card-number {
+  color: #4285F4;
+}
+
+/* Solved status badge on question catalog */
+.q-solved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #ECFDF5;
+  color: #059669;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid #A7F3D0;
+}
+
+@media (max-width: 900px) {
+  .progress-banner-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 550px) {
+  .progress-banner-stats-grid {
     grid-template-columns: 1fr;
   }
 }

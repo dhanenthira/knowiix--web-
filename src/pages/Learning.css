@@ -3,28 +3,28 @@
    ========================================================================== */
 
 :root {
-  --learning-bg: #f8fafc;
-  --learning-surface: #ffffff;
-  --learning-card-bg: #ffffff;
-  --learning-border: #e2e8f0;
-  --learning-border-hover: #cbd5e1;
-  --learning-text-main: #0f172a;
-  --learning-text-muted: #64748b;
-  --learning-primary: #4f46e5;
-  --learning-primary-hover: #4338ca;
-  --learning-primary-light: #eef2ff;
-  --learning-emerald: #10b981;
-  --learning-emerald-light: #ecfdf5;
-  --learning-amber: #f59e0b;
-  --learning-amber-light: #fffbeb;
-  --learning-sidebar-bg: #ffffff;
-  --learning-code-bg: #0f172a;
+  --learning-bg: var(--color-bg, #F8F9FA);
+  --learning-surface: var(--color-secondary, #FFFFFF);
+  --learning-card-bg: var(--color-secondary, #FFFFFF);
+  --learning-border: var(--color-border, #DADCE0);
+  --learning-border-hover: #BDC1C6;
+  --learning-text-main: var(--color-text, #202124);
+  --learning-text-muted: var(--color-muted-text, #5F6368);
+  --learning-primary: var(--color-accent, #4285F4);
+  --learning-primary-hover: var(--color-hover, #303134);
+  --learning-primary-light: #E8F0FE;
+  --learning-emerald: #0F9D58;
+  --learning-emerald-light: #E6F4EA;
+  --learning-amber: #F4B400;
+  --learning-amber-light: #FEF7E0;
+  --learning-sidebar-bg: var(--color-secondary, #FFFFFF);
+  --learning-code-bg: var(--color-hover, #303134);
   --learning-radius-sm: 8px;
-  --learning-radius-md: 12px;
-  --learning-radius-lg: 16px;
-  --learning-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --learning-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --learning-shadow-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+  --learning-radius-md: 10px;
+  --learning-radius-lg: 12px;
+  --learning-shadow: 0 1px 3px rgba(60, 64, 67, 0.08), 0 1px 2px rgba(60, 64, 67, 0.04);
+  --learning-shadow-lg: 0 4px 12px rgba(60, 64, 67, 0.12);
+  --learning-shadow-glow: 0 0 16px rgba(66, 133, 244, 0.2);
 }
 
 .learning-dashboard-app {
@@ -33,7 +33,9 @@
   flex-direction: column;
   background-color: var(--learning-bg);
   color: var(--learning-text-main);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-body, 400);
   overflow-x: hidden;
 }
 

@@ -4,24 +4,24 @@
    ========================================================================== */
 
 :root {
-  --hr-green: #00a86b;
-  --hr-green-hover: #008f5b;
-  --hr-green-light: rgba(0, 168, 107, 0.12);
-  --hr-green-border: rgba(0, 168, 107, 0.3);
-  --hr-bg-light: #f8fafc;
-  --hr-bg-card: #ffffff;
-  --hr-text-dark: #0f172a;
-  --hr-text-muted: #64748b;
-  --hr-border: #e2e8f0;
-  --hr-dark-bg: #0f172a;
-  --hr-dark-surface: #1e293b;
-  --hr-dark-border: #334155;
-  --hr-easy: #059669;
-  --hr-easy-bg: #ecfdf5;
-  --hr-med: #d97706;
-  --hr-med-bg: #fffbeb;
-  --hr-hard: #dc2626;
-  --hr-hard-bg: #fef2f2;
+  --hr-green: var(--color-accent, #4285F4);
+  --hr-green-hover: var(--color-hover, #303134);
+  --hr-green-light: #E8F0FE;
+  --hr-green-border: rgba(66, 133, 244, 0.3);
+  --hr-bg-light: var(--color-bg, #F8F9FA);
+  --hr-bg-card: var(--color-secondary, #FFFFFF);
+  --hr-text-dark: var(--color-text, #202124);
+  --hr-text-muted: var(--color-muted-text, #5F6368);
+  --hr-border: var(--color-border, #DADCE0);
+  --hr-dark-bg: var(--color-hover, #303134);
+  --hr-dark-surface: #202124;
+  --hr-dark-border: var(--color-border, #DADCE0);
+  --hr-easy: #0F9D58;
+  --hr-easy-bg: #E6F4EA;
+  --hr-med: #F4B400;
+  --hr-med-bg: #FEF7E0;
+  --hr-hard: #DB4437;
+  --hr-hard-bg: #FCE8E6;
 }
 
 /* ----------------- DASHBOARD CONTAINER ----------------- */
@@ -29,7 +29,9 @@
   min-height: 100vh;
   background-color: var(--hr-bg-light);
   color: var(--hr-text-dark);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-primary, 'Inter', sans-serif);
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-body, 400);
   display: flex;
   flex-direction: column;
 }

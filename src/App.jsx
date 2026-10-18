@@ -2,24 +2,29 @@ import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { UIProvider } from './context/UIContext';
-import Sidebar from './components/Sidebar';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import UserDashboard from './pages/UserDashboard';
-import Students from './pages/Students';
-import Questions from './pages/Questions';
-import CodingManagement from './pages/CodingManagement';
-import Assessments from './pages/Assessments';
-import BattlesMonitor from './pages/BattlesMonitor';
-import Analytics from './pages/Analytics';
-import Learning from './pages/Learning';
-import Profile from './pages/Profile';
-import Aptitude from './pages/Aptitude';
-import CodingPractice from './pages/CodingPractice';
-import CodingWorkspace from './pages/CodingWorkspace';
-import Navbar from './components/navbar';
+// Admin Components & Pages
+import Sidebar from './admin/components/Sidebar';
+import Dashboard from './admin/pages/Dashboard';
+import Students from './admin/pages/Students';
+import Questions from './admin/pages/Questions';
+import CodingManagement from './admin/pages/CodingManagement';
+import Assessments from './admin/pages/Assessments';
+import BattlesMonitor from './admin/pages/BattlesMonitor';
+import Analytics from './admin/pages/Analytics';
+
+// User Pages
+import UserDashboard from './user/pages/dashboard/UserDashboard';
+import Learning from './user/pages/learning/Learning';
+import Profile from './user/pages/profile/Profile';
+import Aptitude from './user/pages/aptitude/Aptitude';
+import CodingPractice from './user/pages/coding/CodingPractice';
+import CodingWorkspace from './user/pages/coding/CodingWorkspace';
+
+// Shared Components & Pages
+import Navbar from './shared/components/navbar';
+import Landing from './shared/pages/Landing';
+import Login from './shared/pages/Login';
+import Register from './shared/pages/Register';
 
 function ProtectedLayout() {
   const { admin } = useAuth();

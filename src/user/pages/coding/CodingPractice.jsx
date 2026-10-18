@@ -23,9 +23,9 @@ import {
   FileCode,
   LayoutDashboard
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/navbar';
-import codingApi from '../api/codingApi';
+import { useAuth } from '../../../context/AuthContext';
+import Navbar from '../../../shared/components/navbar';
+import codingApi from '../../api/codingApi';
 import './CodingPractice.css';
 
 // Category icon mapper

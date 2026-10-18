@@ -26,8 +26,8 @@ import {
   AlertCircle,
   Menu
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useUI } from '../context/UIContext';
+import { useAuth } from '../../context/AuthContext';
+import { useUI } from '../../context/UIContext';
 import UserProfileModal from '../components/UserProfileModal';
 import './Dashboard.css';
 

@@ -35,9 +35,9 @@ import {
   Layers,
   Compass
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import KnowiixLogo from '../components/KnowiixLogo';
-import Navbar from '../components/navbar';
+import { useAuth } from '../../../context/AuthContext';
+import KnowiixLogo from '../../../shared/components/KnowiixLogo';
+import Navbar from '../../../shared/components/navbar';
 import './Aptitude.css';
 
 // Built-in comprehensive Aptitude Question Bank covering major placement topics

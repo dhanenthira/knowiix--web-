@@ -22,11 +22,11 @@ import {
   Sparkles,
   ExternalLink
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import KnowiixLogo from '../components/KnowiixLogo';
-import Navbar from '../components/navbar';
-import TodayPracticeCard from '../components/today-practice';
-import SkillProgressSection from '../components/skill-progress';
+import { useAuth } from '../../../context/AuthContext';
+import KnowiixLogo from '../../../shared/components/KnowiixLogo';
+import Navbar from '../../../shared/components/navbar';
+import TodayPracticeCard from '../../components/today-practice';
+import SkillProgressSection from '../../components/skill-progress';
 import './UserDashboard.css';
 
 export default function UserDashboard() {

@@ -17,7 +17,7 @@ import {
   Minimize2,
   Check
 } from 'lucide-react';
-import codingApi from '../api/codingApi';
+import codingApi from '../../api/codingApi';
 import './CodingPractice.css';
 
 // Default starter codes for popular languages

@@ -17,9 +17,9 @@ import {
   BookOpen,
   Brain
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useUI } from '../context/UIContext';
-import KnowiixLogo from './KnowiixLogo';
+import { useAuth } from '../../context/AuthContext';
+import { useUI } from '../../context/UIContext';
+import KnowiixLogo from '../../shared/components/KnowiixLogo';
 
 export default function Sidebar() {
   const { logout } = useAuth();

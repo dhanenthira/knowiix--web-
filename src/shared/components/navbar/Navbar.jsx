@@ -14,10 +14,10 @@ import {
   Flame,
   CheckCircle2
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import UserProfileModal from '../UserProfileModal';
+import { useAuth } from '../../../context/AuthContext';
+import UserProfileModal from '../../../admin/components/UserProfileModal';
 import KnowiixLogo from '../KnowiixLogo';
-import logoImage from '../../assets/knowiix-logo.jpg';
+import logoImage from '../../../assets/knowiix-logo.jpg';
 import './Navbar.css';
 
 // User navigation items (functionality and menu items 100% preserved)

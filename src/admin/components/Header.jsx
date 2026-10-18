@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bell, Menu, ChevronDown, Sun, Moon } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useUI } from '../context/UIContext';
+import { useAuth } from '../../context/AuthContext';
+import { useUI } from '../../context/UIContext';
 import UserProfileModal from './UserProfileModal';
 
 export default function Header({ title, subtitle }) {

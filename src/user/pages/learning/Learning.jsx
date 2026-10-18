@@ -44,9 +44,9 @@ import {
   Filter,
   CheckCheck
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/navbar';
-import learningApi from '../api/learningApi';
+import { useAuth } from '../../../context/AuthContext';
+import Navbar from '../../../shared/components/navbar';
+import learningApi from '../../api/learningApi';
 import './Learning.css';
 
 export default function Learning() {

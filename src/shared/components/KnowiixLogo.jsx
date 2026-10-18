@@ -1,5 +1,5 @@
 import React from 'react';
-import logoImage from '../assets/knowiix-logo.jpg';
+import logoImage from '../../assets/knowiix-logo.jpg';
 
 /**
  * Knowiix Official Logo Component

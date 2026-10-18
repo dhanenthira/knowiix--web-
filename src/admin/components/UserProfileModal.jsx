@@ -22,7 +22,7 @@ import {
   RefreshCw,
   Camera
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function UserProfileModal({ isOpen, onClose, user, onUpdateUser }) {
   const { logout, updateAdmin } = useAuth();

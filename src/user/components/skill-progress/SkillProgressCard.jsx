@@ -34,12 +34,12 @@ export default function SkillProgressCard({
     setMenuOpen(prev => !prev);
   };
 
-  const calculatedPct = totalProblems > 0 
-    ? Math.round((solvedProblems / totalProblems) * 100) 
+  const calculatedPct = totalProblems > 0
+    ? Math.round((solvedProblems / totalProblems) * 100)
     : progress;
 
-  const actualRemaining = remainingProblems !== undefined 
-    ? remainingProblems 
+  const actualRemaining = remainingProblems !== undefined
+    ? remainingProblems
     : Math.max(0, totalProblems - solvedProblems);
 
   return (

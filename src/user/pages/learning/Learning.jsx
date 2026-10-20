@@ -1,34 +1,34 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Zap, 
-  BookOpen, 
-  Database, 
-  RefreshCw, 
-  Search, 
-  CheckCircle, 
-  Clock, 
-  Code2, 
-  Layers, 
-  Brain, 
-  ExternalLink, 
-  X, 
-  Copy, 
-  Check, 
-  Plus, 
+import {
+  Zap,
+  BookOpen,
+  Database,
+  RefreshCw,
+  Search,
+  CheckCircle,
+  Clock,
+  Code2,
+  Layers,
+  Brain,
+  ExternalLink,
+  X,
+  Copy,
+  Check,
+  Plus,
   Bookmark,
-  ChevronRight, 
-  ChevronLeft, 
-  Sparkles, 
-  AlertCircle, 
-  Menu, 
-  Award, 
-  Play, 
-  RotateCcw, 
-  CheckCircle2, 
-  SlidersHorizontal, 
-  ArrowRight, 
-  LogOut, 
+  ChevronRight,
+  ChevronLeft,
+  Sparkles,
+  AlertCircle,
+  Menu,
+  Award,
+  Play,
+  RotateCcw,
+  CheckCircle2,
+  SlidersHorizontal,
+  ArrowRight,
+  LogOut,
   Bell,
   User,
   Trash2,
@@ -60,8 +60,7 @@ export default function Learning() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
 
   // Live Data States
   const [currentUser, setCurrentUser] = useState(null);
@@ -88,12 +87,7 @@ export default function Learning() {
   const [newNote, setNewNote] = useState('');
   const [localNotes, setLocalNotes] = useState([]);
 
-  // Notifications demo list
-  const notifications = [
-    { id: 1, title: 'Achievement Unlocked!', message: 'Completed your first web development lesson.', time: '10m ago' },
-    { id: 2, title: 'Daily Streak Active', message: 'You are on a 12-day learning streak. Keep it up!', time: '2h ago' },
-    { id: 3, title: 'New Tutorial Published', message: 'FastAPI Production Microservices is now live.', time: '1d ago' },
-  ];
+
 
   // Map category slug to Lucide Icon
   const getCategoryIcon = (iconName, slug) => {
@@ -247,7 +241,7 @@ export default function Learning() {
 
       // Update current tutorial topics list
       if (currentTutorial) {
-        const updatedTopics = (currentTutorial.topics || []).map(t => 
+        const updatedTopics = (currentTutorial.topics || []).map(t =>
           t.id === topicId ? { ...t, is_completed: true } : t
         );
         const compCount = updatedTopics.filter(t => t.is_completed).length;
@@ -283,12 +277,12 @@ export default function Learning() {
       }
 
       // Update in recommended
-      setRecommendedTutorials(prev => prev.map(t => 
+      setRecommendedTutorials(prev => prev.map(t =>
         t.id === tutorialId ? { ...t, is_bookmarked: !isCurrentlyBookmarked } : t
       ));
 
       // Update in all tutorials
-      setAllTutorials(prev => prev.map(t => 
+      setAllTutorials(prev => prev.map(t =>
         t.id === tutorialId ? { ...t, is_bookmarked: !isCurrentlyBookmarked } : t
       ));
 
@@ -341,11 +335,11 @@ export default function Learning() {
   // Filtered Tutorials for Catalog / Search
   const filteredTutorials = useMemo(() => {
     return allTutorials.filter(tut => {
-      const matchesCategory = categoryFilter === 'all' || 
+      const matchesCategory = categoryFilter === 'all' ||
         tut.category_slug?.toLowerCase() === categoryFilter.toLowerCase() ||
         tut.category_id === categoryFilter;
 
-      const matchesSearch = !searchQuery.trim() || 
+      const matchesSearch = !searchQuery.trim() ||
         tut.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tut.description?.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -357,8 +351,8 @@ export default function Learning() {
   const studioTopics = currentTutorial?.topics || [];
   const currentTopicIndex = studioTopics.findIndex(t => t.id === currentTopic?.id);
   const prevTopic = currentTopicIndex > 0 ? studioTopics[currentTopicIndex - 1] : null;
-  const nextTopic = currentTopicIndex >= 0 && currentTopicIndex < studioTopics.length - 1 
-    ? studioTopics[currentTopicIndex + 1] 
+  const nextTopic = currentTopicIndex >= 0 && currentTopicIndex < studioTopics.length - 1
+    ? studioTopics[currentTopicIndex + 1]
     : null;
 
   return (
@@ -366,173 +360,7 @@ export default function Learning() {
       {/* 1. BOLTSHIFT UNIFIED NAVBAR */}
       <Navbar variant="user" />
 
-      {/* ==========================================================
-          2. STUDIO SUBHEADER TOOLBAR
-          ========================================================== */}
-      <header className="learning-top-navbar" role="banner" style={{ top: '68px', zIndex: 90 }}>
-        <div className="navbar-left-cluster">
-          {/* Mobile Sidebar Toggle */}
-          <button 
-            className="mobile-sidebar-toggle"
-            onClick={() => setSidebarOpen(prev => !prev)}
-            aria-label="Toggle navigation menu"
-            id="btn-sidebar-toggle"
-          >
-            <Menu size={20} />
-          </button>
 
-          {/* Platform Logo */}
-          <Link to="/student" className="platform-logo-link" id="logo-dashboard-link">
-            <div className="logo-badge-icon">
-              <Zap size={22} className="logo-zap" />
-            </div>
-            <div className="logo-text-stack">
-              <span className="logo-main-title">Code<span>Arena</span></span>
-              <span className="logo-sub-tag">W3Schools Learning Studio</span>
-            </div>
-          </Link>
-
-          {/* Quick Nav Links */}
-          <nav className="navbar-quick-nav">
-            <button 
-              className={`nav-link-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              id="nav-tab-dashboard"
-            >
-              Dashboard
-            </button>
-            <button 
-              className={`nav-link-btn ${activeTab === 'tutorials' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('tutorials'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              id="nav-tab-tutorials"
-            >
-              Tutorials
-            </button>
-            <button 
-              className={`nav-link-btn ${activeTab === 'progress' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('progress'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              id="nav-tab-progress"
-            >
-              My Progress
-            </button>
-          </nav>
-        </div>
-
-        {/* Global Search Bar */}
-        <div className="navbar-search-wrapper">
-          <Search size={16} className="navbar-search-icon" />
-          <input 
-            type="text"
-            placeholder="Search tutorials, topics, syntax (e.g. Python, SQL)..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (activeTab === 'dashboard' && e.target.value) {
-                setActiveTab('tutorials');
-              }
-            }}
-            className="navbar-search-input"
-            id="input-global-search"
-          />
-          {searchQuery && (
-            <button className="navbar-search-clear" onClick={() => setSearchQuery('')}>
-              <X size={14} />
-            </button>
-          )}
-        </div>
-
-        {/* Right Action Cluster */}
-        <div className="navbar-right-cluster">
-          {/* Notifications Dropdown */}
-          <div className="nav-dropdown-anchor">
-            <button 
-              className="navbar-icon-btn" 
-              onClick={() => { setNotificationsOpen(!notificationsOpen); setUserDropdownOpen(false); }}
-              title="Notifications"
-              id="btn-notifications"
-            >
-              <Bell size={18} />
-              <span className="notification-ping-dot"></span>
-            </button>
-
-            {notificationsOpen && (
-              <div className="navbar-dropdown-card notifications-menu">
-                <div className="dropdown-card-header">
-                  <span>Notifications</span>
-                  <span className="badge-count">{notifications.length} new</span>
-                </div>
-                <div className="notifications-list">
-                  {notifications.map(n => (
-                    <div key={n.id} className="notification-row">
-                      <div className="notif-bullet"></div>
-                      <div>
-                        <div className="notif-title">{n.title}</div>
-                        <div className="notif-desc">{n.message}</div>
-                        <span className="notif-time">{n.time}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* User Profile & DP with Dropdown */}
-          <div className="nav-dropdown-anchor">
-            <button 
-              className="navbar-user-btn"
-              onClick={() => { setUserDropdownOpen(!userDropdownOpen); setNotificationsOpen(false); }}
-              id="btn-user-dropdown"
-              aria-expanded={userDropdownOpen}
-            >
-              {userAvatar ? (
-                <img src={userAvatar} alt={userName} className="user-dp-img" />
-              ) : (
-                <div className="user-dp-placeholder">
-                  {userName.substring(0, 2).toUpperCase()}
-                </div>
-              )}
-              <span className="user-display-name">{userName}</span>
-              <ChevronRight size={14} className={`dropdown-caret ${userDropdownOpen ? 'rotated' : ''}`} />
-            </button>
-
-            {userDropdownOpen && (
-              <div className="navbar-dropdown-card user-menu">
-                <div className="user-dropdown-header">
-                  <div className="user-full-name">{userName}</div>
-                  <div className="user-email-text">{userEmail}</div>
-                  <span className="user-role-badge">Student Learner</span>
-                </div>
-                <div className="dropdown-divider"></div>
-                <Link to="/profile" className="dropdown-menu-item" onClick={() => setUserDropdownOpen(false)}>
-                  <User size={16} />
-                  <span>My Profile</span>
-                </Link>
-                <button 
-                  className="dropdown-menu-item"
-                  onClick={() => { setActiveTab('progress'); setUserDropdownOpen(false); }}
-                >
-                  <TrendingUp size={16} />
-                  <span>Learning Stats</span>
-                </button>
-                <div className="dropdown-divider"></div>
-                <button 
-                  className="dropdown-menu-item logout"
-                  onClick={() => {
-                    setUserDropdownOpen(false);
-                    logout();
-                    navigate('/login');
-                  }}
-                  id="btn-logout"
-                >
-                  <LogOut size={16} />
-                  <span>Log Out</span>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
 
       {/* ==========================================================
           2. DASHBOARD BODY: SIDEBAR + MAIN CONTENT
@@ -544,7 +372,7 @@ export default function Learning() {
             {/* Quick Navigation Sections */}
             <div className="sidebar-group">
               <div className="sidebar-group-title">LEARNING DASHBOARD</div>
-              <button 
+              <button
                 className={`sidebar-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('dashboard'); setCategoryFilter('all'); }}
                 id="sidebar-nav-dashboard"
@@ -552,7 +380,7 @@ export default function Learning() {
                 <Sparkles size={16} className="nav-icon" />
                 <span>Dashboard</span>
               </button>
-              <button 
+              <button
                 className={`sidebar-nav-item ${activeTab === 'tutorials' ? 'active' : ''}`}
                 onClick={() => { setActiveTab('tutorials'); setCategoryFilter('all'); }}
                 id="sidebar-nav-tutorials"
@@ -561,7 +389,7 @@ export default function Learning() {
                 <span>All Tutorials</span>
                 {allTutorials.length > 0 && <span className="sidebar-badge">{allTutorials.length}</span>}
               </button>
-              <button 
+              <button
                 className={`sidebar-nav-item ${activeTab === 'continue' ? 'active' : ''}`}
                 onClick={() => setActiveTab('continue')}
                 id="sidebar-nav-continue"
@@ -570,7 +398,7 @@ export default function Learning() {
                 <span>Continue Learning</span>
                 {continueItems.length > 0 && <span className="sidebar-badge active">{continueItems.length}</span>}
               </button>
-              <button 
+              <button
                 className={`sidebar-nav-item ${activeTab === 'progress' ? 'active' : ''}`}
                 onClick={() => setActiveTab('progress')}
                 id="sidebar-nav-progress"
@@ -578,7 +406,7 @@ export default function Learning() {
                 <TrendingUp size={16} className="nav-icon" />
                 <span>My Progress</span>
               </button>
-              <button 
+              <button
                 className={`sidebar-nav-item ${activeTab === 'saved' ? 'active' : ''}`}
                 onClick={() => setActiveTab('saved')}
                 id="sidebar-nav-saved"
@@ -587,7 +415,7 @@ export default function Learning() {
                 <span>Saved Tutorials</span>
                 {savedBookmarks.length > 0 && <span className="sidebar-badge">{savedBookmarks.length}</span>}
               </button>
-              <button 
+              <button
                 className={`sidebar-nav-item ${activeTab === 'history' ? 'active' : ''}`}
                 onClick={() => setActiveTab('history')}
                 id="sidebar-nav-history"
@@ -666,7 +494,7 @@ export default function Learning() {
             <div className="w3schools-studio-view">
               {/* Studio Top Control Strip */}
               <div className="studio-top-bar">
-                <button 
+                <button
                   className="studio-back-btn"
                   onClick={() => setActiveTab('dashboard')}
                   id="btn-back-to-dashboard"
@@ -685,8 +513,8 @@ export default function Learning() {
                 <div className="studio-progress-pill">
                   <span>Progress:</span>
                   <div className="mini-progress-track">
-                    <div 
-                      className="mini-progress-fill" 
+                    <div
+                      className="mini-progress-fill"
                       style={{ width: `${currentTutorial.progress_percentage || 0}%` }}
                     ></div>
                   </div>
@@ -748,7 +576,7 @@ export default function Learning() {
                         </div>
 
                         {/* Mark Complete Action Button */}
-                        <button 
+                        <button
                           className={`btn-mark-complete ${currentTopic.is_completed ? 'completed' : ''}`}
                           onClick={() => handleCompleteTopic(currentTopic.id)}
                           disabled={actionLoading}
@@ -773,7 +601,7 @@ export default function Learning() {
                               <span>Code Example ({currentTutorial.category_name || 'Code'})</span>
                             </div>
                             <div className="code-header-actions">
-                              <button 
+                              <button
                                 className="code-action-btn"
                                 onClick={() => handleCopyCode(currentTopic.code_example)}
                                 title="Copy snippet to clipboard"
@@ -781,7 +609,7 @@ export default function Learning() {
                                 {copiedCode ? <Check size={14} /> : <Copy size={14} />}
                                 <span>{copiedCode ? 'Copied!' : 'Copy'}</span>
                               </button>
-                              <button 
+                              <button
                                 className="code-action-btn run-btn"
                                 onClick={() => handleRunCode(currentTopic.code_example)}
                                 title="Execute code interactive demonstration"
@@ -815,7 +643,7 @@ export default function Learning() {
 
                       {/* Previous & Next Navigation Buttons */}
                       <div className="topic-navigation-footer">
-                        <button 
+                        <button
                           className={`footer-nav-btn prev ${!prevTopic ? 'disabled' : ''}`}
                           onClick={() => prevTopic && handleSelectTopic(prevTopic.id)}
                           disabled={!prevTopic}
@@ -825,7 +653,7 @@ export default function Learning() {
                           <span>Previous Topic</span>
                         </button>
 
-                        <button 
+                        <button
                           className={`footer-nav-btn next ${!nextTopic ? 'disabled' : ''}`}
                           onClick={() => nextTopic && handleSelectTopic(nextTopic.id)}
                           disabled={!nextTopic}
@@ -843,8 +671,8 @@ export default function Learning() {
                           <h3>Personal Study Notes for this Topic</h3>
                         </div>
                         <form onSubmit={handleAddNote} className="add-note-form">
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             placeholder="Add a key takeaway or interview formula to remember..."
                             value={newNote}
                             onChange={(e) => setNewNote(e.target.value)}
@@ -895,7 +723,7 @@ export default function Learning() {
                   </p>
 
                   <div className="welcome-cta-row">
-                    <button 
+                    <button
                       className="btn-primary-continue"
                       onClick={() => {
                         if (continueItems.length > 0) {
@@ -909,7 +737,7 @@ export default function Learning() {
                       <Play size={16} />
                       <span>Continue Learning</span>
                     </button>
-                    <button 
+                    <button
                       className="btn-secondary-explore"
                       onClick={() => setActiveTab('tutorials')}
                     >
@@ -924,10 +752,10 @@ export default function Learning() {
                     <div className="progress-circle-wrap">
                       <svg className="progress-ring-svg" viewBox="0 0 100 100">
                         <circle className="progress-ring-bg" cx="50" cy="50" r="42" />
-                        <circle 
-                          className="progress-ring-bar" 
-                          cx="50" 
-                          cy="50" 
+                        <circle
+                          className="progress-ring-bar"
+                          cx="50"
+                          cy="50"
                           r="42"
                           style={{
                             strokeDasharray: 264,
@@ -1046,14 +874,14 @@ export default function Learning() {
                             <span>{item.completed_topics}/{item.total_topics} topics ({item.progress_percentage}%)</span>
                           </div>
                           <div className="progress-track-bar">
-                            <div 
-                              className="progress-fill-bar" 
+                            <div
+                              className="progress-fill-bar"
                               style={{ width: `${item.progress_percentage}%` }}
                             ></div>
                           </div>
                         </div>
 
-                        <button 
+                        <button
                           className="btn-resume-learning"
                           onClick={() => handleOpenTutorial(item.tutorial_slug, item.last_topic_id)}
                           id={`btn-resume-${item.tutorial_id}`}
@@ -1071,7 +899,7 @@ export default function Learning() {
                     </div>
                     <h3>No Started Courses Yet</h3>
                     <p>Select any category below to begin your personalized learning journey.</p>
-                    <button 
+                    <button
                       className="btn-empty-start"
                       onClick={() => {
                         if (allTutorials.length > 0) handleOpenTutorial(allTutorials[0].slug);
@@ -1097,8 +925,8 @@ export default function Learning() {
 
                 <div className="categories-grid">
                   {categories.map(cat => (
-                    <div 
-                      key={cat.id} 
+                    <div
+                      key={cat.id}
                       className="category-showcase-card"
                       onClick={() => {
                         setCategoryFilter(cat.slug);
@@ -1154,7 +982,7 @@ export default function Learning() {
                         </div>
 
                         <div className="rec-card-actions">
-                          <button 
+                          <button
                             className={`btn-rec-bookmark ${tut.is_bookmarked ? 'active' : ''}`}
                             onClick={() => handleToggleBookmark(tut.id, tut.is_bookmarked)}
                             title={tut.is_bookmarked ? 'Remove bookmark' : 'Bookmark tutorial'}
@@ -1162,7 +990,7 @@ export default function Learning() {
                           >
                             <Bookmark size={16} />
                           </button>
-                          <button 
+                          <button
                             className="btn-rec-start"
                             onClick={() => handleOpenTutorial(tut.slug)}
                             id={`btn-open-rec-${tut.id}`}
@@ -1240,7 +1068,7 @@ export default function Learning() {
                         <div key={bm.id} className="bookmark-card">
                           <div className="bookmark-card-top">
                             <span className="bookmark-cat-pill">{tut.category_name}</span>
-                            <button 
+                            <button
                               className="btn-remove-bookmark"
                               onClick={() => handleToggleBookmark(tut.id, true)}
                               title="Remove bookmark"
@@ -1252,7 +1080,7 @@ export default function Learning() {
                           <p className="bookmark-card-desc">{tut.description}</p>
                           <div className="bookmark-card-footer">
                             <span className="bookmark-topics-count">{tut.total_topics} topics</span>
-                            <button 
+                            <button
                               className="btn-open-bookmark"
                               onClick={() => handleOpenTutorial(tut.slug)}
                             >
@@ -1289,14 +1117,14 @@ export default function Learning() {
 
                 {/* Filter Pills */}
                 <div className="catalog-filter-scroller">
-                  <button 
+                  <button
                     className={`filter-pill-btn ${categoryFilter === 'all' ? 'active' : ''}`}
                     onClick={() => setCategoryFilter('all')}
                   >
                     All ({allTutorials.length})
                   </button>
                   {categories.map(cat => (
-                    <button 
+                    <button
                       key={cat.id}
                       className={`filter-pill-btn ${categoryFilter === cat.slug ? 'active' : ''}`}
                       onClick={() => setCategoryFilter(cat.slug)}
@@ -1313,7 +1141,7 @@ export default function Learning() {
                     <div key={tut.id} className="tutorial-catalog-card">
                       <div className="tut-card-top">
                         <span className="tut-cat-badge">{tut.category_name}</span>
-                        <button 
+                        <button
                           className={`tut-bm-icon-btn ${tut.is_bookmarked ? 'active' : ''}`}
                           onClick={() => handleToggleBookmark(tut.id, tut.is_bookmarked)}
                           title="Bookmark"
@@ -1338,7 +1166,7 @@ export default function Learning() {
                       </div>
 
                       <div className="tut-footer-action">
-                        <button 
+                        <button
                           className="btn-start-tutorial"
                           onClick={() => handleOpenTutorial(tut.slug)}
                         >
@@ -1408,7 +1236,7 @@ export default function Learning() {
                           {item.completed_at ? new Date(item.completed_at).toLocaleDateString() : 'Completed'}
                         </div>
                         <div className="table-cell-action">
-                          <button 
+                          <button
                             className="btn-review-topic"
                             onClick={() => handleOpenTutorial(item.tutorial_id, item.topic_id)}
                           >
@@ -1448,7 +1276,7 @@ export default function Learning() {
                       <div key={bm.id} className="bookmark-card">
                         <div className="bookmark-card-top">
                           <span className="bookmark-cat-pill">{tut.category_name}</span>
-                          <button 
+                          <button
                             className="btn-remove-bookmark"
                             onClick={() => handleToggleBookmark(tut.id, true)}
                             title="Remove bookmark"
@@ -1460,7 +1288,7 @@ export default function Learning() {
                         <p className="bookmark-card-desc">{tut.description}</p>
                         <div className="bookmark-card-footer">
                           <span className="bookmark-topics-count">{tut.total_topics} topics</span>
-                          <button 
+                          <button
                             className="btn-open-bookmark"
                             onClick={() => handleOpenTutorial(tut.slug)}
                           >
@@ -1502,8 +1330,8 @@ export default function Learning() {
                       <div className="timeline-body">
                         <div className="timeline-event-name">
                           {act.activity_type === 'completed_topic' ? 'Completed Topic' :
-                           act.activity_type === 'bookmarked' ? 'Bookmarked Tutorial' :
-                           act.activity_type === 'removed_bookmark' ? 'Removed Bookmark' : 'Accessed Topic'}:
+                            act.activity_type === 'bookmarked' ? 'Bookmarked Tutorial' :
+                              act.activity_type === 'removed_bookmark' ? 'Removed Bookmark' : 'Accessed Topic'}:
                           <strong> {act.topic_title || act.tutorial_title || 'Module'}</strong>
                         </div>
                         <div className="timeline-meta-text">
@@ -1561,14 +1389,14 @@ export default function Learning() {
                           <span>{item.completed_topics}/{item.total_topics} topics ({item.progress_percentage}%)</span>
                         </div>
                         <div className="progress-track-bar">
-                          <div 
-                            className="progress-fill-bar" 
+                          <div
+                            className="progress-fill-bar"
                             style={{ width: `${item.progress_percentage}%` }}
                           ></div>
                         </div>
                       </div>
 
-                      <button 
+                      <button
                         className="btn-resume-learning"
                         onClick={() => handleOpenTutorial(item.tutorial_slug, item.last_topic_id)}
                       >

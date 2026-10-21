@@ -18,9 +18,10 @@ import './SkillProgress.css';
  */
 export default function SkillProgressSection({
   skillsData,
+  skillProgress,
   title = 'Your Skill Progress',
   subtitle = 'Track your competencies, daily active drills, and placement milestones.',
-  readinessText = 'Overall: 75% Ready',
+  readinessText,
   className = '',
   id,
   aptitudeProgress: propAptitudeProgress
@@ -28,15 +29,26 @@ export default function SkillProgressSection({
   const navigate = useNavigate();
 
   // Aptitude live progress state from database
-  const [aptitudeProgress, setAptitudeProgress] = useState(propAptitudeProgress || {
+  const [aptitudeProgress, setAptitudeProgress] = useState(propAptitudeProgress || skillProgress?.aptitude || {
     total_problems: 100,
     problems_solved: 35,
     problems_remaining: 65,
     progress_percentage: 35.0
   });
 
-  // Fetch real-time user progress from database
+  // Sync when prop updates
   useEffect(() => {
+    if (skillProgress?.aptitude) {
+      setAptitudeProgress(skillProgress.aptitude);
+    } else if (propAptitudeProgress) {
+      setAptitudeProgress(propAptitudeProgress);
+    }
+  }, [skillProgress, propAptitudeProgress]);
+
+  // Fetch real-time user progress from database if not passed via props
+  useEffect(() => {
+    if (skillProgress?.aptitude || propAptitudeProgress) return;
+
     let isMounted = true;
     axios.get('/api/v1/questions/aptitude/progress')
       .then(res => {
@@ -45,14 +57,34 @@ export default function SkillProgressSection({
         }
       })
       .catch(err => {
-        // Fallback to prop or initial 35/100
         if (propAptitudeProgress) {
           setAptitudeProgress(propAptitudeProgress);
         }
       });
 
     return () => { isMounted = false; };
-  }, [propAptitudeProgress]);
+  }, [propAptitudeProgress, skillProgress]);
+
+  const activeAptitude = skillProgress?.aptitude || {
+    total_problems: aptitudeProgress.total_problems || 100,
+    problems_solved: aptitudeProgress.problems_solved !== undefined ? aptitudeProgress.problems_solved : 35,
+    problems_remaining: aptitudeProgress.problems_remaining !== undefined ? aptitudeProgress.problems_remaining : 65,
+    progress_percentage: aptitudeProgress.progress_percentage !== undefined ? aptitudeProgress.progress_percentage : 35
+  };
+
+  const activeTechnical = skillProgress?.technical || {
+    total_problems: 220,
+    problems_solved: 185,
+    problems_remaining: 35,
+    progress_percentage: 84
+  };
+
+  const activeCoding = skillProgress?.coding || {
+    total_problems: 65,
+    problems_solved: 38,
+    problems_remaining: 27,
+    progress_percentage: 59
+  };
 
   // Exactly 3 cards (Communication card removed)
   const defaultSkills = [
@@ -63,12 +95,12 @@ export default function SkillProgressSection({
       tagColor: 'purple',
       title: 'Aptitude & Problem Solving',
       subtitle: 'Quantitative & Logical Reasoning',
-      totalProblems: aptitudeProgress.total_problems || 100,
-      solvedProblems: aptitudeProgress.problems_solved !== undefined ? aptitudeProgress.problems_solved : 35,
-      remainingProblems: aptitudeProgress.problems_remaining !== undefined ? aptitudeProgress.problems_remaining : 65,
-      progress: aptitudeProgress.progress_percentage !== undefined ? aptitudeProgress.progress_percentage : 35,
+      totalProblems: activeAptitude.total_problems,
+      solvedProblems: activeAptitude.problems_solved,
+      remainingProblems: activeAptitude.problems_remaining,
+      progress: activeAptitude.progress_percentage,
       theme: 'purple',
-      deadlineBadge: `${aptitudeProgress.problems_remaining !== undefined ? aptitudeProgress.problems_remaining : 65} Remaining`,
+      deadlineBadge: `${activeAptitude.problems_remaining} Remaining`,
       path: '/aptitude'
     },
     {
@@ -78,12 +110,12 @@ export default function SkillProgressSection({
       tagColor: 'blue',
       title: 'Technical (DSA & Core)',
       subtitle: 'Data Structures, Algorithms & OS',
-      totalProblems: 220,
-      solvedProblems: 185,
-      remainingProblems: 35,
-      progress: 84,
+      totalProblems: activeTechnical.total_problems,
+      solvedProblems: activeTechnical.problems_solved,
+      remainingProblems: activeTechnical.problems_remaining,
+      progress: activeTechnical.progress_percentage,
       theme: 'blue',
-      deadlineBadge: '35 Qs Left',
+      deadlineBadge: `${activeTechnical.problems_remaining} Qs Left`,
       path: '/questions?category=Technical'
     },
     {
@@ -93,17 +125,18 @@ export default function SkillProgressSection({
       tagColor: 'purple',
       title: 'Coding & Algorithms',
       subtitle: 'Competitive Programming Drills',
-      totalProblems: 65,
-      solvedProblems: 38,
-      remainingProblems: 27,
-      progress: 59,
+      totalProblems: activeCoding.total_problems,
+      solvedProblems: activeCoding.problems_solved,
+      remainingProblems: activeCoding.problems_remaining,
+      progress: activeCoding.progress_percentage,
       theme: 'purple',
-      deadlineBadge: '27 Problems Left',
+      deadlineBadge: `${activeCoding.problems_remaining} Problems Left`,
       path: '/coding/practice'
     }
   ];
 
   const cardsToRender = skillsData || defaultSkills;
+  const currentReadiness = readinessText || skillProgress?.readiness_text || 'Overall: 75% Ready';
 
   return (
     <section className={`skill-progress-section ${className}`} id={id || "daily-practice-focus"}>
@@ -114,10 +147,10 @@ export default function SkillProgressSection({
             {subtitle && <p className="skill-progress-section-subtitle">{subtitle}</p>}
           </div>
         </div>
-        {readinessText && (
+        {currentReadiness && (
           <div className="skill-progress-readiness-pill">
             <span>📈</span>
-            <span>{readinessText}</span>
+            <span>{currentReadiness}</span>
           </div>
         )}
       </div>

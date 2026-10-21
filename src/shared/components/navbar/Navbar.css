@@ -503,37 +503,189 @@
   }
 }
 
+@media (max-width: 640px) {
+  .bolt-navbar-header {
+    padding: 6px 8px;
+  }
+  .bolt-navbar-container {
+    padding: 4px 8px 4px 12px;
+    height: 52px;
+    gap: 8px;
+  }
+  .bolt-brand-title {
+    font-size: 18px;
+  }
+  .bolt-brand-logo-box {
+    height: 30px;
+  }
+  .bolt-brand-logo-img {
+    height: 26px;
+  }
+  .bolt-brand-tag {
+    display: none;
+  }
+  .bolt-navbar-actions {
+    gap: 6px;
+  }
+  .bolt-action-icon-btn {
+    width: 34px;
+    height: 34px;
+  }
+  .bolt-profile-avatar-capsule {
+    padding: 2px;
+  }
+  .bolt-profile-caret {
+    display: none;
+  }
+  .bolt-avatar-wrapper,
+  .bolt-avatar-img,
+  .bolt-avatar-fallback {
+    width: 32px;
+    height: 32px;
+  }
+  .bolt-quick-search-dropdown,
+  .bolt-notif-dropdown {
+    position: fixed;
+    top: 66px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    z-index: 1001;
+  }
+  .bolt-dropdown-menu {
+    position: fixed;
+    top: 66px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+    z-index: 1001;
+  }
+}
+
+/* Mobile Drawer Backdrop Overlay */
+.bolt-mobile-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 998;
+  pointer-events: auto;
+  animation: boltFadeIn 0.2s ease;
+}
+
 /* Mobile Overlay Drawer */
 .bolt-mobile-drawer {
   display: none;
   position: fixed;
-  top: 76px;
-  left: 16px;
-  right: 16px;
+  top: 70px;
+  left: 12px;
+  right: 12px;
+  max-height: calc(100vh - 84px);
+  overflow-y: auto;
   background: var(--color-secondary, #FFFFFF);
   border: 1px solid var(--color-border, #DADCE0);
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 16px;
-  box-shadow: 0 8px 24px rgba(60, 64, 67, 0.15);
+  box-shadow: 0 16px 36px -6px rgba(15, 23, 42, 0.22);
   z-index: 999;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
   pointer-events: auto;
+  animation: boltSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .bolt-mobile-drawer.open {
   display: flex;
 }
 
+.bolt-mobile-drawer-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border, #DADCE0);
+}
+
+.bolt-mobile-user-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bolt-mobile-user-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text, #202124);
+}
+
+.bolt-mobile-user-role {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  background: #E8F0FE;
+  color: #1A73E8;
+  border-radius: 9999px;
+}
+
+.bolt-mobile-drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .bolt-mobile-drawer .bolt-nav-pill-btn {
   width: 100%;
   justify-content: flex-start;
-  padding: 10px 16px;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 500;
 }
 
 .bolt-mobile-drawer .bolt-nav-pill-btn.active {
-  background: #F1F3F4;
-  color: var(--color-text, #202124);
-  font-weight: var(--font-weight-heading, 500);
+  background: #E8F0FE;
+  color: #1A73E8;
+  font-weight: 600;
+}
+
+.bolt-mobile-drawer-footer {
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border, #DADCE0);
+}
+
+.bolt-mobile-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #FEE2E2;
+  color: #DC2626;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.bolt-mobile-logout-btn:hover {
+  background: #FECACA;
+}
+
+@keyframes boltFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes boltSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -88,7 +88,7 @@ export default function Navbar({ variant }) {
 
   const navItems = isVariantAdmin ? ADMIN_NAV_ITEMS : USER_NAV_ITEMS;
   const brandLink = isVariantAdmin ? '/dashboard' : '/student';
-  const brandTag = isVariantAdmin ? 'Admin' : 'Student';
+  const brandTag = isVariantAdmin ? 'Admin' : '';
 
   // Profile text & avatar details
   const displayName = admin?.name || (isVariantAdmin ? 'System Administrator' : 'Ananya Kumar');
@@ -149,9 +149,11 @@ export default function Navbar({ variant }) {
               <img src={logoImage} alt="Knowiix Logo" className="bolt-brand-logo-img" />
             </div>
             <span className="bolt-brand-title">Knowiix</span>
-            <span className={`bolt-brand-tag ${isVariantAdmin ? 'admin-badge' : 'user-badge'}`}>
-              {brandTag}
-            </span>
+            {brandTag && (
+              <span className={`bolt-brand-tag ${isVariantAdmin ? 'admin-badge' : 'user-badge'}`}>
+                {brandTag}
+              </span>
+            )}
           </Link>
 
           {/* ================= 2. SEGMENTED CAPSULE TRACK (CENTER) ================= */}
@@ -358,32 +360,62 @@ export default function Navbar({ variant }) {
           </div>
         </div>
 
+        {/* Mobile Backdrop Overlay */}
+        {isMobileMenuOpen && (
+          <div
+            className="bolt-mobile-drawer-backdrop"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
         {/* Mobile Navigation Drawer */}
         <div className={`bolt-mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
-          {navItems.map((item) => {
-            const active = isTabActive(item.path, item.isAnchor);
-            if (item.isAnchor) {
+          <div className="bolt-mobile-drawer-header">
+            <div className="bolt-mobile-user-info">
+              <span className="bolt-mobile-user-name">{displayName}</span>
+              {brandTag && <span className="bolt-mobile-user-role">{brandTag}</span>}
+            </div>
+          </div>
+          <div className="bolt-mobile-drawer-nav">
+            {navItems.map((item) => {
+              const active = isTabActive(item.path, item.isAnchor);
+              if (item.isAnchor) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.path}
+                    className={`bolt-nav-pill-btn ${active ? 'active' : ''}`}
+                    onClick={(e) => {
+                      setIsMobileMenuOpen(false);
+                      handleAnchorClick(e, item.path);
+                    }}
+                  >
+                    {item.name}
+                  </a>
+                );
+              }
               return (
-                <a
+                <NavLink
                   key={item.name}
-                  href={item.path}
+                  to={item.path}
                   className={`bolt-nav-pill-btn ${active ? 'active' : ''}`}
-                  onClick={(e) => handleAnchorClick(e, item.path)}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </NavLink>
               );
-            }
-            return (
-              <NavLink
-                key={item.name}
-                to={item.path}
-                className={`bolt-nav-pill-btn ${active ? 'active' : ''}`}
-              >
-                {item.name}
-              </NavLink>
-            );
-          })}
+            })}
+          </div>
+          <div className="bolt-mobile-drawer-footer">
+            <button
+              className="bolt-mobile-logout-btn"
+              onClick={handleLogout}
+            >
+              <LogOut size={16} />
+              <span>Sign Out</span>
+            </button>
+          </div>
         </div>
       </header>
 

@@ -376,3 +376,50 @@
   background: #FFFBEB;
   color: #D97706;
 }
+
+/* ================= MOBILE RESPONSIVE TWEAKS ================= */
+@media (max-width: 640px) {
+  .skill-progress-section {
+    margin: 20px 0;
+  }
+  .skill-progress-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .skill-progress-section-title {
+    font-size: 19px;
+  }
+  .skill-progress-section-subtitle {
+    font-size: 12.5px;
+  }
+  .skill-progress-readiness-pill {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+  .skill-card {
+    padding: 18px 16px;
+    border-radius: 18px;
+  }
+  .skill-card-title {
+    font-size: 16.5px;
+  }
+  .skill-card-subtitle {
+    font-size: 13px;
+  }
+  .skill-card-stats-strip {
+    padding: 8px 10px;
+    margin-bottom: 12px;
+  }
+  .stat-label {
+    font-size: 10px;
+  }
+  .stat-value {
+    font-size: 14px;
+  }
+  .skill-card-deadline-badge {
+    font-size: 11px;
+    padding: 4px 9px;
+  }
+}

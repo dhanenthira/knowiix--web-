@@ -1218,13 +1218,73 @@
     border: 1px solid var(--color-border, #DADCE0);
     border-radius: 16px;
     padding: 18px 22px;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.chart-stat-item.clickable-metric {
+    cursor: pointer;
+    user-select: none;
+}
+
+.chart-stat-item.clickable-metric:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(60, 64, 67, 0.08);
+}
+
+.chart-stat-item.active-metric.score {
+    border-color: #4285F4;
+    background: #F8FAFF;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.25), 0 4px 14px rgba(66, 133, 244, 0.1);
+}
+
+.chart-stat-item.active-metric.accuracy {
+    border-color: #059669;
+    background: #F0FDF4;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.25), 0 4px 14px rgba(5, 150, 105, 0.1);
+}
+
+.chart-stat-item.active-metric.tests {
+    border-color: #7C3AED;
+    background: #FAF5FF;
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25), 0 4px 14px rgba(124, 58, 237, 0.1);
+}
+
+.chart-stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
 }
 
 .chart-stat-item h4 {
     font-size: 13px;
     font-weight: 500;
     color: var(--color-muted-text, #5F6368);
-    margin: 0 0 6px 0;
+    margin: 0;
+}
+
+.metric-active-badge {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    letter-spacing: 0.02em;
+}
+
+.metric-active-badge.score {
+    background: #E8F0FE;
+    color: #1A73E8;
+}
+
+.metric-active-badge.accuracy {
+    background: #ECFDF5;
+    color: #059669;
+}
+
+.metric-active-badge.tests {
+    background: #F3E8FD;
+    color: #7C3AED;
 }
 
 .chart-stat-item p {
@@ -1240,6 +1300,89 @@
     font-weight: 500;
     display: block;
     margin-top: 6px;
+}
+
+/* Metric Selector Pills */
+.chart-metric-selector-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.chart-metric-selector-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-muted-text, #5F6368);
+}
+
+.chart-metric-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.metric-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    border: 1px solid var(--color-border, #DADCE0);
+    background: #FFFFFF;
+    color: var(--color-muted-text, #5F6368);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+}
+
+.metric-pill-btn:hover {
+    color: var(--color-text, #202124);
+    border-color: #BCC1C8;
+}
+
+.metric-pill-btn.active.score {
+    border-color: #4285F4;
+    background: #E8F0FE;
+    color: #1A73E8;
+    font-weight: 600;
+}
+
+.metric-pill-btn.active.accuracy {
+    border-color: #059669;
+    background: #ECFDF5;
+    color: #059669;
+    font-weight: 600;
+}
+
+.metric-pill-btn.active.tests {
+    border-color: #7C3AED;
+    background: #F3E8FD;
+    color: #7C3AED;
+    font-weight: 600;
+}
+
+.metric-pill-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.metric-pill-dot.score {
+    background: #4285F4;
+}
+
+.metric-pill-dot.accuracy {
+    background: #059669;
+}
+
+.metric-pill-dot.tests {
+    background: #7C3AED;
 }
 
 .full-width-chart-container {
@@ -2090,5 +2233,194 @@ body {
 
     .subnav-greeting-subtitle {
         font-size: 0.8rem;
+    }
+}
+
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVE RULES FOR USER DASHBOARD
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .dashboard-content {
+        padding: 20px 16px 48px;
+        gap: 20px;
+    }
+
+    .dashboard-grid-2col {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .dashboard-grid-3col {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-content {
+        padding: 16px 12px 40px;
+        gap: 16px;
+    }
+
+    .card {
+        padding: 20px 16px;
+        border-radius: 18px;
+    }
+
+    .card-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .card-title {
+        font-size: 1.05rem;
+    }
+
+    .performance-overview-full-card {
+        padding: 20px 16px;
+        border-radius: 20px;
+    }
+
+    .performance-overview-full-card .card-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .filter-button-group {
+        width: 100%;
+        display: flex;
+        justify-content: stretch;
+    }
+
+    .filter-button-group .btn-filter {
+        flex: 1;
+        text-align: center;
+        padding: 8px 10px;
+        font-size: 12.5px;
+    }
+
+    .chart-stats-summary {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin: 18px 0;
+    }
+
+    .chart-stat-item {
+        padding: 14px 16px;
+        border-radius: 14px;
+    }
+
+    .chart-stat-item h4 {
+        font-size: 12px;
+    }
+
+    .chart-stat-item p {
+        font-size: 21px;
+    }
+
+    .chart-stat-subtext {
+        font-size: 11px;
+    }
+
+    .full-width-chart-container {
+        height: 220px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .full-width-chart-container svg {
+        min-width: 600px;
+    }
+
+    .assessments-table-wrapper {
+        margin: 0 -4px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .assessments-table th {
+        padding: 10px 12px;
+        font-size: 0.72rem;
+        white-space: nowrap;
+    }
+
+    .assessments-table td {
+        padding: 12px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-content {
+        padding: 12px 8px 36px;
+        gap: 14px;
+    }
+
+    .card {
+        padding: 16px 12px;
+        border-radius: 16px;
+    }
+
+    .performance-overview-full-card {
+        padding: 16px 12px;
+        border-radius: 16px;
+    }
+
+    .filter-button-group .btn-filter {
+        padding: 6px 4px;
+        font-size: 11.5px;
+    }
+
+    .chart-stats-summary {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .chart-stat-item {
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    .chart-stat-item p {
+        font-size: 18px;
+    }
+
+    .chart-stat-subtext {
+        font-size: 10px;
+    }
+
+    .full-width-chart-container {
+        height: 190px;
+    }
+
+    .full-width-chart-container svg {
+        min-width: 520px;
+    }
+
+    .assessments-table th {
+        padding: 8px 8px;
+        font-size: 0.68rem;
+    }
+
+    .assessments-table td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+
+    .score-pill-table {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+    }
+
+    .btn-table-view {
+        padding: 4px 8px;
+        font-size: 0.78rem;
     }
 }

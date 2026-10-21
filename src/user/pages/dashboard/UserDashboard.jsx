@@ -134,7 +134,29 @@ export default function UserDashboard() {
     }
   };
 
-  const activeChart = chartConfigs[chartFilter] || chartConfigs['7d'];
+  const [activeMetric, setActiveMetric] = useState('score'); // 'score' | 'accuracy' | 'tests'
+  const activePeriod = dashboardData?.performance_overview?.[chartFilter] || chartConfigs[chartFilter] || chartConfigs['7d'];
+  const recentAssessmentsList = dashboardData?.recent_assessments || [
+    { id: '1', title: 'Aptitude Mock Test 01', icon: '🧠', score: '82%', score_num: 82, accuracy: '86%', date: 'Today', status: 'active', action_label: 'Launch', action_url: '/aptitude?mode=mock' },
+    { id: '2', title: 'Technical Test 02', icon: '💻', score: '76%', score_num: 76, accuracy: '79%', date: 'Yesterday', status: 'completed', action_label: 'View', action_url: '/assessments' },
+    { id: '3', title: 'Placement Mock Assessment', icon: '⭐', score: '88%', score_num: 88, accuracy: '91%', date: '3 days ago', status: 'completed', action_label: 'View', action_url: '/assessments' },
+    { id: '4', title: 'Verbal Diagnostic Test', icon: '🗣', score: '70%', score_num: 70, accuracy: '74%', date: '5 days ago', status: 'completed', action_label: 'View', action_url: '/assessments' }
+  ];
+
+  // Resolve dynamic metric curve (Average Score, Overall Accuracy, or Tests Completed)
+  const activeMetricData = activePeriod?.metrics?.[activeMetric] || {
+    id: activeMetric,
+    title: activeMetric === 'accuracy' ? 'Overall Accuracy' : activeMetric === 'tests' ? 'Tests Completed' : 'Average Score',
+    color: activeMetric === 'accuracy' ? '#059669' : activeMetric === 'tests' ? '#7C3AED' : '#4285F4',
+    gradientId: activeMetric === 'accuracy' ? 'dashAccGrad' : activeMetric === 'tests' ? 'dashTestsGrad' : 'dashScoreGrad',
+    yMarkers: activeMetric === 'tests'
+      ? (chartFilter === '3m' ? ['80', '60', '40', '0'] : chartFilter === '30d' ? ['32', '24', '16', '0'] : ['8', '6', '4', '0'])
+      : ['90%', '75%', '60%', '0%'],
+    pathLine: activePeriod.pathLine,
+    pathArea: activePeriod.pathArea,
+    nodes: activePeriod.nodes || [],
+    labels: activePeriod.labels || []
+  };
 
   return (
     <div className="user-dashboard-wrapper">
@@ -169,7 +191,10 @@ export default function UserDashboard() {
           {/* ==========================================================
                 YOUR SKILL PROGRESS CARDS (EXACT REFERENCE DESIGN)
                 ========================================================== */}
-          <SkillProgressSection aptitudeProgress={dashboardData?.aptitude_progress} />
+          <SkillProgressSection
+            skillProgress={dashboardData?.skill_progress}
+            aptitudeProgress={dashboardData?.aptitude_progress}
+          />
 
           {/* ==========================================================
                 5. PERFORMANCE OVERVIEW (FULL-WIDTH ANALYTICS CHART)
@@ -180,7 +205,9 @@ export default function UserDashboard() {
                 <div>
                   <h3 className="card-title">📊 Performance Overview</h3>
                   <p style={{ fontSize: '13.5px', color: 'var(--color-muted-text, #5F6368)', margin: '4px 0 0 0' }}>
-                    Track your overall diagnostic scores, accuracy trends, and placement readiness over time.
+                    {activeMetric === 'score' && '📊 Tracking your Average Diagnostic Score progression across evaluated assessments.'}
+                    {activeMetric === 'accuracy' && '🎯 Tracking your Overall Accuracy and precision consistency across problems solved.'}
+                    {activeMetric === 'tests' && '📝 Tracking your Tests Completed volume and diagnostic milestones over time.'}
                   </p>
                 </div>
                 <div className="filter-button-group">
@@ -205,31 +232,96 @@ export default function UserDashboard() {
                 </div>
               </div>
 
-              {/* 4 Stats Metric Cards */}
+              {/* 4 Stats Metric Cards with Interactive Selection */}
               <div className="chart-stats-summary">
-                <div className="chart-stat-item">
-                  <h4>Average Score</h4>
-                  <p style={{ color: 'var(--color-text, #202124)' }}>{activeChart.avg}</p>
-                  <span className="chart-stat-subtext" style={{ color: '#059669' }}>↑ +6.2% this period</span>
+                <div
+                  className={`chart-stat-item clickable-metric ${activeMetric === 'score' ? 'active-metric score' : ''}`}
+                  onClick={() => setActiveMetric('score')}
+                  role="button"
+                  tabIndex={0}
+                  title="Click to view Average Score trendline on graph"
+                >
+                  <div className="chart-stat-header">
+                    <h4>Average Score</h4>
+                    {activeMetric === 'score' && <span className="metric-active-badge score">● On Graph</span>}
+                  </div>
+                  <p style={{ color: '#202124' }}>{activePeriod.avg || '82.4%'}</p>
+                  <span className="chart-stat-subtext" style={{ color: '#059669' }}>
+                    {activePeriod.trend || '↑ +6.2% this period'}
+                  </span>
                 </div>
-                <div className="chart-stat-item">
-                  <h4>Overall Accuracy</h4>
-                  <p style={{ color: '#2563EB' }}>{activeChart.acc}</p>
-                  <span className="chart-stat-subtext" style={{ color: '#2563EB' }}>Top 10% Batch Rank</span>
+
+                <div
+                  className={`chart-stat-item clickable-metric ${activeMetric === 'accuracy' ? 'active-metric accuracy' : ''}`}
+                  onClick={() => setActiveMetric('accuracy')}
+                  role="button"
+                  tabIndex={0}
+                  title="Click to view Overall Accuracy trendline on graph"
+                >
+                  <div className="chart-stat-header">
+                    <h4>Overall Accuracy</h4>
+                    {activeMetric === 'accuracy' && <span className="metric-active-badge accuracy">● On Graph</span>}
+                  </div>
+                  <p style={{ color: '#059669' }}>{activePeriod.acc || '86%'}</p>
+                  <span className="chart-stat-subtext" style={{ color: '#059669' }}>Top 10% Batch Rank</span>
                 </div>
-                <div className="chart-stat-item">
-                  <h4>Tests Completed</h4>
-                  <p style={{ color: '#7C3AED' }}>{activeChart.tests}</p>
+
+                <div
+                  className={`chart-stat-item clickable-metric ${activeMetric === 'tests' ? 'active-metric tests' : ''}`}
+                  onClick={() => setActiveMetric('tests')}
+                  role="button"
+                  tabIndex={0}
+                  title="Click to view Tests Completed curve on graph"
+                >
+                  <div className="chart-stat-header">
+                    <h4>Tests Completed</h4>
+                    {activeMetric === 'tests' && <span className="metric-active-badge tests">● On Graph</span>}
+                  </div>
+                  <p style={{ color: '#7C3AED' }}>{activePeriod.tests || '7 Tests'}</p>
                   <span className="chart-stat-subtext" style={{ color: '#7C3AED' }}>100% Evaluated</span>
                 </div>
+
                 <div className="chart-stat-item">
-                  <h4>Active Consistency</h4>
-                  <p style={{ color: '#D97706' }}>{activeChart.streak}</p>
+                  <div className="chart-stat-header">
+                    <h4>Active Consistency</h4>
+                  </div>
+                  <p style={{ color: '#D97706' }}>{activePeriod.streak || '12 Days Active'}</p>
                   <span className="chart-stat-subtext" style={{ color: '#D97706' }}>🔥 Daily Streak Active</span>
                 </div>
               </div>
 
-              {/* Full-Width SVG Line Chart */}
+              {/* Metric Selector Quick Pills */}
+              <div className="chart-metric-selector-row">
+                <span className="chart-metric-selector-title">Graph Display:</span>
+                <div className="chart-metric-pills">
+                  <button
+                    type="button"
+                    className={`metric-pill-btn score ${activeMetric === 'score' ? 'active' : ''}`}
+                    onClick={() => setActiveMetric('score')}
+                  >
+                    <span className="metric-pill-dot score"></span>
+                    Average Score
+                  </button>
+                  <button
+                    type="button"
+                    className={`metric-pill-btn accuracy ${activeMetric === 'accuracy' ? 'active' : ''}`}
+                    onClick={() => setActiveMetric('accuracy')}
+                  >
+                    <span className="metric-pill-dot accuracy"></span>
+                    Overall Accuracy
+                  </button>
+                  <button
+                    type="button"
+                    className={`metric-pill-btn tests ${activeMetric === 'tests' ? 'active' : ''}`}
+                    onClick={() => setActiveMetric('tests')}
+                  >
+                    <span className="metric-pill-dot tests"></span>
+                    Tests Completed
+                  </button>
+                </div>
+              </div>
+
+              {/* Full-Width Dynamic SVG Line Chart */}
               <div className="svg-chart-container full-width-chart-container">
                 <svg
                   viewBox="0 0 1000 240"
@@ -241,6 +333,14 @@ export default function UserDashboard() {
                       <stop offset="0%" stopColor="#4285F4" stopOpacity="0.25" />
                       <stop offset="100%" stopColor="#4285F4" stopOpacity="0.0" />
                     </linearGradient>
+                    <linearGradient id="dashAccGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#059669" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#059669" stopOpacity="0.0" />
+                    </linearGradient>
+                    <linearGradient id="dashTestsGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#7C3AED" stopOpacity="0.0" />
+                    </linearGradient>
                   </defs>
 
                   {/* Horizontal Grid lines */}
@@ -249,37 +349,48 @@ export default function UserDashboard() {
                   <line x1="40" y1="150" x2="960" y2="150" stroke="#E2E8F0" strokeDasharray="4 4" strokeWidth="1" />
                   <line x1="40" y1="200" x2="960" y2="200" stroke="#E2E8F0" strokeWidth="1.5" />
 
-                  {/* Y-axis percentage markers */}
-                  <text x="30" y="54" fill="#94A3B8" fontSize="11" textAnchor="end" fontFamily="sans-serif">90%</text>
-                  <text x="30" y="104" fill="#94A3B8" fontSize="11" textAnchor="end" fontFamily="sans-serif">75%</text>
-                  <text x="30" y="154" fill="#94A3B8" fontSize="11" textAnchor="end" fontFamily="sans-serif">60%</text>
-                  <text x="30" y="204" fill="#94A3B8" fontSize="11" textAnchor="end" fontFamily="sans-serif">0%</text>
+                  {/* Y-axis dynamic markers */}
+                  {(activeMetricData.yMarkers || ['90%', '75%', '60%', '0%']).map((lbl, idx) => (
+                    <text
+                      key={idx}
+                      x="32"
+                      y={54 + idx * 50}
+                      fill="#94A3B8"
+                      fontSize="11"
+                      textAnchor="end"
+                      fontFamily="sans-serif"
+                    >
+                      {lbl}
+                    </text>
+                  ))}
 
                   {/* Gradient Area Fill under Curve */}
                   <path
                     id="chart-path-area"
-                    d={activeChart.pathArea}
-                    fill="url(#dashScoreGrad)"
+                    d={activeMetricData.pathArea}
+                    fill={`url(#${activeMetricData.gradientId || 'dashScoreGrad'})`}
+                    style={{ transition: 'all 0.35s ease' }}
                   />
 
                   {/* Main Line Stroke */}
                   <path
                     id="chart-path-line"
-                    d={activeChart.pathLine}
+                    d={activeMetricData.pathLine}
                     fill="none"
-                    stroke="#4285F4"
+                    stroke={activeMetricData.color || '#4285F4'}
                     strokeWidth="3.5"
                     strokeLinecap="round"
+                    style={{ transition: 'all 0.35s ease' }}
                   />
 
                   {/* Nodes & Tooltips */}
-                  {activeChart.nodes.map((node, i) => (
+                  {activeMetricData.nodes.map((node, i) => (
                     <g key={i} className="chart-node-group">
                       <circle
                         cx={node.cx}
                         cy={node.cy}
                         r="8"
-                        fill="#4285F4"
+                        fill={activeMetricData.color || '#4285F4'}
                         fillOpacity="0.18"
                       />
                       <circle
@@ -287,14 +398,14 @@ export default function UserDashboard() {
                         cy={node.cy}
                         r="5"
                         fill="#FFFFFF"
-                        stroke="#4285F4"
+                        stroke={activeMetricData.color || '#4285F4'}
                         strokeWidth="2.5"
                       />
                       {/* Tooltip badge */}
                       <rect
-                        x={node.cx - 20}
+                        x={node.cx - 24}
                         y={node.cy - 28}
-                        width="40"
+                        width="48"
                         height="20"
                         rx="6"
                         fill="#1E293B"
@@ -314,8 +425,8 @@ export default function UserDashboard() {
                   ))}
 
                   {/* X-Axis Date Labels */}
-                  {activeChart.labels.map((lbl, idx) => {
-                    const xPos = activeChart.nodes[idx]?.cx || (idx * (900 / (activeChart.labels.length - 1 || 1)) + 50);
+                  {activeMetricData.labels.map((lbl, idx) => {
+                    const xPos = activeMetricData.nodes[idx]?.cx || (idx * (900 / (activeMetricData.labels.length - 1 || 1)) + 50);
                     return (
                       <text
                         key={idx}
@@ -359,58 +470,55 @@ export default function UserDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>
-                      <div className="test-title-cell">
-                        <span>🧠</span> Aptitude Mock Test 01
-                      </div>
-                    </td>
-                    <td><span className="score-pill-table">82%</span></td>
-                    <td>86%</td>
-                    <td>Today</td>
-                    <td>
-                      <button className="btn-table-view" onClick={() => navigate('/aptitude?mode=mock')}>Launch</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="test-title-cell">
-                        <span>💻</span> Technical Test 02
-                      </div>
-                    </td>
-                    <td><span className="score-pill-table">76%</span></td>
-                    <td>79%</td>
-                    <td>Yesterday</td>
-                    <td>
-                      <button className="btn-table-view" onClick={() => navigate('/assessments')}>View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="test-title-cell">
-                        <span>⭐</span> Placement Mock Assessment
-                      </div>
-                    </td>
-                    <td><span className="score-pill-table" style={{ background: '#ecfdf5', color: '#059669' }}>88%</span></td>
-                    <td>91%</td>
-                    <td>3 days ago</td>
-                    <td>
-                      <button className="btn-table-view" onClick={() => navigate('/assessments')}>View</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div className="test-title-cell">
-                        <span>🗣</span> Verbal Diagnostic Test
-                      </div>
-                    </td>
-                    <td><span className="score-pill-table" style={{ background: '#fffbeb', color: '#d97706' }}>70%</span></td>
-                    <td>74%</td>
-                    <td>5 days ago</td>
-                    <td>
-                      <button className="btn-table-view" onClick={() => navigate('/assessments')}>View</button>
-                    </td>
-                  </tr>
+                  {recentAssessmentsList && recentAssessmentsList.length > 0 ? (
+                    recentAssessmentsList.map((test, idx) => {
+                      const scoreNum = test.score_num !== undefined ? test.score_num : (parseInt(test.score) || 0);
+                      const pillStyle = scoreNum >= 85
+                        ? { background: '#ecfdf5', color: '#059669' }
+                        : scoreNum >= 75
+                        ? { background: '#eef2ff', color: '#4338ca' }
+                        : { background: '#fffbeb', color: '#d97706' };
+
+                      return (
+                        <tr key={test.id || idx}>
+                          <td>
+                            <div className="test-title-cell">
+                              <span>{test.icon || '📝'}</span> {test.title}
+                            </div>
+                          </td>
+                          <td>
+                            <span className="score-pill-table" style={pillStyle}>
+                              {test.score}
+                            </span>
+                          </td>
+                          <td>{test.accuracy}</td>
+                          <td>{test.date}</td>
+                          <td>
+                            <button
+                              className="btn-table-view"
+                              onClick={() => {
+                                if (test.action_url) {
+                                  navigate(test.action_url);
+                                } else if (test.status === 'active' || test.action_label === 'Launch') {
+                                  navigate('/aptitude?mode=mock');
+                                } else {
+                                  navigate('/assessments');
+                                }
+                              }}
+                            >
+                              {test.action_label || (test.status === 'active' ? 'Launch' : 'View')}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', padding: '24px', color: '#64748b' }}>
+                        No recent assessments found. Start your first practice mock test today!
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

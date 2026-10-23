@@ -30,10 +30,10 @@ export default function SkillProgressSection({
 
   // Aptitude live progress state from database
   const [aptitudeProgress, setAptitudeProgress] = useState(propAptitudeProgress || skillProgress?.aptitude || {
-    total_problems: 100,
-    problems_solved: 35,
-    problems_remaining: 65,
-    progress_percentage: 35.0
+    total_problems: 0,
+    problems_solved: 0,
+    problems_remaining: 0,
+    progress_percentage: 0.0
   });
 
   // Sync when prop updates
@@ -66,24 +66,24 @@ export default function SkillProgressSection({
   }, [propAptitudeProgress, skillProgress]);
 
   const activeAptitude = skillProgress?.aptitude || {
-    total_problems: aptitudeProgress.total_problems || 100,
-    problems_solved: aptitudeProgress.problems_solved !== undefined ? aptitudeProgress.problems_solved : 35,
-    problems_remaining: aptitudeProgress.problems_remaining !== undefined ? aptitudeProgress.problems_remaining : 65,
-    progress_percentage: aptitudeProgress.progress_percentage !== undefined ? aptitudeProgress.progress_percentage : 35
+    total_problems: aptitudeProgress?.total_problems ?? 0,
+    problems_solved: aptitudeProgress?.problems_solved ?? 0,
+    problems_remaining: aptitudeProgress?.problems_remaining ?? 0,
+    progress_percentage: aptitudeProgress?.progress_percentage ?? 0.0
   };
 
   const activeTechnical = skillProgress?.technical || {
-    total_problems: 220,
-    problems_solved: 185,
-    problems_remaining: 35,
-    progress_percentage: 84
+    total_problems: 0,
+    problems_solved: 0,
+    problems_remaining: 0,
+    progress_percentage: 0.0
   };
 
   const activeCoding = skillProgress?.coding || {
-    total_problems: 65,
-    problems_solved: 38,
-    problems_remaining: 27,
-    progress_percentage: 59
+    total_problems: 0,
+    problems_solved: 0,
+    problems_remaining: 0,
+    progress_percentage: 0.0
   };
 
   // Exactly 3 cards (Communication card removed)

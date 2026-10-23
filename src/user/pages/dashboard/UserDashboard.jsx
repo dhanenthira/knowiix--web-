@@ -29,134 +29,262 @@ import TodayPracticeCard from '../../components/today-practice';
 import SkillProgressSection from '../../components/skill-progress';
 import './UserDashboard.css';
 
+// Real-Time Cubic Bezier Path Generator for live streaming curves
+const computeSvgPath = (values, labels, maxVal = 100.0, minVal = 0.0, unit = '%') => {
+  const n = values.length;
+  if (!n) return { nodes: [], labels: [], pathLine: '', pathArea: '' };
+  const marginL = 60;
+  const marginR = 950;
+  const valRange = Math.max(1.0, maxVal - minVal);
+  const nodes = values.map((val, idx) => {
+    const cx = Math.round(marginL + (idx * (marginR - marginL)) / Math.max(1, n - 1));
+    const norm = (Math.max(minVal, Math.min(maxVal, Number(val))) - minVal) / valRange;
+    const cy = Math.max(35, Math.min(205, Math.round(200 - norm * 160)));
+    const formatted = unit === '%' ? `${Math.round(val)}%` : `${Math.round(val)} ${unit}`.trim();
+    return { cx, cy, val: formatted, raw: Math.round(Number(val) * 10) / 10 };
+  });
+
+  if (n === 1) {
+    return {
+      nodes,
+      labels,
+      pathLine: `M ${nodes[0].cx},${nodes[0].cy}`,
+      pathArea: `M ${nodes[0].cx},${nodes[0].cy} L ${nodes[0].cx},210 Z`
+    };
+  }
+
+  const parts = [`M ${nodes[0].cx},${nodes[0].cy}`];
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = nodes[i];
+    const p1 = nodes[i + 1];
+    const dx = (p1.cx - p0.cx) / 2.0;
+    const c1x = Math.round(p0.cx + dx * 0.7);
+    const c1y = p0.cy;
+    const c2x = Math.round(p1.cx - dx * 0.7);
+    const c2y = p1.cy;
+    parts.push(`C ${c1x},${c1y} ${c2x},${c2y} ${p1.cx},${p1.cy}`);
+  }
+  const pathLine = parts.join(' ');
+  const pathArea = `${pathLine} L ${nodes[nodes.length - 1].cx},210 L ${nodes[0].cx},210 Z`;
+  return { nodes, labels, pathLine, pathArea };
+};
+
 export default function UserDashboard() {
   const { admin, logout } = useAuth();
   const navigate = useNavigate();
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [chartFilter, setChartFilter] = useState('7d');
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chartFilter, setChartFilter] = useState('7d'); // 'live' | '7d' | '30d' | '3m'
+  const [activeMetric, setActiveMetric] = useState('score'); // 'score' | 'accuracy' | 'tests'
 
-  useEffect(() => {
-    // Fetch live student dashboard data
-    axios.get('/api/v1/students/dashboard')
+  // Live skill stats fetched from database
+  const [liveSkillStats, setLiveSkillStats] = useState({
+    aptitude: { total: 0, solved: 0, remaining: 0, progress: 0.0 },
+    technical: { total: 0, solved: 0, remaining: 0, progress: 0.0 },
+    coding: { total: 0, solved: 0, remaining: 0, progress: 0.0 }
+  });
+
+  const fetchDashboardData = React.useCallback((isSilent = false) => {
+    if (!isSilent) setLoading(true);
+
+    let token = admin?.token;
+    if (!token) {
+      try {
+        const saved = localStorage.getItem('codearena_admin');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          token = parsed?.token || parsed?.access_token;
+        }
+      } catch (e) {}
+    }
+    const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+
+    return axios.get('/api/v1/students/dashboard', config)
       .then(res => {
         setDashboardData(res.data);
+        if (res.data?.skill_progress) {
+          const sp = res.data.skill_progress;
+          setLiveSkillStats({
+            aptitude: {
+              total: sp.aptitude?.total_problems ?? 0,
+              solved: sp.aptitude?.problems_solved ?? 0,
+              remaining: sp.aptitude?.problems_remaining ?? 0,
+              progress: sp.aptitude?.progress_percentage ?? 0.0
+            },
+            technical: {
+              total: sp.technical?.total_problems ?? 0,
+              solved: sp.technical?.problems_solved ?? 0,
+              remaining: sp.technical?.problems_remaining ?? 0,
+              progress: sp.technical?.progress_percentage ?? 0.0
+            },
+            coding: {
+              total: sp.coding?.total_problems ?? 0,
+              solved: sp.coding?.problems_solved ?? 0,
+              remaining: sp.coding?.problems_remaining ?? 0,
+              progress: sp.coding?.progress_percentage ?? 0.0
+            }
+          });
+        }
         setLoading(false);
       })
       .catch(err => {
-        console.warn('Using demo data fallback for student dashboard:', err);
-        setDashboardData(null);
+        console.warn('Student dashboard fetch error:', err);
         setLoading(false);
       });
   }, []);
 
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Auto-update on window focus and on custom performance update events
+    const onWindowFocus = () => fetchDashboardData(true);
+    const onPerfUpdate = () => fetchDashboardData(true);
+
+    window.addEventListener('focus', onWindowFocus);
+    window.addEventListener('student_performance_updated', onPerfUpdate);
+
+    // Auto-polling every 6 seconds to capture any performance updates in real time
+    const pollTimer = setInterval(() => {
+      fetchDashboardData(true);
+    }, 6000);
+
+    return () => {
+      window.removeEventListener('focus', onWindowFocus);
+      window.removeEventListener('student_performance_updated', onPerfUpdate);
+      clearInterval(pollTimer);
+    };
+  }, [fetchDashboardData]);
+
+
   const student = dashboardData?.user || {
-    name: 'Ananya Kumar',
-    student_id: 'CA-2026-8042',
-    college_name: 'Dept of Computer Science',
-    streak_days: 12,
-    total_points: 2450,
-    overall_accuracy: 82.5,
-    coding_problems_solved: 48,
-    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya'
+    name: admin?.name || 'Student',
+    student_id: admin?.student_id || '',
+    college_name: admin?.college_name || '',
+    streak_days: 0,
+    total_points: 0,
+    overall_accuracy: 0.0,
+    coding_problems_solved: 0,
+    avatar_url: admin?.avatar_url || ''
   };
 
   const stats = dashboardData?.stats || {
-    overall_accuracy: 82.5,
-    streak_days: 12,
-    total_points: 2450,
-    coding_problems_solved: 48,
-    questions_solved: 426
+    overall_accuracy: 0.0,
+    streak_days: 0,
+    total_points: 0,
+    coding_problems_solved: 0,
+    questions_solved: 0,
+    total_questions: 0
   };
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+  const displayName = admin?.name || student.name || 'Student';
+
+  const emptyPeriod = {
+    avg: '0.0%',
+    acc: '0.0%',
+    tests: '0 Tests',
+    streak: `${stats.streak_days || 0} Days Active`,
+    trend: stats.questions_solved > 0 ? 'Active Synced' : 'No test records yet',
+    pathLine: 'M 40,200 L 960,200',
+    pathArea: 'M 40,200 L 960,200 L 960,210 L 40,210 Z',
+    nodes: [],
+    labels: chartFilter === '3m' ? ['Month 1', 'Month 2', 'Month 3'] : chartFilter === '30d' ? ['Week 1', 'Week 2', 'Week 3', 'Week 4'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    metrics: {}
   };
 
-  const displayName = admin?.role === 'admin'
-    ? 'Administrator'
-    : (admin?.name || student.name || 'Administrator');
+  const activePeriod = dashboardData?.performance_overview?.[chartFilter] || emptyPeriod;
 
-  // Full-width chart data configurations for 7d, 30d, 3m
-  const chartConfigs = {
-    '7d': {
-      avg: '82.4%',
-      acc: '86%',
-      tests: '7 Tests',
-      streak: '12 Days Active',
-      pathArea: 'M 60,150 C 130,140 160,125 210,125 C 280,125 310,95 360,95 C 430,95 460,110 510,110 C 580,110 610,75 660,75 C 730,75 760,60 810,60 C 880,60 910,38 950,38 L 950,210 L 60,210 Z',
-      pathLine: 'M 60,150 C 130,140 160,125 210,125 C 280,125 310,95 360,95 C 430,95 460,110 510,110 C 580,110 610,75 660,75 C 730,75 760,60 810,60 C 880,60 910,38 950,38',
-      nodes: [
-        { cx: 60, cy: 150, val: '70%' },
-        { cx: 210, cy: 125, val: '75%' },
-        { cx: 360, cy: 95, val: '81%' },
-        { cx: 510, cy: 110, val: '78%' },
-        { cx: 660, cy: 75, val: '86%' },
-        { cx: 810, cy: 60, val: '89%' },
-        { cx: 950, cy: 38, val: '94%' }
-      ],
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    '30d': {
-      avg: '79.8%',
-      acc: '83%',
-      tests: '28 Tests',
-      streak: '12 Days Active',
-      pathArea: 'M 80,160 C 200,150 240,120 360,120 C 480,120 520,85 640,85 C 760,85 820,45 940,45 L 940,210 L 80,210 Z',
-      pathLine: 'M 80,160 C 200,150 240,120 360,120 C 480,120 520,85 640,85 C 760,85 820,45 940,45',
-      nodes: [
-        { cx: 80, cy: 160, val: '68%' },
-        { cx: 360, cy: 120, val: '76%' },
-        { cx: 640, cy: 85, val: '84%' },
-        { cx: 940, cy: 45, val: '92%' }
-      ],
-      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4']
-    },
-    '3m': {
-      avg: '84.6%',
-      acc: '88%',
-      tests: '74 Tests',
-      streak: '12 Days Active',
-      pathArea: 'M 100,165 C 280,150 340,95 500,95 C 680,95 740,40 920,40 L 920,210 L 100,210 Z',
-      pathLine: 'M 100,165 C 280,150 340,95 500,95 C 680,95 740,40 920,40',
-      nodes: [
-        { cx: 100, cy: 165, val: '65%' },
-        { cx: 500, cy: 95, val: '81%' },
-        { cx: 920, cy: 40, val: '95%' }
-      ],
-      labels: ['Month 1 (Basics)', 'Month 2 (Intermediate)', 'Month 3 (Mock Arena)']
-    }
-  };
+  // Real-time dynamic curve generation directly from actual user performance data
+  const periodMetric = activePeriod?.metrics?.[activeMetric];
+  const rawValues = (periodMetric?.values && periodMetric.values.length > 0)
+    ? periodMetric.values
+    : (periodMetric?.nodes && periodMetric.nodes.length > 0
+        ? periodMetric.nodes.map(n => n.raw ?? 0)
+        : [0, 0, 0, 0, 0, 0, 0]
+      );
+  const rawLabels = periodMetric?.labels || emptyPeriod.labels;
 
-  const [activeMetric, setActiveMetric] = useState('score'); // 'score' | 'accuracy' | 'tests'
-  const activePeriod = dashboardData?.performance_overview?.[chartFilter] || chartConfigs[chartFilter] || chartConfigs['7d'];
-  const recentAssessmentsList = dashboardData?.recent_assessments || [
-    { id: '1', title: 'Aptitude Mock Test 01', icon: '🧠', score: '82%', score_num: 82, accuracy: '86%', date: 'Today', status: 'active', action_label: 'Launch', action_url: '/aptitude?mode=mock' },
-    { id: '2', title: 'Technical Test 02', icon: '💻', score: '76%', score_num: 76, accuracy: '79%', date: 'Yesterday', status: 'completed', action_label: 'View', action_url: '/assessments' },
-    { id: '3', title: 'Placement Mock Assessment', icon: '⭐', score: '88%', score_num: 88, accuracy: '91%', date: '3 days ago', status: 'completed', action_label: 'View', action_url: '/assessments' },
-    { id: '4', title: 'Verbal Diagnostic Test', icon: '🗣', score: '70%', score_num: 70, accuracy: '74%', date: '5 days ago', status: 'completed', action_label: 'View', action_url: '/assessments' }
-  ];
+  const maxVal = activeMetric === 'tests'
+    ? Math.max(4.0, Math.max(...rawValues, 0) * 1.25)
+    : 100.0;
+  const unit = activeMetric === 'tests' ? '' : '%';
 
-  // Resolve dynamic metric curve (Average Score, Overall Accuracy, or Tests Completed)
-  const activeMetricData = activePeriod?.metrics?.[activeMetric] || {
+  const computedSvg = computeSvgPath(rawValues, rawLabels, maxVal, 0.0, unit);
+
+  const maxValInt = Math.ceil(maxVal);
+  const dynamicYMarkers = activeMetric === 'tests'
+    ? [
+        `${maxValInt}`,
+        `${Math.round(maxValInt * 0.75)}`,
+        `${Math.round(maxValInt * 0.5)}`,
+        '0'
+      ]
+    : ['100%', '75%', '50%', '0%'];
+
+  const activeMetricData = {
     id: activeMetric,
     title: activeMetric === 'accuracy' ? 'Overall Accuracy' : activeMetric === 'tests' ? 'Tests Completed' : 'Average Score',
     color: activeMetric === 'accuracy' ? '#059669' : activeMetric === 'tests' ? '#7C3AED' : '#4285F4',
     gradientId: activeMetric === 'accuracy' ? 'dashAccGrad' : activeMetric === 'tests' ? 'dashTestsGrad' : 'dashScoreGrad',
-    yMarkers: activeMetric === 'tests'
-      ? (chartFilter === '3m' ? ['80', '60', '40', '0'] : chartFilter === '30d' ? ['32', '24', '16', '0'] : ['8', '6', '4', '0'])
-      : ['90%', '75%', '60%', '0%'],
-    pathLine: activePeriod.pathLine,
-    pathArea: activePeriod.pathArea,
-    nodes: activePeriod.nodes || [],
-    labels: activePeriod.labels || []
+    yMarkers: periodMetric?.yMarkers || dynamicYMarkers,
+    pathLine: computedSvg.pathLine,
+    pathArea: computedSvg.pathArea,
+    nodes: computedSvg.nodes,
+    labels: computedSvg.labels,
+    rawValues
   };
+
+  // 3 Skill Progress Cards derived from live database data
+  const skillCardsData = [
+    {
+      id: 'aptitude',
+      date: 'Updated from DB',
+      tag: liveSkillStats.aptitude.solved > 0 ? 'Working' : 'Not Started',
+      tagColor: 'purple',
+      title: 'Aptitude & Problem Solving',
+      subtitle: 'Quantitative & Logical Reasoning',
+      totalProblems: liveSkillStats.aptitude.total,
+      solvedProblems: liveSkillStats.aptitude.solved,
+      remainingProblems: liveSkillStats.aptitude.remaining,
+      progress: liveSkillStats.aptitude.progress,
+      theme: 'purple',
+      deadlineBadge: `${liveSkillStats.aptitude.remaining} Remaining`,
+      path: '/aptitude'
+    },
+    {
+      id: 'technical',
+      date: 'Active Session',
+      tag: liveSkillStats.technical.solved > 0 ? 'In Progress' : 'Not Started',
+      tagColor: 'blue',
+      title: 'Technical (DSA & Core)',
+      subtitle: 'Data Structures, Algorithms & OS',
+      totalProblems: liveSkillStats.technical.total,
+      solvedProblems: liveSkillStats.technical.solved,
+      remainingProblems: liveSkillStats.technical.remaining,
+      progress: liveSkillStats.technical.progress,
+      theme: 'blue',
+      deadlineBadge: `${liveSkillStats.technical.remaining} Qs Left`,
+      path: '/questions?category=Technical'
+    },
+    {
+      id: 'coding',
+      date: 'Daily Target',
+      tag: liveSkillStats.coding.solved > 0 ? 'Working' : 'Not Started',
+      tagColor: 'purple',
+      title: 'Coding & Algorithms',
+      subtitle: 'Competitive Programming Drills',
+      totalProblems: liveSkillStats.coding.total,
+      solvedProblems: liveSkillStats.coding.solved,
+      remainingProblems: liveSkillStats.coding.remaining,
+      progress: liveSkillStats.coding.progress,
+      theme: 'purple',
+      deadlineBadge: `${liveSkillStats.coding.remaining} Problems Left`,
+      path: '/coding/practice'
+    }
+  ];
+
+  const recentAssessmentsList = dashboardData?.recent_assessments || [];
+
 
   return (
     <div className="user-dashboard-wrapper">
@@ -169,12 +297,12 @@ export default function UserDashboard() {
           TODAY'S PRACTICE / WELCOME CARD (EXACT REFERENCE STYLE)
           ========================================================== */}
       <TodayPracticeCard
-        userName={displayName?.split(' ')[0] || 'Courtney'}
+        userName={displayName?.split(' ')[0] || 'Student'}
         greeting="Welcome back"
         subtitle="Complete your daily curated drills in Aptitude, Technical and Coding to maintain your placement readiness."
-        streakDays={stats.streak_days || 12}
-        completedCount={18}
-        totalCount={21}
+        streakDays={stats.streak_days || 0}
+        completedCount={(stats.questions_solved || 0) + (stats.coding_problems_solved || 0)}
+        totalCount={(stats.total_questions || 0) + (stats.coding_breakdown?.total || 0)}
         onStartPractice={() => {
           const el = document.getElementById('skill-progress-section');
           el?.scrollIntoView({ behavior: 'smooth' });
@@ -192,6 +320,7 @@ export default function UserDashboard() {
                 YOUR SKILL PROGRESS CARDS (EXACT REFERENCE DESIGN)
                 ========================================================== */}
           <SkillProgressSection
+            skillsData={skillCardsData}
             skillProgress={dashboardData?.skill_progress}
             aptitudeProgress={dashboardData?.aptitude_progress}
           />
@@ -199,11 +328,23 @@ export default function UserDashboard() {
           {/* ==========================================================
                 5. PERFORMANCE OVERVIEW (FULL-WIDTH ANALYTICS CHART)
                 ========================================================== */}
-          <div className="dashboard-analytics-full-row" style={{ marginBottom: '32px' }}>
+          <div className="dashboard-analytics-full-row" style={{ marginBottom: '24px' }}>
             <section className="card performance-overview-full-card" id="performance-chart-section">
               <div className="card-header-row">
                 <div>
-                  <h3 className="card-title">📊 Performance Overview</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <h3 className="card-title">📊 Performance Overview</h3>
+                    {chartFilter === 'live' ? (
+                      <span className="realtime-live-indicator">
+                        <span className="pulse-beacon-circle"></span>
+                        REAL-TIME STREAMING
+                      </span>
+                    ) : (
+                      <span className="realtime-sync-indicator" title="Connected to database and real-time event pipeline">
+                        ● Real-Time Synced
+                      </span>
+                    )}
+                  </div>
                   <p style={{ fontSize: '13.5px', color: 'var(--color-muted-text, #5F6368)', margin: '4px 0 0 0' }}>
                     {activeMetric === 'score' && '📊 Tracking your Average Diagnostic Score progression across evaluated assessments.'}
                     {activeMetric === 'accuracy' && '🎯 Tracking your Overall Accuracy and precision consistency across problems solved.'}
@@ -211,6 +352,14 @@ export default function UserDashboard() {
                   </p>
                 </div>
                 <div className="filter-button-group">
+                  <button
+                    className={`btn-filter live-filter-btn ${chartFilter === 'live' ? 'active live-active' : ''}`}
+                    onClick={() => setChartFilter('live')}
+                    title="Switch to Real-Time Dynamic Stream"
+                  >
+                    <span className="live-filter-dot"></span>
+                    Live Stream
+                  </button>
                   <button
                     className={`btn-filter ${chartFilter === '7d' ? 'active' : ''}`}
                     onClick={() => setChartFilter('7d')}
@@ -245,9 +394,9 @@ export default function UserDashboard() {
                     <h4>Average Score</h4>
                     {activeMetric === 'score' && <span className="metric-active-badge score">● On Graph</span>}
                   </div>
-                  <p style={{ color: '#202124' }}>{activePeriod.avg || '82.4%'}</p>
+                  <p style={{ color: '#202124' }}>{activePeriod.avg || '0.0%'}</p>
                   <span className="chart-stat-subtext" style={{ color: '#059669' }}>
-                    {activePeriod.trend || '↑ +6.2% this period'}
+                    {activePeriod.trend || 'Connected to Database'}
                   </span>
                 </div>
 
@@ -262,8 +411,10 @@ export default function UserDashboard() {
                     <h4>Overall Accuracy</h4>
                     {activeMetric === 'accuracy' && <span className="metric-active-badge accuracy">● On Graph</span>}
                   </div>
-                  <p style={{ color: '#059669' }}>{activePeriod.acc || '86%'}</p>
-                  <span className="chart-stat-subtext" style={{ color: '#059669' }}>Top 10% Batch Rank</span>
+                  <p style={{ color: '#059669' }}>{activePeriod.acc || '0.0%'}</p>
+                  <span className="chart-stat-subtext" style={{ color: '#059669' }}>
+                    {parseFloat(activePeriod.acc) > 0 ? 'Accuracy Calibrated' : 'Accuracy Baseline'}
+                  </span>
                 </div>
 
                 <div
@@ -277,16 +428,20 @@ export default function UserDashboard() {
                     <h4>Tests Completed</h4>
                     {activeMetric === 'tests' && <span className="metric-active-badge tests">● On Graph</span>}
                   </div>
-                  <p style={{ color: '#7C3AED' }}>{activePeriod.tests || '7 Tests'}</p>
-                  <span className="chart-stat-subtext" style={{ color: '#7C3AED' }}>100% Evaluated</span>
+                  <p style={{ color: '#7C3AED' }}>{activePeriod.tests || '0 Tests'}</p>
+                  <span className="chart-stat-subtext" style={{ color: '#7C3AED' }}>
+                    {parseInt(activePeriod.tests) > 0 ? 'Evaluated in DB' : '0 Evaluated'}
+                  </span>
                 </div>
 
                 <div className="chart-stat-item">
                   <div className="chart-stat-header">
                     <h4>Active Consistency</h4>
                   </div>
-                  <p style={{ color: '#D97706' }}>{activePeriod.streak || '12 Days Active'}</p>
-                  <span className="chart-stat-subtext" style={{ color: '#D97706' }}>🔥 Daily Streak Active</span>
+                  <p style={{ color: '#D97706' }}>{activePeriod.streak || `${stats.streak_days || 0} Days Active`}</p>
+                  <span className="chart-stat-subtext" style={{ color: '#D97706' }}>
+                    {(stats.streak_days || 0) > 0 ? '🔥 Daily Streak Active' : 'Start Your Streak'}
+                  </span>
                 </div>
               </div>
 
@@ -321,7 +476,7 @@ export default function UserDashboard() {
                 </div>
               </div>
 
-              {/* Full-Width Dynamic SVG Line Chart */}
+              {/* Full-Width Dynamic SVG Line Chart with Real-Time Method */}
               <div className="svg-chart-container full-width-chart-container">
                 <svg
                   viewBox="0 0 1000 240"
@@ -384,45 +539,59 @@ export default function UserDashboard() {
                   />
 
                   {/* Nodes & Tooltips */}
-                  {activeMetricData.nodes.map((node, i) => (
-                    <g key={i} className="chart-node-group">
-                      <circle
-                        cx={node.cx}
-                        cy={node.cy}
-                        r="8"
-                        fill={activeMetricData.color || '#4285F4'}
-                        fillOpacity="0.18"
-                      />
-                      <circle
-                        cx={node.cx}
-                        cy={node.cy}
-                        r="5"
-                        fill="#FFFFFF"
-                        stroke={activeMetricData.color || '#4285F4'}
-                        strokeWidth="2.5"
-                      />
-                      {/* Tooltip badge */}
-                      <rect
-                        x={node.cx - 24}
-                        y={node.cy - 28}
-                        width="48"
-                        height="20"
-                        rx="6"
-                        fill="#1E293B"
-                      />
-                      <text
-                        x={node.cx}
-                        y={node.cy - 14}
-                        fill="#FFFFFF"
-                        fontSize="10"
-                        fontWeight="600"
-                        textAnchor="middle"
-                        fontFamily="sans-serif"
-                      >
-                        {node.val}
-                      </text>
-                    </g>
-                  ))}
+                  {activeMetricData.nodes.map((node, i) => {
+                    const isLatest = i === activeMetricData.nodes.length - 1;
+                    return (
+                      <g key={i} className="chart-node-group">
+                        {/* Real-time radar ping on active latest point */}
+                        {isLatest && (
+                          <circle
+                            cx={node.cx}
+                            cy={node.cy}
+                            r="16"
+                            fill={activeMetricData.color || '#4285F4'}
+                            fillOpacity="0.2"
+                            className="live-radar-ping"
+                          />
+                        )}
+                        <circle
+                          cx={node.cx}
+                          cy={node.cy}
+                          r="8"
+                          fill={activeMetricData.color || '#4285F4'}
+                          fillOpacity={isLatest ? 0.35 : 0.18}
+                        />
+                        <circle
+                          cx={node.cx}
+                          cy={node.cy}
+                          r="5"
+                          fill="#FFFFFF"
+                          stroke={activeMetricData.color || '#4285F4'}
+                          strokeWidth="2.5"
+                        />
+                        {/* Tooltip badge */}
+                        <rect
+                          x={node.cx - 24}
+                          y={node.cy - 28}
+                          width="48"
+                          height="20"
+                          rx="6"
+                          fill="#1E293B"
+                        />
+                        <text
+                          x={node.cx}
+                          y={node.cy - 14}
+                          fill="#FFFFFF"
+                          fontSize="10"
+                          fontWeight="600"
+                          textAnchor="middle"
+                          fontFamily="sans-serif"
+                        >
+                          {node.val}
+                        </text>
+                      </g>
+                    );
+                  })}
 
                   {/* X-Axis Date Labels */}
                   {activeMetricData.labels.map((lbl, idx) => {
@@ -446,6 +615,7 @@ export default function UserDashboard() {
               </div>
             </section>
           </div>
+
 
           {/* ==========================================================
                 8. RECENT ASSESSMENTS TABLE

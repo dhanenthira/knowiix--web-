@@ -156,7 +156,7 @@ export default function Login() {
 
             <div className="auth-header">
               <h1>Welcome Back 👋</h1>
-              <p>Continue your SkillPrep journey and ace your placement.</p>
+              <p>Continue your learning journey and ace your placement.</p>
             </div>
 
             {/* General Alert */}
@@ -397,7 +397,7 @@ export default function Login() {
                   gap: '6px'
                 }}
               >
-                <span>← Back to SkillPrep Home</span>
+                <span>← Back to Home</span>
               </Link>
             </div>
           </div>

@@ -78,6 +78,9 @@ export const codingApi = {
       language,
       code
     });
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('student_performance_updated'));
+    }
     return res.data;
   },
 
@@ -99,11 +102,46 @@ export const codingApi = {
     return res.data;
   },
 
-  // 9. Problem status for current user
-  getProblemStatus: async (problemId) => {
-    const res = await apiClient.get(`/api/v1/coding/problems/${problemId}/status`);
+  // 10. User Profile & LeetCode-style APIs
+  getUserProfile: async (username = 'me') => {
+    const res = await apiClient.get(`/api/v1/users/${username}`);
+    return res.data;
+  },
+  getUserStats: async (username = 'me') => {
+    const res = await apiClient.get(`/api/v1/users/${username}/stats`);
+    return res.data;
+  },
+  getUserActivity: async (username = 'me', year = null) => {
+    const res = await apiClient.get(`/api/v1/users/${username}/activity`, {
+      params: year ? { year } : {}
+    });
+    return res.data;
+  },
+  getUserContests: async (username = 'me') => {
+    const res = await apiClient.get(`/api/v1/users/${username}/contests`);
+    return res.data;
+  },
+  getUserSkills: async (username = 'me') => {
+    const res = await apiClient.get(`/api/v1/users/${username}/skills`);
+    return res.data;
+  },
+  getUserBadges: async (username = 'me') => {
+    const res = await apiClient.get(`/api/v1/users/${username}/badges`);
+    return res.data;
+  },
+  getUserSubmissionsList: async (username = 'me', params = {}) => {
+    const res = await apiClient.get(`/api/v1/users/${username}/submissions`, { params });
+    return res.data;
+  },
+  getUserAnalytics: async (username = 'me') => {
+    const res = await apiClient.get(`/api/v1/users/${username}/analytics`);
+    return res.data;
+  },
+  updateUserProfile: async (data) => {
+    const res = await apiClient.put('/api/v1/users/me', data);
     return res.data;
   }
 };
 
 export default codingApi;
+

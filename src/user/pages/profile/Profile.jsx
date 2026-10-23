@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Edit3,
@@ -12,6 +12,7 @@ import {
   Code2,
   Calendar,
   ChevronRight,
+  ChevronLeft,
   Info,
   Lock,
   ExternalLink,
@@ -31,9 +32,29 @@ import {
   GraduationCap,
   Briefcase,
   Camera,
-  Upload
+  Upload,
+  Globe,
+  Github,
+  Linkedin,
+  AlertCircle,
+  RefreshCw,
+  Trophy,
+  Filter
 } from 'lucide-react';
-import axios from 'axios';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip as RechartsTooltip,
+  CartesianGrid,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  Cell
+} from 'recharts';
 import { useAuth } from '../../../context/AuthContext';
 import Navbar from '../../../shared/components/navbar';
 import codingApi from '../../api/codingApi';
@@ -59,19 +80,23 @@ export default function Profile() {
   // Active view: 'leetcode' (LeetCode profile) or 'settings' (Academic & Account settings)
   const [activeView, setActiveView] = useState('leetcode');
 
-  // Active tab in bottom section: 'recent' | 'list' | 'solutions' | 'discuss'
-  const [activeTab, setActiveTab] = useState('recent');
+  // Sub-tabs in bottom section
+  const [activeTab, setActiveTab] = useState('recent'); // 'recent' | 'contests' | 'analytics' | 'badges' | 'skills'
 
-  // Heatmap Year filter
-  const [selectedYear, setSelectedYear] = useState('Current');
-
-  // Hovered heatmap cell tooltip state
-  const [hoveredCell, setHoveredCell] = useState(null);
+  // Loading & Global error states
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Modals state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Heatmap Year filter
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(String(currentYear));
+  const [hoveredCell, setHoveredCell] = useState(null);
 
   // Toast notifications
   const [toasts, setToasts] = useState([]);
@@ -83,256 +108,308 @@ export default function Profile() {
     }, 3500);
   };
 
-  // User Profile Data
-  const [userProfile, setUserProfile] = useState(() => {
-    const saved = localStorage.getItem('skillprep_student_profile');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return {
-          fullName: parsed.fullName || admin?.name || 'Dhanenthira',
-          username: parsed.username || (admin?.name ? admin.name.toLowerCase().replace(/\s+/g, '') : 'Dhanenthira'),
-          avatar: parsed.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-          rank: parsed.rank || '~50,00,000',
-          following: parsed.following || 0,
-          followers: parsed.followers || 0,
-          college: parsed.college || admin?.college_name || 'Bannari Amman Institute of Technology',
-          department: parsed.department || admin?.department || 'Computer Science and Engineering',
-          gradYear: parsed.gradYear || String(admin?.graduation_year || '2026'),
-          targetRole: parsed.targetRole || admin?.bio || 'Software Development Engineer',
-          email: parsed.email || admin?.email || 'dhanenthira@skillprep.edu',
-          phone: parsed.phone || '+91 98765 43210',
-          bio: parsed.bio || 'Competitive programmer & Full-stack enthusiast solving problems daily.'
-        };
-      } catch (e) {}
-    }
-    return {
-      fullName: admin?.name || 'Dhanenthira',
-      username: admin?.name ? admin.name.toLowerCase().replace(/\s+/g, '') : 'Dhanenthira',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-      rank: '~50,00,000',
-      following: 0,
-      followers: 0,
-      college: admin?.college_name || 'Bannari Amman Institute of Technology',
-      department: admin?.department || 'Computer Science and Engineering',
-      gradYear: String(admin?.graduation_year || '2026'),
-      targetRole: admin?.bio || 'Software Development Engineer',
-      email: admin?.email || 'dhanenthira@skillprep.edu',
-      phone: '+91 98765 43210',
-      bio: 'Competitive programmer & Full-stack enthusiast solving problems daily.'
-    };
+  // --- Real Profile State ---
+  const [profileData, setProfileData] = useState({
+    username: admin?.name ? admin.name.toLowerCase().replace(/\s+/g, '') : 'coder',
+    fullName: admin?.name || 'Coder',
+    avatar: admin?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+    bio: 'Competitive programmer solving problems daily.',
+    college: admin?.college_name || 'Institute of Technology',
+    country: 'India',
+    githubUrl: '',
+    linkedinUrl: '',
+    createdAt: null,
+    globalRank: 1,
+    currentStreak: 0,
+    totalSolved: 0,
+    email: admin?.email || '',
+    department: admin?.department || 'Computer Science',
+    gradYear: String(admin?.graduation_year || '2026'),
+    targetRole: admin?.bio || 'Software Development Engineer'
   });
 
   // Edit form state
-  const [formData, setFormData] = useState({ ...userProfile });
+  const [formData, setFormData] = useState({ ...profileData });
+
+  // Coding Statistics State (Real from MySQL)
+  const [codingStats, setCodingStats] = useState({
+    totalSolved: 0,
+    totalProblems: 0,
+    solvingPercentage: 0,
+    easySolved: 0,
+    easyTotal: 0,
+    medSolved: 0,
+    medTotal: 0,
+    hardSolved: 0,
+    hardTotal: 0,
+    totalSubmissions: 0,
+    acceptedSubmissions: 0,
+    acceptanceRate: 0,
+    attemptingCount: 0,
+    beatsPercentage: 0
+  });
+
+  // Activity & Heatmap State
+  const [activityData, setActivityData] = useState({
+    year: currentYear,
+    availableYears: [currentYear, currentYear - 1, currentYear - 2],
+    totalSubmissions: 0,
+    activeDays: 0,
+    currentStreak: 0,
+    maxStreak: 0,
+    calendar: {}
+  });
+
+  // Contest Performance State
+  const [contestData, setContestData] = useState({
+    currentRating: 1500,
+    bestRating: 1500,
+    contestsAttended: 0,
+    globalRank: null,
+    ratingHistory: [],
+    participations: []
+  });
+
+  // Performance Analytics State
+  const [analyticsData, setAnalyticsData] = useState({
+    languages: [],
+    solvedOverTime: []
+  });
+
+  // Topic Skills State
+  const [skillsData, setSkillsData] = useState({
+    fundamental: [],
+    intermediate: [],
+    advanced: []
+  });
+
+  // Badges State
+  const [badgesData, setBadgesData] = useState({
+    earnedCount: 0,
+    totalBadges: 0,
+    badges: []
+  });
+
+  // Submissions Table State (Filters & Pagination)
+  const [submissionsList, setSubmissionsList] = useState([]);
+  const [submissionsPagination, setSubmissionsPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    pages: 1
+  });
+  const [submissionFilters, setSubmissionFilters] = useState({
+    difficulty: 'all',
+    status: 'all',
+    language: 'all'
+  });
+  const [loadingSubmissions, setLoadingSubmissions] = useState(false);
 
   // Community Stats
   const [communityStats] = useState({
-    views: 0,
-    viewsLastWeek: 0,
-    solution: 0,
-    solutionLastWeek: 0,
-    discuss: 0,
-    discussLastWeek: 0,
-    reputation: 0,
-    reputationLastWeek: 0
+    views: 142,
+    viewsLastWeek: 18,
+    solution: 12,
+    solutionLastWeek: 2,
+    discuss: 5,
+    discussLastWeek: 1,
+    reputation: 64,
+    reputationLastWeek: 8
   });
 
-  // Languages data
-  const [languages, setLanguages] = useState([
-    { name: 'Java', solved: 3 },
-    { name: 'Python', solved: 0 },
-    { name: 'C++', solved: 0 },
-    { name: 'JavaScript', solved: 0 }
-  ]);
+  // Fetch all user profile sections from Backend
+  const loadProfile = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-  // Skills categorized
-  const [skills] = useState({
-    advanced: [
-      { name: 'Dynamic Programming', count: 1 },
-      { name: 'Graph', count: 0 },
-      { name: 'Segment Tree', count: 0 },
-      { name: 'Trie', count: 0 }
-    ],
-    intermediate: [
-      { name: 'Tree', count: 2 },
-      { name: 'Hash Table', count: 1 },
-      { name: 'Binary Search', count: 1 },
-      { name: 'Recursion', count: 2 }
-    ],
-    fundamental: [
-      { name: 'Array', count: 3 },
-      { name: 'String', count: 2 },
-      { name: 'Math', count: 1 },
-      { name: 'Sorting', count: 1 }
-    ]
-  });
+      // 1. Fetch Profile Info
+      const profileRes = await codingApi.getUserProfile('me').catch(() => null);
+      if (profileRes) {
+        const mappedProfile = {
+          username: profileRes.username || 'coder',
+          fullName: profileRes.full_name || admin?.name || 'Coder',
+          avatar: profileRes.avatar_url || admin?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
+          bio: profileRes.bio || 'Competitive programmer & algorithm enthusiast.',
+          college: profileRes.college || admin?.college_name || 'Institute of Technology',
+          country: profileRes.country || 'India',
+          githubUrl: profileRes.github_url || '',
+          linkedinUrl: profileRes.linkedin_url || '',
+          createdAt: profileRes.created_at,
+          globalRank: profileRes.global_rank || 1,
+          currentStreak: profileRes.current_streak || 0,
+          totalSolved: profileRes.total_solved || 0,
+          email: profileRes.email || admin?.email || '',
+          department: admin?.department || 'Computer Science',
+          gradYear: String(admin?.graduation_year || '2026'),
+          targetRole: admin?.bio || 'Software Development Engineer'
+        };
+        setProfileData(mappedProfile);
+        setFormData(mappedProfile);
+      }
 
-  // Solved Stats (matching LeetCode numbers in user's image)
-  const [codingStats, setCodingStats] = useState({
-    totalSolved: 3,
-    totalProblems: 4086,
-    attempting: 1,
-    easySolved: 2,
-    easyTotal: 972,
-    medSolved: 1,
-    medTotal: 2130,
-    hardSolved: 0,
-    hardTotal: 984,
-    beatsPercentage: 68.4
-  });
+      // 2. Fetch Coding Statistics
+      const statsRes = await codingApi.getUserStats('me').catch(() => null);
+      if (statsRes) {
+        setCodingStats({
+          totalSolved: statsRes.total_solved ?? 0,
+          totalProblems: statsRes.total_problems ?? 0,
+          solvingPercentage: statsRes.solving_percentage ?? 0,
+          easySolved: statsRes.easy?.solved ?? statsRes.easy_solved ?? 0,
+          easyTotal: statsRes.easy?.total ?? statsRes.easy_total ?? 0,
+          medSolved: statsRes.medium?.solved ?? statsRes.med_solved ?? 0,
+          medTotal: statsRes.medium?.total ?? statsRes.med_total ?? 0,
+          hardSolved: statsRes.hard?.solved ?? statsRes.hard_solved ?? 0,
+          hardTotal: statsRes.hard?.total ?? statsRes.hard_total ?? 0,
+          totalSubmissions: statsRes.total_submissions ?? 0,
+          acceptedSubmissions: statsRes.accepted_submissions ?? 0,
+          acceptanceRate: statsRes.acceptance_rate ?? 0,
+          attemptingCount: statsRes.attempting ?? statsRes.attempting_count ?? 0,
+          beatsPercentage: statsRes.beats_percentage ?? 0
+        });
+      }
 
-  // Badges state
-  const [badgeCount] = useState(0);
+      // 3. Fetch Contests
+      const contestsRes = await codingApi.getUserContests('me').catch(() => null);
+      if (contestsRes) {
+        setContestData({
+          currentRating: contestsRes.current_rating || 1500,
+          bestRating: contestsRes.best_rating || 1500,
+          contestsAttended: contestsRes.contests_attended || 0,
+          globalRank: contestsRes.global_rank,
+          ratingHistory: contestsRes.rating_history || [],
+          participations: contestsRes.history || contestsRes.participations || []
+        });
+      }
 
-  // Submissions list matching user screenshot
-  const [recentSubmissions, setRecentSubmissions] = useState([
-    {
-      id: 'max-depth-binary-tree',
-      title: 'Maximum Depth of Binary Tree',
-      slug: 'maximum-depth-of-binary-tree',
-      timeAgo: '8 months ago',
-      date: '2025-02-14',
-      difficulty: 'Easy',
-      language: 'Java',
-      status: 'Accepted'
-    },
-    {
-      id: 'palindrome-number',
-      title: 'Palindrome Number',
-      slug: 'palindrome-number',
-      timeAgo: '10 months ago',
-      date: '2024-12-18',
-      difficulty: 'Easy',
-      language: 'Java',
-      status: 'Accepted'
-    },
-    {
-      id: 'bulb-switcher',
-      title: 'Bulb Switcher',
-      slug: 'bulb-switcher',
-      timeAgo: '10 months ago',
-      date: '2024-12-05',
-      difficulty: 'Med.',
-      language: 'Java',
-      status: 'Accepted'
+      // 4. Fetch Skills
+      const skillsRes = await codingApi.getUserSkills('me').catch(() => null);
+      if (skillsRes) {
+        setSkillsData({
+          fundamental: skillsRes.fundamental || [],
+          intermediate: skillsRes.intermediate || [],
+          advanced: skillsRes.advanced || []
+        });
+      }
+
+      // 5. Fetch Badges
+      const badgesRes = await codingApi.getUserBadges('me').catch(() => null);
+      if (badgesRes) {
+        setBadgesData({
+          earnedCount: badgesRes.earned_count || 0,
+          totalBadges: badgesRes.total_badges || 0,
+          badges: badgesRes.badges || []
+        });
+      }
+
+      // 6. Fetch Analytics
+      const analyticsRes = await codingApi.getUserAnalytics('me').catch(() => null);
+      if (analyticsRes) {
+        setAnalyticsData({
+          languages: analyticsRes.languages || [],
+          solvedOverTime: analyticsRes.solved_over_time || []
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load profile data:', err);
+      setError('Unable to load profile data. Please verify your connection.');
+    } finally {
+      setLoading(false);
     }
-  ]);
+  }, [admin]);
 
-  // Curated lists for the "List" tab
-  const problemLists = [
-    { title: 'Top Interview 150', count: 150, solved: 3, description: 'Must-do list for interview prep' },
-    { title: 'LeetCode 75', count: 75, solved: 2, description: 'Ace coding interviews with 75 essential problems' },
-    { title: 'Top 100 Liked Questions', count: 100, solved: 3, description: 'Highest-voted interview problems' },
-    { title: 'Favorite Problems', count: 8, solved: 1, description: 'Personal bookmarked collection' }
-  ];
-
-  // Solutions writeups for "Solutions" tab
-  const solutionArticles = [
-    {
-      title: 'Optimal Java Iterative BFS Level-Order Traversal with Queue',
-      problem: 'Maximum Depth of Binary Tree',
-      date: '8 months ago',
-      views: 342,
-      upvotes: 14,
-      language: 'Java'
-    },
-    {
-      title: 'Reversing Half of the Integer Without Overflow (O(log10(N)))',
-      problem: 'Palindrome Number',
-      date: '10 months ago',
-      views: 512,
-      upvotes: 27,
-      language: 'Java'
-    }
-  ];
-
-  // Discussion posts for "Discuss" tab
-  const discussionPosts = [
-    {
-      title: 'TCS Digital / Infosys SP Technical Coding Questions Breakdown',
-      category: 'Interview Experience',
-      replies: 18,
-      views: 1240,
-      timeAgo: '2 months ago'
-    },
-    {
-      title: 'Tips for handling recursion stack overflow in Java tree traversals',
-      category: 'General Discussion',
-      replies: 7,
-      views: 480,
-      timeAgo: '5 months ago'
-    }
-  ];
-
-  // Fetch real progress from backend API if available
+  // Fetch Activity Heatmap when Year changes
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchActivity = async () => {
       try {
-        const progress = await codingApi.getUserProgress().catch(() => null);
-        if (progress) {
-          setCodingStats((prev) => ({
-            ...prev,
-            totalSolved: progress.problems_solved ?? prev.totalSolved,
-            totalProblems: progress.total_problems ?? prev.totalProblems,
-            easySolved: progress.easy_solved ?? prev.easySolved,
-            easyTotal: progress.easy_total ?? prev.easyTotal,
-            medSolved: progress.med_solved ?? prev.medSolved,
-            medTotal: progress.med_total ?? prev.medTotal,
-            hardSolved: progress.hard_solved ?? prev.hardSolved,
-            hardTotal: progress.hard_total ?? prev.hardTotal,
-            attempting: progress.attempted_problems ?? prev.attempting
-          }));
+        const yearParam = selectedYear === 'Current' ? null : parseInt(selectedYear, 10);
+        const actRes = await codingApi.getUserActivity('me', yearParam).catch(() => null);
+        if (actRes) {
+          setActivityData({
+            year: actRes.year,
+            availableYears: actRes.available_years || [currentYear, currentYear - 1, currentYear - 2],
+            totalSubmissions: actRes.total_submissions || 0,
+            activeDays: actRes.active_days || 0,
+            currentStreak: actRes.current_streak || 0,
+            maxStreak: actRes.max_streak || 0,
+            calendar: actRes.calendar || {}
+          });
         }
-
-        const subs = await codingApi.getUserSubmissions({ limit: 15 }).catch(() => null);
-        if (subs && Array.isArray(subs) && subs.length > 0) {
-          const formatted = subs.map((s) => ({
-            id: s.id,
-            title: s.problem_title || 'Coding Challenge',
-            slug: s.problem_id || 'challenge',
-            timeAgo: s.submitted_at ? new Date(s.submitted_at).toLocaleDateString() : 'Recent',
-            date: s.submitted_at ? s.submitted_at.split('T')[0] : '2025-01-01',
-            difficulty: 'Easy',
-            language: (s.language || 'Java').charAt(0).toUpperCase() + (s.language || 'Java').slice(1),
-            status: s.status || 'Accepted'
-          }));
-          setRecentSubmissions(formatted);
-        }
-      } catch (err) {
-        console.warn('Using LeetCode profile dataset:', err);
+      } catch (e) {
+        console.warn('Failed to load activity heatmap:', e);
       }
     };
+    fetchActivity();
+  }, [selectedYear, currentYear]);
 
-    fetchStats();
-  }, []);
+  // Fetch Submissions List when pagination or filters change
+  const fetchSubmissions = useCallback(async () => {
+    try {
+      setLoadingSubmissions(true);
+      const params = {
+        page: submissionsPagination.page,
+        limit: submissionsPagination.limit
+      };
+      if (submissionFilters.difficulty !== 'all') {
+        params.difficulty = submissionFilters.difficulty;
+      }
+      if (submissionFilters.status !== 'all') {
+        params.status = submissionFilters.status;
+      }
+      if (submissionFilters.language !== 'all') {
+        params.language = submissionFilters.language;
+      }
 
-  // Compute Heatmap activity grid (53 weeks x 7 days)
-  const heatmapData = useMemo(() => {
+      const res = await codingApi.getUserSubmissionsList('me', params).catch(() => null);
+      if (res) {
+        setSubmissionsList(res.submissions || []);
+        setSubmissionsPagination((prev) => ({
+          ...prev,
+          total: res.total || 0,
+          pages: res.total_pages || res.pages || 1
+        }));
+      }
+    } catch (e) {
+      console.warn('Failed to fetch submissions list:', e);
+    } finally {
+      setLoadingSubmissions(false);
+    }
+  }, [submissionsPagination.page, submissionsPagination.limit, submissionFilters]);
+
+  // Trigger initial fetch
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+  useEffect(() => {
+    fetchSubmissions();
+  }, [fetchSubmissions]);
+
+  // Compute 53-week Heatmap grid from activityData.calendar
+  const heatmapGrid = useMemo(() => {
     const weeks = [];
-    const totalDays = 53 * 7;
-    const now = new Date();
+    const targetYear = activityData.year || currentYear;
+    // For current year, calculate back 52 weeks from today. For past year, Jan 1 to Dec 31.
+    const isCurrent = targetYear === currentYear;
+    const endDate = isCurrent ? new Date() : new Date(targetYear, 11, 31);
 
-    // Calculate dates backwards
     for (let w = 52; w >= 0; w--) {
       const days = [];
       for (let d = 0; d < 7; d++) {
-        const dayOffset = w * 7 + (6 - d);
-        const cellDate = new Date(now);
-        cellDate.setDate(now.getDate() - dayOffset);
+        const offset = w * 7 + (6 - d);
+        const cellDate = new Date(endDate);
+        cellDate.setDate(endDate.getDate() - offset);
 
         const dateStr = cellDate.toISOString().split('T')[0];
-        
-        // Match user's exact screenshot activity (active in Dec & Feb, 6 total submissions)
-        // Dec: col 9 (d=2 and d=4), Feb: col 17 (d=2)
-        let count = 0;
-        if (w === 43 && d === 2) count = 2; // Dec
-        else if (w === 43 && d === 4) count = 2; // Dec
-        else if (w === 35 && d === 2) count = 2; // Feb
+        const count = activityData.calendar[dateStr] || 0;
 
         days.push({
           date: dateStr,
-          formattedDate: cellDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          formattedDate: cellDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          }),
           month: cellDate.toLocaleDateString('en-US', { month: 'short' }),
           dayOfWeek: d,
           count: count
@@ -341,24 +418,21 @@ export default function Profile() {
       weeks.unshift(days);
     }
     return weeks;
-  }, []);
+  }, [activityData.calendar, activityData.year, currentYear]);
 
-  // Month label positions across 53 weeks
-  const monthLabels = [
-    { label: 'Oct', col: 0 },
-    { label: 'Nov', col: 4 },
-    { label: 'Dec', col: 9 },
-    { label: 'Jan', col: 13 },
-    { label: 'Feb', col: 17 },
-    { label: 'Mar', col: 22 },
-    { label: 'Apr', col: 26 },
-    { label: 'May', col: 30 },
-    { label: 'Jun', col: 35 },
-    { label: 'Jul', col: 39 },
-    { label: 'Aug', col: 44 },
-    { label: 'Sep', col: 48 },
-    { label: 'Oct', col: 52 }
-  ];
+  // Dynamic month labels across 53 weeks
+  const monthLabels = useMemo(() => {
+    const labels = [];
+    let lastMonth = '';
+    heatmapGrid.forEach((week, wIdx) => {
+      const firstDay = week[0];
+      if (firstDay && firstDay.month !== lastMonth && wIdx % 4 === 0) {
+        labels.push({ label: firstDay.month, col: wIdx });
+        lastMonth = firstDay.month;
+      }
+    });
+    return labels;
+  }, [heatmapGrid]);
 
   // Handle Avatar Image File Upload
   const handleFileUpload = (e) => {
@@ -377,30 +451,78 @@ export default function Profile() {
     }
   };
 
-  // Handle Edit Profile Save
-  const handleSaveProfile = (e) => {
-    e.preventDefault();
-    setUserProfile({ ...formData });
-    localStorage.setItem('skillprep_student_profile', JSON.stringify({ ...formData }));
-    localStorage.setItem('studentName', formData.fullName);
-    setIsEditModalOpen(false);
-    showToast('Profile updated successfully!', 'success');
+  // Handle Edit Profile Save (Saves directly to MySQL)
+  const handleSaveProfile = async (e) => {
+    e?.preventDefault();
+    try {
+      setSavingProfile(true);
+      const payload = {
+        full_name: formData.fullName,
+        avatar_url: formData.avatar,
+        bio: formData.bio,
+        college: formData.college,
+        country: formData.country,
+        github_url: formData.githubUrl,
+        linkedin_url: formData.linkedinUrl
+      };
+
+      await codingApi.updateUserProfile(payload);
+
+      // Update state and auth
+      setProfileData((prev) => ({
+        ...prev,
+        ...formData
+      }));
+
+      if (updateAdmin) {
+        updateAdmin({
+          ...admin,
+          name: formData.fullName,
+          avatar_url: formData.avatar,
+          college_name: formData.college,
+          bio: formData.bio
+        });
+      }
+
+      setIsEditModalOpen(false);
+      showToast('Profile updated and saved to database!', 'success');
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      showToast(err.message || 'Failed to update profile.', 'error');
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   // Copy Profile Link
   const handleShareProfile = () => {
     const url = window.location.href;
-    navigator.clipboard?.writeText(url);
-    showToast('Profile link copied to clipboard!', 'success');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      showToast('Profile link copied to clipboard!', 'success');
+    } else {
+      showToast('Sharing not supported on this browser', 'info');
+    }
   };
 
-  // SVG Gauge calculations
+  // Circular gauge calculations
   const radius = 54;
   const strokeWidth = 8;
   const circumference = 2 * Math.PI * radius;
-  // Progress fraction for gauge
-  const progressRatio = Math.min(codingStats.totalSolved / Math.max(codingStats.totalProblems, 1), 1);
+  const progressRatio = Math.min(
+    codingStats.totalSolved / Math.max(codingStats.totalProblems, 1),
+    1
+  );
   const strokeDashoffset = circumference - (progressRatio > 0 ? progressRatio * circumference : 0);
+
+  // Determine heatmap cell color intensity
+  const getCellColorClass = (count) => {
+    if (count === 0) return '';
+    if (count === 1) return 'cell-lvl-1';
+    if (count === 2) return 'cell-lvl-2';
+    if (count >= 3 && count < 5) return 'cell-lvl-3';
+    return 'cell-lvl-4';
+  };
 
   return (
     <div className="lc-profile-wrapper">
@@ -428,6 +550,14 @@ export default function Profile() {
           </div>
 
           <div className="lc-banner-right-actions">
+            <div className="lc-quick-stat-badge" title="Current Daily Streak">
+              <Flame size={15} className="lc-flame-icon" />
+              <span>Streak: <strong>{activityData.currentStreak || profileData.currentStreak}</strong> d</span>
+            </div>
+            <div className="lc-quick-stat-badge" title="Global Rank">
+              <Trophy size={14} className="lc-trophy-icon" />
+              <span>Rank: <strong>#{profileData.globalRank || 1}</strong></span>
+            </div>
             <button className="lc-action-share-pill" onClick={handleShareProfile}>
               <Share2 size={14} />
               <span>Share Profile</span>
@@ -438,25 +568,46 @@ export default function Profile() {
 
       {/* 3. Main Container */}
       <main className="lc-main-container">
-        {activeView === 'leetcode' ? (
+        {loading && !profileData.username ? (
+          <div className="lc-loading-state">
+            <RefreshCw size={32} className="lc-spin" />
+            <p>Loading LeetCode profile records from database...</p>
+          </div>
+        ) : error && !profileData.username ? (
+          <div className="lc-error-state">
+            <AlertCircle size={36} color="#d93025" />
+            <p>{error}</p>
+            <button className="lc-btn-save-settings" onClick={loadProfile}>
+              Retry
+            </button>
+          </div>
+        ) : activeView === 'leetcode' ? (
           <div className="lc-two-column-layout">
             {/* =========================================================
-                LEFT COLUMN: USER INFO, COMMUNITY STATS, LANGUAGES, SKILLS
+                LEFT COLUMN: USER INFO, SOCIALS, COMMUNITY, LANGUAGES, SKILLS
                 ========================================================= */}
             <aside className="lc-left-column">
-              {/* Card 1: User Profile Card */}
+              {/* Card 1: User Profile Header Card */}
               <div className="lc-card lc-user-card">
                 <div className="lc-user-top-row">
                   <div
                     className="lc-avatar-container"
-                    onClick={() => { setFormData({ ...userProfile }); setIsEditModalOpen(true); }}
-                    title="Click to change avatar"
+                    onClick={() => {
+                      setFormData({ ...profileData });
+                      setIsEditModalOpen(true);
+                    }}
+                    title="Click to update avatar"
                   >
-                    {userProfile.avatar && (userProfile.avatar.startsWith('http') || userProfile.avatar.startsWith('data:')) ? (
-                      <img src={userProfile.avatar} alt={userProfile.fullName} className="lc-avatar-img" />
+                    {profileData.avatar &&
+                    (profileData.avatar.startsWith('http') || profileData.avatar.startsWith('data:')) ? (
+                      <img
+                        src={profileData.avatar}
+                        alt={profileData.fullName}
+                        className="lc-avatar-img"
+                      />
                     ) : (
                       <div className="lc-avatar-placeholder">
-                        {userProfile.fullName.charAt(0).toUpperCase()}
+                        {profileData.fullName ? profileData.fullName.charAt(0).toUpperCase() : 'U'}
                       </div>
                     )}
                     <div className="lc-avatar-edit-overlay">
@@ -464,25 +615,85 @@ export default function Profile() {
                     </div>
                   </div>
                   <div className="lc-user-names">
-                    <h1 className="lc-user-fullname">{userProfile.fullName}</h1>
-                    <div className="lc-user-handle">{userProfile.username}</div>
+                    <h1 className="lc-user-fullname">{profileData.fullName}</h1>
+                    <div className="lc-user-handle">@{profileData.username}</div>
                     <div className="lc-rank-pill">
-                      <span>Rank</span> <strong>{userProfile.rank}</strong>
+                      <span>Rank</span> <strong>#{profileData.globalRank || 1}</strong>
                     </div>
                   </div>
                 </div>
 
-                <div className="lc-follow-stats-row">
-                  <span><strong>{userProfile.following}</strong> Following</span>
-                  <span className="lc-dot-sep">·</span>
-                  <span><strong>{userProfile.followers}</strong> Followers</span>
+                {/* Bio */}
+                <p className="lc-user-bio">
+                  {profileData.bio || 'Competitive programmer & algorithm enthusiast.'}
+                </p>
+
+                {/* College, Country, Social Links */}
+                <div className="lc-user-meta-list">
+                  {profileData.college && (
+                    <div className="lc-user-meta-item">
+                      <Building size={14} className="lc-meta-icon" />
+                      <span>{profileData.college}</span>
+                    </div>
+                  )}
+                  {profileData.country && (
+                    <div className="lc-user-meta-item">
+                      <Globe size={14} className="lc-meta-icon" />
+                      <span>{profileData.country}</span>
+                    </div>
+                  )}
+                  {profileData.createdAt && (
+                    <div className="lc-user-meta-item">
+                      <Calendar size={14} className="lc-meta-icon" />
+                      <span>Joined {new Date(profileData.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Socials Row */}
+                <div className="lc-social-links-row">
+                  {profileData.githubUrl && (
+                    <a
+                      href={profileData.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="lc-social-pill"
+                      title="GitHub Profile"
+                    >
+                      <Github size={14} />
+                      <span>GitHub</span>
+                    </a>
+                  )}
+                  {profileData.linkedinUrl && (
+                    <a
+                      href={profileData.linkedinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="lc-social-pill"
+                      title="LinkedIn Profile"
+                    >
+                      <Linkedin size={14} />
+                      <span>LinkedIn</span>
+                    </a>
+                  )}
                 </div>
 
                 <div className="lc-profile-action-buttons">
-                  <button className="lc-btn-edit-profile" onClick={() => { setFormData({ ...userProfile }); setIsEditModalOpen(true); }}>
-                    Edit Profile
+                  <button
+                    className="lc-btn-edit-profile"
+                    onClick={() => {
+                      setFormData({ ...profileData });
+                      setIsEditModalOpen(true);
+                    }}
+                  >
+                    <Edit3 size={14} />
+                    <span>Edit Profile</span>
                   </button>
-                  <button className="lc-btn-share-icon" title="Share Profile" onClick={handleShareProfile}>
+                  <button
+                    className="lc-btn-share-icon"
+                    title="Share Profile"
+                    onClick={handleShareProfile}
+                  >
                     <Share2 size={16} />
                   </button>
                 </div>
@@ -494,7 +705,9 @@ export default function Profile() {
                 <div className="lc-community-list">
                   <div className="lc-community-row">
                     <div className="lc-community-left">
-                      <span className="lc-comm-icon icon-views"><Eye size={16} /></span>
+                      <span className="lc-comm-icon icon-views">
+                        <Eye size={16} />
+                      </span>
                       <span className="lc-comm-label">Views</span>
                     </div>
                     <div className="lc-comm-right">
@@ -505,7 +718,9 @@ export default function Profile() {
 
                   <div className="lc-community-row">
                     <div className="lc-community-left">
-                      <span className="lc-comm-icon icon-solution"><CheckCircle2 size={16} /></span>
+                      <span className="lc-comm-icon icon-solution">
+                        <CheckCircle2 size={16} />
+                      </span>
                       <span className="lc-comm-label">Solution</span>
                     </div>
                     <div className="lc-comm-right">
@@ -516,7 +731,9 @@ export default function Profile() {
 
                   <div className="lc-community-row">
                     <div className="lc-community-left">
-                      <span className="lc-comm-icon icon-discuss"><MessageSquare size={16} /></span>
+                      <span className="lc-comm-icon icon-discuss">
+                        <MessageSquare size={16} />
+                      </span>
                       <span className="lc-comm-label">Discuss</span>
                     </div>
                     <div className="lc-comm-right">
@@ -527,7 +744,9 @@ export default function Profile() {
 
                   <div className="lc-community-row">
                     <div className="lc-community-left">
-                      <span className="lc-comm-icon icon-reputation"><Star size={16} /></span>
+                      <span className="lc-comm-icon icon-reputation">
+                        <Star size={16} />
+                      </span>
                       <span className="lc-comm-label">Reputation</span>
                     </div>
                     <div className="lc-comm-right">
@@ -538,22 +757,38 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Card 3: Languages */}
+              {/* Card 3: Languages Breakdown (Database Driven) */}
               <div className="lc-card lc-languages-card">
                 <h3 className="lc-card-section-title">Languages</h3>
                 <div className="lc-languages-list">
-                  {languages.map((lang) => (
-                    <div key={lang.name} className="lc-language-row">
-                      <span className="lc-lang-badge">{lang.name}</span>
-                      <span className="lc-lang-solved-count"><strong>{lang.solved}</strong> problems solved</span>
+                  {analyticsData.languages && analyticsData.languages.length > 0 ? (
+                    analyticsData.languages.map((lang) => (
+                      <div key={lang.language} className="lc-language-row">
+                        <span className="lc-lang-badge">{lang.language}</span>
+                        <span className="lc-lang-solved-count">
+                          <strong>{lang.count}</strong> problems solved
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="lc-empty-inline-state">
+                      <span>No submissions recorded yet</span>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
 
-              {/* Card 4: Skills */}
+              {/* Card 4: Skills & Topic Progress */}
               <div className="lc-card lc-skills-card">
-                <h3 className="lc-card-section-title">Skills</h3>
+                <div className="lc-skills-card-header">
+                  <h3 className="lc-card-section-title">Skills</h3>
+                  <button
+                    className="lc-link-text-btn"
+                    onClick={() => setActiveTab('skills')}
+                  >
+                    View All
+                  </button>
+                </div>
 
                 {/* Advanced */}
                 <div className="lc-skill-group">
@@ -562,9 +797,9 @@ export default function Profile() {
                     <span>Advanced</span>
                   </div>
                   <div className="lc-skill-tags-wrap">
-                    {skills.advanced.map((s) => (
-                      <span key={s.name} className="lc-skill-tag">
-                        {s.name} <span className="lc-tag-count">×{s.count}</span>
+                    {skillsData.advanced.slice(0, 4).map((s) => (
+                      <span key={s.name} className="lc-skill-tag" title={`${s.solved}/${s.total} solved`}>
+                        {s.name} <span className="lc-tag-count">×{s.solved}</span>
                       </span>
                     ))}
                   </div>
@@ -577,9 +812,9 @@ export default function Profile() {
                     <span>Intermediate</span>
                   </div>
                   <div className="lc-skill-tags-wrap">
-                    {skills.intermediate.map((s) => (
-                      <span key={s.name} className="lc-skill-tag">
-                        {s.name} <span className="lc-tag-count">×{s.count}</span>
+                    {skillsData.intermediate.slice(0, 4).map((s) => (
+                      <span key={s.name} className="lc-skill-tag" title={`${s.solved}/${s.total} solved`}>
+                        {s.name} <span className="lc-tag-count">×{s.solved}</span>
                       </span>
                     ))}
                   </div>
@@ -592,9 +827,9 @@ export default function Profile() {
                     <span>Fundamental</span>
                   </div>
                   <div className="lc-skill-tags-wrap">
-                    {skills.fundamental.map((s) => (
-                      <span key={s.name} className="lc-skill-tag">
-                        {s.name} <span className="lc-tag-count">×{s.count}</span>
+                    {skillsData.fundamental.slice(0, 4).map((s) => (
+                      <span key={s.name} className="lc-skill-tag" title={`${s.solved}/${s.total} solved`}>
+                        {s.name} <span className="lc-tag-count">×{s.solved}</span>
                       </span>
                     ))}
                   </div>
@@ -603,7 +838,7 @@ export default function Profile() {
             </aside>
 
             {/* =========================================================
-                RIGHT COLUMN: SOLVED PROGRESS, BADGES, HEATMAP, SUBMISSIONS
+                RIGHT COLUMN: SOLVED PROGRESS, BADGES, CONTESTS, HEATMAP, SUBMISSIONS
                 ========================================================= */}
             <section className="lc-right-column">
               {/* TOP ROW: SOLVED PROBLEMS CARD & BADGES CARD */}
@@ -611,8 +846,12 @@ export default function Profile() {
                 {/* Solved Problems Donut Widget */}
                 <div className="lc-card lc-solved-problems-card">
                   <div className="lc-solved-donut-wrapper">
-                    <svg className="lc-donut-svg" width="130" height="130" viewBox="0 0 130 130">
-                      {/* Background circle track */}
+                    <svg
+                      className="lc-donut-svg"
+                      width="130"
+                      height="130"
+                      viewBox="0 0 130 130"
+                    >
                       <circle
                         cx="65"
                         cy="65"
@@ -621,7 +860,6 @@ export default function Profile() {
                         stroke="#f0f1f3"
                         strokeWidth={strokeWidth}
                       />
-                      {/* Solved colored progress arc */}
                       <circle
                         cx="65"
                         cy="65"
@@ -635,7 +873,13 @@ export default function Profile() {
                         transform="rotate(-90 65 65)"
                       />
                       <defs>
-                        <linearGradient id="solvedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <linearGradient
+                          id="solvedGradient"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="100%"
+                        >
                           <stop offset="0%" stopColor="#00b8a3" />
                           <stop offset="60%" stopColor="#ffc01e" />
                           <stop offset="100%" stopColor="#ff375f" />
@@ -652,7 +896,8 @@ export default function Profile() {
                         <Check size={14} className="lc-check-icon" /> Solved
                       </div>
                       <div className="lc-donut-attempting-label">
-                        <span className="lc-attempting-dot">●</span> {codingStats.attempting} Attempting
+                        <span className="lc-attempting-dot">●</span>{' '}
+                        {codingStats.attemptingCount} Attempting
                       </div>
                     </div>
                   </div>
@@ -663,12 +908,19 @@ export default function Profile() {
                     <div className="lc-diff-row">
                       <div className="lc-diff-label diff-easy">Easy</div>
                       <div className="lc-diff-score">
-                        <strong>{codingStats.easySolved}</strong>/{codingStats.easyTotal}
+                        <strong>{codingStats.easySolved}</strong>/
+                        {codingStats.easyTotal}
                       </div>
                       <div className="lc-diff-bar-track">
                         <div
                           className="lc-diff-bar-fill fill-easy"
-                          style={{ width: `${Math.max((codingStats.easySolved / codingStats.easyTotal) * 100, 3)}%` }}
+                          style={{
+                            width: `${
+                              codingStats.easyTotal > 0
+                                ? Math.max((codingStats.easySolved / codingStats.easyTotal) * 100, 2)
+                                : 0
+                            }%`
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -677,12 +929,19 @@ export default function Profile() {
                     <div className="lc-diff-row">
                       <div className="lc-diff-label diff-med">Med.</div>
                       <div className="lc-diff-score">
-                        <strong>{codingStats.medSolved}</strong>/{codingStats.medTotal}
+                        <strong>{codingStats.medSolved}</strong>/
+                        {codingStats.medTotal}
                       </div>
                       <div className="lc-diff-bar-track">
                         <div
                           className="lc-diff-bar-fill fill-med"
-                          style={{ width: `${Math.max((codingStats.medSolved / codingStats.medTotal) * 100, 2)}%` }}
+                          style={{
+                            width: `${
+                              codingStats.medTotal > 0
+                                ? Math.max((codingStats.medSolved / codingStats.medTotal) * 100, 2)
+                                : 0
+                            }%`
+                          }}
                         ></div>
                       </div>
                     </div>
@@ -691,13 +950,32 @@ export default function Profile() {
                     <div className="lc-diff-row">
                       <div className="lc-diff-label diff-hard">Hard</div>
                       <div className="lc-diff-score">
-                        <strong>{codingStats.hardSolved}</strong>/{codingStats.hardTotal}
+                        <strong>{codingStats.hardSolved}</strong>/
+                        {codingStats.hardTotal}
                       </div>
                       <div className="lc-diff-bar-track">
                         <div
                           className="lc-diff-bar-fill fill-hard"
-                          style={{ width: `${Math.max((codingStats.hardSolved / codingStats.hardTotal) * 100, 0)}%` }}
+                          style={{
+                            width: `${
+                              codingStats.hardTotal > 0
+                                ? Math.max((codingStats.hardSolved / codingStats.hardTotal) * 100, 0)
+                                : 0
+                            }%`
+                          }}
                         ></div>
+                      </div>
+                    </div>
+
+                    {/* Acceptance Rate & Submissions */}
+                    <div className="lc-stats-extra-metrics">
+                      <div className="lc-extra-metric-item">
+                        <span>Acceptance Rate</span>
+                        <strong>{codingStats.acceptanceRate}%</strong>
+                      </div>
+                      <div className="lc-extra-metric-item">
+                        <span>Total Submissions</span>
+                        <strong>{codingStats.totalSubmissions}</strong>
                       </div>
                     </div>
                   </div>
@@ -706,36 +984,173 @@ export default function Profile() {
                 {/* Badges Widget */}
                 <div className="lc-card lc-badges-card">
                   <div className="lc-badges-header">
-                    <span className="lc-badges-title">Badges</span>
-                    <span className="lc-badges-count">{badgeCount}</span>
+                    <span className="lc-badges-title">Badges &amp; Achievements</span>
+                    <span className="lc-badges-count">{badgesData.earnedCount}</span>
                   </div>
 
-                  <div className="lc-badge-challenge-box" onClick={() => setIsBadgesModalOpen(true)}>
-                    <div className="lc-badge-graphic-wrapper">
-                      <div className="lc-badge-hex-glow"></div>
-                      <div className="lc-badge-hex-shield">
-                        <Award size={36} className="lc-badge-icon" />
+                  {badgesData.badges && badgesData.badges.length > 0 ? (
+                    <div
+                      className="lc-badge-challenge-box"
+                      onClick={() => setIsBadgesModalOpen(true)}
+                      title="Click to view all achievements"
+                    >
+                      <div className="lc-badge-graphic-wrapper">
+                        <div className="lc-badge-hex-glow"></div>
+                        <div className="lc-badge-hex-shield">
+                          <Award size={36} className="lc-badge-icon" />
+                        </div>
+                      </div>
+                      <div className="lc-badge-details">
+                        <div className="lc-badge-status-tag">
+                          {badgesData.earnedCount > 0 ? 'Unlocked Achievements' : 'Locked Badge'}
+                        </div>
+                        <div className="lc-badge-name">
+                          {badgesData.earnedCount > 0
+                            ? `${badgesData.earnedCount} Badges Unlocked`
+                            : 'First Problem Challenge'}
+                        </div>
+                        <div className="lc-badge-hint">
+                          {badgesData.earnedCount > 0
+                            ? 'Keep solving to earn streak and contest awards'
+                            : 'Solve your first problem to earn a badge'}
+                        </div>
                       </div>
                     </div>
-                    <div className="lc-badge-details">
-                      <div className="lc-badge-status-tag">Locked Badge</div>
-                      <div className="lc-badge-name">Oct LeetCoding Challenge</div>
-                      <div className="lc-badge-hint">Solve daily coding challenges to unlock</div>
+                  ) : (
+                    <div
+                      className="lc-badge-challenge-box"
+                      onClick={() => setIsBadgesModalOpen(true)}
+                    >
+                      <div className="lc-badge-graphic-wrapper">
+                        <div className="lc-badge-hex-shield">
+                          <Award size={36} className="lc-badge-icon" />
+                        </div>
+                      </div>
+                      <div className="lc-badge-details">
+                        <div className="lc-badge-status-tag">Locked Badge</div>
+                        <div className="lc-badge-name">First Problem Solved</div>
+                        <div className="lc-badge-hint">Solve problems in the arena to unlock badges</div>
+                      </div>
                     </div>
+                  )}
+
+                  <div className="lc-badges-quick-footer">
+                    <button
+                      className="lc-link-text-btn"
+                      onClick={() => setIsBadgesModalOpen(true)}
+                    >
+                      View All {badgesData.totalBadges} Badges
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* MIDDLE ROW: SUBMISSIONS HEATMAP (ACTIVITY CALENDAR) */}
+              {/* CONTEST PERFORMANCE SECTION */}
+              <div className="lc-card lc-contest-section-card">
+                <div className="lc-card-header-with-actions">
+                  <div className="lc-contest-headline">
+                    <Trophy size={18} className="lc-trophy-gold" />
+                    <span className="lc-card-title">Contest Performance</span>
+                  </div>
+                  <div className="lc-contest-stats-pills">
+                    <span className="lc-stat-pill">
+                      Rating: <strong>{contestData.currentRating}</strong>
+                    </span>
+                    <span className="lc-stat-pill">
+                      Best: <strong>{contestData.bestRating}</strong>
+                    </span>
+                    <span className="lc-stat-pill">
+                      Attended: <strong>{contestData.contestsAttended}</strong>
+                    </span>
+                    {contestData.globalRank && (
+                      <span className="lc-stat-pill">
+                        Rank: <strong>#{contestData.globalRank}</strong>
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {contestData.ratingHistory && contestData.ratingHistory.length > 0 ? (
+                  <div className="lc-contest-chart-wrapper">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <LineChart
+                        data={contestData.ratingHistory}
+                        margin={{ top: 15, right: 20, left: -20, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f1f3" />
+                        <XAxis
+                          dataKey="date"
+                          stroke="#9aa0a6"
+                          fontSize={12}
+                          tickLine={false}
+                        />
+                        <YAxis
+                          stroke="#9aa0a6"
+                          fontSize={12}
+                          domain={['dataMin - 100', 'dataMax + 100']}
+                          tickLine={false}
+                        />
+                        <RechartsTooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const d = payload[0].payload;
+                              return (
+                                <div className="lc-chart-custom-tooltip">
+                                  <div className="lc-tooltip-title">{d.contest_name}</div>
+                                  <div className="lc-tooltip-row">
+                                    <span>Date:</span> <strong>{d.date}</strong>
+                                  </div>
+                                  <div className="lc-tooltip-row">
+                                    <span>Rating:</span> <strong>{d.rating}</strong>
+                                  </div>
+                                  <div className="lc-tooltip-row">
+                                    <span>Rank:</span> <strong>#{d.rank || '-'}</strong>
+                                  </div>
+                                  <div className="lc-tooltip-row">
+                                    <span>Problems Solved:</span> <strong>{d.solved}</strong>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="rating"
+                          stroke="#ffc01e"
+                          strokeWidth={2.5}
+                          dot={{ r: 4, fill: '#ffc01e', stroke: '#ffffff', strokeWidth: 2 }}
+                          activeDot={{ r: 6, fill: '#ff9800' }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="lc-contest-empty-state">
+                    <Trophy size={32} className="lc-empty-trophy-icon" />
+                    <p className="lc-empty-main-text">No contest participation recorded yet</p>
+                    <p className="lc-empty-sub-text">
+                      Compete in weekly coding contests to establish your contest rating, global ranking, and climb the platform leaderboard!
+                    </p>
+                    <Link to="/coding/contests" className="lc-btn-participate">
+                      Explore Contests
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* SUBMISSIONS HEATMAP (ACTIVITY CALENDAR) */}
               <div className="lc-card lc-heatmap-card">
                 <div className="lc-heatmap-header">
                   <div className="lc-heatmap-title-wrap">
                     <span className="lc-heatmap-title">
-                      <strong>6</strong> submissions in the past one year
+                      <strong>{activityData.totalSubmissions}</strong> submissions in{' '}
+                      {activityData.year}
                     </span>
                     <button
                       className="lc-info-tooltip-btn"
-                      title="Submissions are recorded across coding challenges, arena submissions and algorithmic practice."
+                      title="Daily submissions recorded across practice problems and coding contests."
                     >
                       <Info size={14} />
                     </button>
@@ -743,10 +1158,13 @@ export default function Profile() {
 
                   <div className="lc-heatmap-meta-wrap">
                     <span className="lc-meta-pill">
-                      Total active days: <strong>3</strong>
+                      Total active days: <strong>{activityData.activeDays}</strong>
                     </span>
                     <span className="lc-meta-pill">
-                      Max streak: <strong>1</strong>
+                      Current streak: <strong>{activityData.currentStreak}</strong>
+                    </span>
+                    <span className="lc-meta-pill">
+                      Max streak: <strong>{activityData.maxStreak}</strong>
                     </span>
                     <div className="lc-year-dropdown-wrap">
                       <select
@@ -754,16 +1172,18 @@ export default function Profile() {
                         onChange={(e) => setSelectedYear(e.target.value)}
                         className="lc-year-select"
                       >
-                        <option value="Current">Current</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
+                        {activityData.availableYears.map((yr) => (
+                          <option key={yr} value={String(yr)}>
+                            {yr}
+                          </option>
+                        ))}
                       </select>
                       <ChevronDown size={14} className="lc-select-chevron" />
                     </div>
                   </div>
                 </div>
 
-                {/* The Heatmap Grid */}
+                {/* Heatmap Grid */}
                 <div className="lc-heatmap-scroll-area">
                   <div className="lc-heatmap-grid-container">
                     {/* Top Month Labels */}
@@ -781,14 +1201,14 @@ export default function Profile() {
 
                     {/* Weeks Columns */}
                     <div className="lc-heatmap-weeks-row">
-                      {heatmapData.map((week, wIndex) => (
+                      {heatmapGrid.map((week, wIndex) => (
                         <div key={wIndex} className="lc-heatmap-week-col">
                           {week.map((cell) => {
-                            const isGreen = cell.count > 0;
+                            const colorClass = getCellColorClass(cell.count);
                             return (
                               <div
                                 key={cell.date}
-                                className={`lc-heatmap-day-cell ${isGreen ? 'cell-active' : ''}`}
+                                className={`lc-heatmap-day-cell ${colorClass}`}
                                 onMouseEnter={(e) => {
                                   const rect = e.currentTarget.getBoundingClientRect();
                                   setHoveredCell({
@@ -819,7 +1239,90 @@ export default function Profile() {
                 )}
               </div>
 
-              {/* BOTTOM ROW: TABBED SUBMISSIONS & SOLUTIONS */}
+              {/* PERFORMANCE ANALYTICS SECTION (RECHARTS) */}
+              <div className="lc-card lc-analytics-card">
+                <div className="lc-card-header-with-actions">
+                  <div className="lc-contest-headline">
+                    <TrendingUp size={18} className="lc-trend-icon" />
+                    <span className="lc-card-title">Performance Analytics</span>
+                  </div>
+                </div>
+
+                <div className="lc-analytics-charts-grid">
+                  {/* Chart 1: Solved Over Time */}
+                  <div className="lc-sub-chart-box">
+                    <h4 className="lc-sub-chart-title">Problems Solved Trend (Last 6 Months)</h4>
+                    {analyticsData.solvedOverTime && analyticsData.solvedOverTime.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={190}>
+                        <AreaChart
+                          data={analyticsData.solvedOverTime}
+                          margin={{ top: 10, right: 15, left: -25, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#00b8a3" stopOpacity={0.4} />
+                              <stop offset="95%" stopColor="#00b8a3" stopOpacity={0.0} />
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f1f3" />
+                          <XAxis dataKey="month" stroke="#9aa0a6" fontSize={11} tickLine={false} />
+                          <YAxis stroke="#9aa0a6" fontSize={11} tickLine={false} />
+                          <RechartsTooltip />
+                          <Area
+                            type="monotone"
+                            dataKey="solved"
+                            name="Cumulative Solved"
+                            stroke="#00b8a3"
+                            strokeWidth={2}
+                            fillOpacity={1}
+                            fill="url(#areaGradient)"
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="lc-empty-chart-box">
+                        <span>No historical submissions yet</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Chart 2: Submissions by Language */}
+                  <div className="lc-sub-chart-box">
+                    <h4 className="lc-sub-chart-title">Submissions by Language</h4>
+                    {analyticsData.languages && analyticsData.languages.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={190}>
+                        <BarChart
+                          data={analyticsData.languages}
+                          margin={{ top: 10, right: 15, left: -20, bottom: 0 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f1f3" />
+                          <XAxis dataKey="language" stroke="#9aa0a6" fontSize={11} tickLine={false} />
+                          <YAxis stroke="#9aa0a6" fontSize={11} tickLine={false} />
+                          <RechartsTooltip />
+                          <Bar dataKey="count" name="Submissions" radius={[4, 4, 0, 0]}>
+                            {analyticsData.languages.map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={
+                                  ['#4285F4', '#00b8a3', '#ffc01e', '#ea4335', '#a142f4'][
+                                    index % 5
+                                  ]
+                                }
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="lc-empty-chart-box">
+                        <span>No language records recorded yet</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* BOTTOM SECTION: TABBED SUBMISSIONS, CONTESTS, SKILLS & BADGES */}
               <div className="lc-card lc-submissions-tab-card">
                 <div className="lc-submissions-header-bar">
                   <div className="lc-sub-tabs-list">
@@ -828,126 +1331,390 @@ export default function Profile() {
                       onClick={() => setActiveTab('recent')}
                     >
                       <CheckCircle2 size={16} />
-                      <span>Recent AC</span>
+                      <span>Recent Submissions</span>
                     </button>
                     <button
-                      className={`lc-sub-tab-item ${activeTab === 'list' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('list')}
+                      className={`lc-sub-tab-item ${activeTab === 'skills' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('skills')}
                     >
                       <Layers size={16} />
-                      <span>List</span>
+                      <span>Topic Skills</span>
                     </button>
                     <button
-                      className={`lc-sub-tab-item ${activeTab === 'solutions' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('solutions')}
+                      className={`lc-sub-tab-item ${activeTab === 'badges' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('badges')}
                     >
-                      <Code2 size={16} />
-                      <span>Solutions</span>
+                      <Award size={16} />
+                      <span>Badges ({badgesData.earnedCount})</span>
                     </button>
                     <button
-                      className={`lc-sub-tab-item ${activeTab === 'discuss' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('discuss')}
+                      className={`lc-sub-tab-item ${activeTab === 'contests' ? 'active' : ''}`}
+                      onClick={() => setActiveTab('contests')}
                     >
-                      <MessageSquare size={16} />
-                      <span>Discuss</span>
+                      <Trophy size={16} />
+                      <span>Contest History</span>
                     </button>
                   </div>
 
                   <Link to="/coding/practice" className="lc-view-all-link">
-                    <span>View all submissions</span>
+                    <span>Arena Practice</span>
                     <ChevronRight size={14} />
                   </Link>
                 </div>
 
-                {/* TAB CONTENT: Recent AC */}
+                {/* TAB 1: RECENT SUBMISSIONS WITH FILTERS & PAGINATION */}
                 {activeTab === 'recent' && (
                   <div className="lc-tab-content-box">
-                    <div className="lc-submissions-table">
-                      {recentSubmissions.map((sub) => (
-                        <div key={sub.id} className="lc-submission-table-row">
-                          <div className="lc-sub-info-col">
-                            <Link to={`/coding/problem/${sub.slug}`} className="lc-problem-title-link">
-                              {sub.title}
-                            </Link>
-                            <span className="lc-sub-lang-pill">{sub.language}</span>
-                            <span className={`lc-diff-badge ${sub.difficulty === 'Easy' ? 'badge-easy' : 'badge-med'}`}>
-                              {sub.difficulty}
+                    {/* Filter controls */}
+                    <div className="lc-submissions-filter-row">
+                      <div className="lc-filter-select-group">
+                        <label>Difficulty:</label>
+                        <select
+                          value={submissionFilters.difficulty}
+                          onChange={(e) =>
+                            setSubmissionFilters((prev) => ({ ...prev, difficulty: e.target.value }))
+                          }
+                          className="lc-filter-select"
+                        >
+                          <option value="all">All Difficulties</option>
+                          <option value="easy">Easy</option>
+                          <option value="medium">Medium</option>
+                          <option value="hard">Hard</option>
+                        </select>
+                      </div>
+
+                      <div className="lc-filter-select-group">
+                        <label>Status:</label>
+                        <select
+                          value={submissionFilters.status}
+                          onChange={(e) =>
+                            setSubmissionFilters((prev) => ({ ...prev, status: e.target.value }))
+                          }
+                          className="lc-filter-select"
+                        >
+                          <option value="all">All Statuses</option>
+                          <option value="accepted">Accepted</option>
+                          <option value="wrong_answer">Wrong Answer</option>
+                          <option value="time_limit_exceeded">Time Limit Exceeded</option>
+                        </select>
+                      </div>
+
+                      <div className="lc-filter-select-group">
+                        <label>Language:</label>
+                        <select
+                          value={submissionFilters.language}
+                          onChange={(e) =>
+                            setSubmissionFilters((prev) => ({ ...prev, language: e.target.value }))
+                          }
+                          className="lc-filter-select"
+                        >
+                          <option value="all">All Languages</option>
+                          <option value="java">Java</option>
+                          <option value="python">Python</option>
+                          <option value="cpp">C++</option>
+                          <option value="javascript">JavaScript</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Submissions Table */}
+                    {loadingSubmissions ? (
+                      <div className="lc-sub-loading-wrap">
+                        <RefreshCw size={24} className="lc-spin" />
+                        <span>Loading submission records...</span>
+                      </div>
+                    ) : submissionsList.length > 0 ? (
+                      <div className="lc-submissions-table">
+                        <div className="lc-sub-table-header">
+                          <span className="col-title">Problem</span>
+                          <span className="col-status">Status</span>
+                          <span className="col-lang">Language</span>
+                          <span className="col-runtime">Runtime</span>
+                          <span className="col-memory">Memory</span>
+                          <span className="col-time">Date</span>
+                        </div>
+
+                        {submissionsList.map((sub) => {
+                          const isAc = sub.status?.toLowerCase() === 'accepted';
+                          const diffClass =
+                            sub.difficulty?.toLowerCase() === 'easy'
+                              ? 'badge-easy'
+                              : sub.difficulty?.toLowerCase() === 'hard'
+                              ? 'badge-hard'
+                              : 'badge-med';
+
+                          return (
+                            <div key={sub.id} className="lc-submission-table-row">
+                              <div className="col-title">
+                                <Link
+                                  to={`/coding/problem/${sub.problem_id}`}
+                                  className="lc-problem-title-link"
+                                >
+                                  {sub.problem_title}
+                                </Link>
+                                <span className={`lc-diff-badge ${diffClass}`}>
+                                  {sub.difficulty}
+                                </span>
+                              </div>
+
+                              <div className="col-status">
+                                <span className={`lc-sub-status-pill ${isAc ? 'ac' : 'err'}`}>
+                                  {sub.status}
+                                </span>
+                              </div>
+
+                              <div className="col-lang">
+                                <span className="lc-sub-lang-pill">{sub.language}</span>
+                              </div>
+
+                              <div className="col-runtime">
+                                {sub.runtime_ms !== null ? `${sub.runtime_ms} ms` : '-'}
+                              </div>
+
+                              <div className="col-memory">
+                                {sub.memory_mb !== null ? `${sub.memory_mb} MB` : '-'}
+                              </div>
+
+                              <div className="col-time">
+                                {sub.submitted_at
+                                  ? new Date(sub.submitted_at).toLocaleDateString()
+                                  : '-'}
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* Pagination controls */}
+                        <div className="lc-pagination-row">
+                          <span className="lc-pagination-info">
+                            Showing {(submissionsPagination.page - 1) * submissionsPagination.limit + 1} to{' '}
+                            {Math.min(
+                              submissionsPagination.page * submissionsPagination.limit,
+                              submissionsPagination.total
+                            )}{' '}
+                            of {submissionsPagination.total} submissions
+                          </span>
+
+                          <div className="lc-pagination-buttons">
+                            <button
+                              className="lc-page-btn"
+                              disabled={submissionsPagination.page <= 1}
+                              onClick={() =>
+                                setSubmissionsPagination((prev) => ({
+                                  ...prev,
+                                  page: Math.max(1, prev.page - 1)
+                                }))
+                              }
+                            >
+                              <ChevronLeft size={16} />
+                            </button>
+                            <span className="lc-page-indicator">
+                              Page {submissionsPagination.page} of {submissionsPagination.pages || 1}
+                            </span>
+                            <button
+                              className="lc-page-btn"
+                              disabled={submissionsPagination.page >= submissionsPagination.pages}
+                              onClick={() =>
+                                setSubmissionsPagination((prev) => ({
+                                  ...prev,
+                                  page: prev.page + 1
+                                }))
+                              }
+                            >
+                              <ChevronRight size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="lc-empty-submissions-state">
+                        <Code2 size={36} color="#9aa0a6" />
+                        <h4>No submissions match the selected filters</h4>
+                        <p>Solve problems in the Arena to see your submission history and performance benchmarks.</p>
+                        <Link to="/coding/practice" className="lc-btn-save-settings">
+                          Start Solving Problems
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 2: TOPIC SKILLS BREAKDOWN */}
+                {activeTab === 'skills' && (
+                  <div className="lc-tab-content-box">
+                    <div className="lc-skills-comprehensive-view">
+                      {/* Fundamental */}
+                      <div className="lc-skill-detail-category">
+                        <h4 className="lc-skill-cat-title">
+                          <span className="lc-skill-level-dot dot-fundamental"></span>
+                          Fundamental Topics
+                        </h4>
+                        <div className="lc-skills-cards-grid">
+                          {skillsData.fundamental.map((topic) => (
+                            <div key={topic.name} className="lc-topic-progress-card">
+                              <div className="lc-topic-header">
+                                <span className="lc-topic-name">{topic.name}</span>
+                                <span className="lc-topic-count">
+                                  <strong>{topic.solved}</strong> / {topic.total} solved
+                                </span>
+                              </div>
+                              <div className="lc-topic-progress-bar">
+                                <div
+                                  className="lc-topic-progress-fill fundamental"
+                                  style={{
+                                    width: `${
+                                      topic.total > 0 ? (topic.solved / topic.total) * 100 : 0
+                                    }%`
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Intermediate */}
+                      <div className="lc-skill-detail-category">
+                        <h4 className="lc-skill-cat-title">
+                          <span className="lc-skill-level-dot dot-intermediate"></span>
+                          Intermediate Topics
+                        </h4>
+                        <div className="lc-skills-cards-grid">
+                          {skillsData.intermediate.map((topic) => (
+                            <div key={topic.name} className="lc-topic-progress-card">
+                              <div className="lc-topic-header">
+                                <span className="lc-topic-name">{topic.name}</span>
+                                <span className="lc-topic-count">
+                                  <strong>{topic.solved}</strong> / {topic.total} solved
+                                </span>
+                              </div>
+                              <div className="lc-topic-progress-bar">
+                                <div
+                                  className="lc-topic-progress-fill intermediate"
+                                  style={{
+                                    width: `${
+                                      topic.total > 0 ? (topic.solved / topic.total) * 100 : 0
+                                    }%`
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Advanced */}
+                      <div className="lc-skill-detail-category">
+                        <h4 className="lc-skill-cat-title">
+                          <span className="lc-skill-level-dot dot-advanced"></span>
+                          Advanced Topics
+                        </h4>
+                        <div className="lc-skills-cards-grid">
+                          {skillsData.advanced.map((topic) => (
+                            <div key={topic.name} className="lc-topic-progress-card">
+                              <div className="lc-topic-header">
+                                <span className="lc-topic-name">{topic.name}</span>
+                                <span className="lc-topic-count">
+                                  <strong>{topic.solved}</strong> / {topic.total} solved
+                                </span>
+                              </div>
+                              <div className="lc-topic-progress-bar">
+                                <div
+                                  className="lc-topic-progress-fill advanced"
+                                  style={{
+                                    width: `${
+                                      topic.total > 0 ? (topic.solved / topic.total) * 100 : 0
+                                    }%`
+                                  }}
+                                ></div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 3: BADGES GALLERY */}
+                {activeTab === 'badges' && (
+                  <div className="lc-tab-content-box">
+                    <div className="lc-badges-gallery-grid">
+                      {badgesData.badges.map((b) => (
+                        <div
+                          key={b.id}
+                          className={`lc-badge-card-item ${b.is_unlocked ? 'unlocked' : 'locked'}`}
+                        >
+                          <div className="lc-badge-item-icon">
+                            {b.is_unlocked ? (
+                              <Award size={40} className="icon-earned" />
+                            ) : (
+                              <Lock size={36} className="icon-locked" />
+                            )}
+                          </div>
+                          <div className="lc-badge-item-title">{b.name}</div>
+                          <p className="lc-badge-item-desc">{b.description}</p>
+                          <div className="lc-badge-item-status">
+                            {b.is_unlocked ? (
+                              <span className="badge-earned-tag">
+                                Earned {b.earned_at ? new Date(b.earned_at).toLocaleDateString() : ''}
+                              </span>
+                            ) : (
+                              <span className="badge-locked-tag">
+                                Criteria: {b.criteria || 'Solve required challenges'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 4: CONTEST HISTORY TABLE */}
+                {activeTab === 'contests' && (
+                  <div className="lc-tab-content-box">
+                    {contestData.participations && contestData.participations.length > 0 ? (
+                      <div className="lc-contest-history-table">
+                        <div className="lc-contest-table-header">
+                          <span>Contest</span>
+                          <span>Rating</span>
+                          <span>Rank</span>
+                          <span>Solved</span>
+                          <span>Date</span>
+                        </div>
+                        {contestData.participations.map((part) => (
+                          <div key={part.id} className="lc-contest-table-row">
+                            <span className="contest-name">
+                              <strong>{part.contest_title}</strong>
+                            </span>
+                            <span className="contest-rating">
+                              <strong>{part.rating}</strong>
+                            </span>
+                            <span className="contest-rank">
+                              #{part.rank || '-'}
+                            </span>
+                            <span className="contest-solved">
+                              {part.solved_count} problems
+                            </span>
+                            <span className="contest-date">
+                              {part.participated_at
+                                ? new Date(part.participated_at).toLocaleDateString()
+                                : '-'}
                             </span>
                           </div>
-                          <div className="lc-sub-time-col">
-                            {sub.timeAgo}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB CONTENT: List */}
-                {activeTab === 'list' && (
-                  <div className="lc-tab-content-box">
-                    <div className="lc-lists-grid">
-                      {problemLists.map((item, idx) => (
-                        <div key={idx} className="lc-list-card-item">
-                          <div className="lc-list-title-row">
-                            <span className="lc-list-card-title">{item.title}</span>
-                            <span className="lc-list-card-solved">{item.solved} / {item.count}</span>
-                          </div>
-                          <p className="lc-list-card-desc">{item.description}</p>
-                          <div className="lc-list-progress-bar">
-                            <div
-                              className="lc-list-progress-fill"
-                              style={{ width: `${(item.solved / item.count) * 100}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB CONTENT: Solutions */}
-                {activeTab === 'solutions' && (
-                  <div className="lc-tab-content-box">
-                    <div className="lc-solutions-list">
-                      {solutionArticles.map((sol, idx) => (
-                        <div key={idx} className="lc-solution-article-item">
-                          <h4 className="lc-solution-title">{sol.title}</h4>
-                          <div className="lc-solution-meta-row">
-                            <span className="lc-sol-prob">{sol.problem}</span>
-                            <span className="lc-dot-sep">·</span>
-                            <span className="lc-sol-lang">{sol.language}</span>
-                            <span className="lc-dot-sep">·</span>
-                            <span className="lc-sol-views">{sol.views} views</span>
-                            <span className="lc-dot-sep">·</span>
-                            <span className="lc-sol-upvotes">{sol.upvotes} upvotes</span>
-                            <span className="lc-dot-sep">·</span>
-                            <span className="lc-sol-time">{sol.date}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* TAB CONTENT: Discuss */}
-                {activeTab === 'discuss' && (
-                  <div className="lc-tab-content-box">
-                    <div className="lc-discuss-list">
-                      {discussionPosts.map((post, idx) => (
-                        <div key={idx} className="lc-discuss-item-row">
-                          <div>
-                            <div className="lc-discuss-title">{post.title}</div>
-                            <div className="lc-discuss-category-pill">{post.category}</div>
-                          </div>
-                          <div className="lc-discuss-meta">
-                            <span>{post.replies} replies</span>
-                            <span>{post.views} views</span>
-                            <span>{post.timeAgo}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="lc-empty-submissions-state">
+                        <Trophy size={36} color="#9aa0a6" />
+                        <h4>No contest participations yet</h4>
+                        <p>Take part in scheduled coding rounds to gain ranking points and earn contest trophies!</p>
+                        <Link to="/coding/contests" className="lc-btn-save-settings">
+                          View Upcoming Contests
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1017,8 +1784,12 @@ export default function Profile() {
                 </div>
               </div>
               <div style={{ marginTop: '20px' }}>
-                <button className="lc-btn-save-settings" onClick={handleSaveProfile}>
-                  Save Academic Details
+                <button
+                  className="lc-btn-save-settings"
+                  onClick={handleSaveProfile}
+                  disabled={savingProfile}
+                >
+                  {savingProfile ? 'Saving...' : 'Save Academic Details'}
                 </button>
               </div>
             </div>
@@ -1028,7 +1799,7 @@ export default function Profile() {
               <h2 className="lc-settings-section-heading">💎 Subscription &amp; Membership</h2>
               <div className="lc-sub-plan-box">
                 <div className="lc-plan-info">
-                  <div className="lc-plan-name">SkillPrep Student Plan</div>
+                  <div className="lc-plan-name">Student Plan</div>
                   <div className="lc-plan-price">₹10 / Year · Unlimited Coding &amp; Aptitude</div>
                   <div className="lc-plan-expiry">Valid until August 2027 · Active Status</div>
                 </div>
@@ -1061,7 +1832,7 @@ export default function Profile() {
                 <button
                   className="lc-btn-outline danger"
                   onClick={() => {
-                    if (window.confirm('Sign out from SkillPrep?')) {
+                    if (window.confirm('Sign out from your account?')) {
                       logout();
                       navigate('/login');
                     }
@@ -1106,18 +1877,22 @@ export default function Profile() {
                   required
                 />
               </div>
+
               {/* Avatar Selection Section */}
               <div className="lc-modal-field">
                 <label className="lc-modal-field-title">Avatar Selection</label>
-                
-                {/* Live Preview & Upload Row */}
                 <div className="lc-avatar-edit-header-row">
                   <div className="lc-avatar-live-preview">
-                    {formData.avatar && (formData.avatar.startsWith('http') || formData.avatar.startsWith('data:')) ? (
-                      <img src={formData.avatar} alt="Selected Avatar" className="lc-avatar-preview-img" />
+                    {formData.avatar &&
+                    (formData.avatar.startsWith('http') || formData.avatar.startsWith('data:')) ? (
+                      <img
+                        src={formData.avatar}
+                        alt="Selected Avatar"
+                        className="lc-avatar-preview-img"
+                      />
                     ) : (
                       <div className="lc-avatar-preview-placeholder">
-                        {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'D'}
+                        {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'U'}
                       </div>
                     )}
                   </div>
@@ -1139,12 +1914,15 @@ export default function Profile() {
 
                 {/* Preset Avatars Grid */}
                 <div className="lc-presets-container">
-                  <div className="lc-presets-subheading">Or choose from preset avatars:</div>
+                  <div className="lc-presets-subheading">Or choose from presets:</div>
                   <div className="lc-avatar-presets-grid">
                     {AVATAR_PRESETS.map((p) => {
-                      const isSelected = p.url === 'INITIALS'
-                        ? (!formData.avatar || (!formData.avatar.startsWith('http') && !formData.avatar.startsWith('data:')))
-                        : formData.avatar === p.url;
+                      const isSelected =
+                        p.url === 'INITIALS'
+                          ? !formData.avatar ||
+                            (!formData.avatar.startsWith('http') &&
+                              !formData.avatar.startsWith('data:'))
+                          : formData.avatar === p.url;
 
                       return (
                         <button
@@ -1162,7 +1940,7 @@ export default function Profile() {
                         >
                           {p.url === 'INITIALS' ? (
                             <div className="lc-preset-initials">
-                              {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'D'}
+                              {formData.fullName ? formData.fullName.charAt(0).toUpperCase() : 'U'}
                             </div>
                           ) : (
                             <img src={p.url} alt={p.label} className="lc-preset-img" />
@@ -1177,18 +1955,49 @@ export default function Profile() {
                     })}
                   </div>
                 </div>
+              </div>
 
-                {/* Optional Web Link Input */}
-                <div style={{ marginTop: '12px' }}>
+              <div className="lc-modal-field">
+                <label>College / University</label>
+                <input
+                  type="text"
+                  value={formData.college}
+                  onChange={(e) => setFormData({ ...formData, college: e.target.value })}
+                  placeholder="e.g. Bannari Amman Institute of Technology"
+                />
+              </div>
+
+              <div className="lc-modal-field">
+                <label>Country</label>
+                <input
+                  type="text"
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                  placeholder="e.g. India"
+                />
+              </div>
+
+              <div className="lc-modal-grid-2col">
+                <div className="lc-modal-field">
+                  <label>GitHub URL</label>
                   <input
-                    type="text"
-                    value={formData.avatar && !formData.avatar.startsWith('data:') ? formData.avatar : ''}
-                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                    placeholder="Or paste an image link (https://...)"
-                    className="lc-avatar-url-input"
+                    type="url"
+                    value={formData.githubUrl}
+                    onChange={(e) => setFormData({ ...formData, githubUrl: e.target.value })}
+                    placeholder="https://github.com/..."
+                  />
+                </div>
+                <div className="lc-modal-field">
+                  <label>LinkedIn URL</label>
+                  <input
+                    type="url"
+                    value={formData.linkedinUrl}
+                    onChange={(e) => setFormData({ ...formData, linkedinUrl: e.target.value })}
+                    placeholder="https://linkedin.com/in/..."
                   />
                 </div>
               </div>
+
               <div className="lc-modal-field">
                 <label>Bio</label>
                 <textarea
@@ -1198,12 +2007,21 @@ export default function Profile() {
                   placeholder="Tell others about your coding journey..."
                 ></textarea>
               </div>
+
               <div className="lc-modal-actions">
-                <button type="button" className="lc-btn-outline" onClick={() => setIsEditModalOpen(false)}>
+                <button
+                  type="button"
+                  className="lc-btn-outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="lc-btn-save-settings">
-                  Save Changes
+                <button
+                  type="submit"
+                  className="lc-btn-save-settings"
+                  disabled={savingProfile}
+                >
+                  {savingProfile ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>
@@ -1212,38 +2030,41 @@ export default function Profile() {
       )}
 
       {/* =========================================================
-          MODAL: BADGES SHOWCASE
+          MODAL: ALL BADGES SHOWCASE
           ========================================================= */}
       {isBadgesModalOpen && (
         <div className="lc-modal-backdrop" onClick={() => setIsBadgesModalOpen(false)}>
-          <div className="lc-modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="lc-modal-card lc-badges-modal" onClick={(e) => e.stopPropagation()}>
             <div className="lc-modal-header">
-              <h3>Badges &amp; Achievements</h3>
+              <h3>Badges &amp; Achievements Gallery</h3>
               <button className="lc-modal-close-btn" onClick={() => setIsBadgesModalOpen(false)}>
                 <X size={18} />
               </button>
             </div>
             <div className="lc-badges-grid-popup">
-              <div className="lc-badge-popup-item locked">
-                <Award size={36} />
-                <div className="lc-badge-p-name">Oct LeetCoding Challenge</div>
-                <div className="lc-badge-p-desc">Complete all daily challenges in October</div>
-              </div>
-              <div className="lc-badge-popup-item locked">
-                <Flame size={36} />
-                <div className="lc-badge-p-name">50 Days Streak</div>
-                <div className="lc-badge-p-desc">Maintain consecutive 50 days active practice</div>
-              </div>
-              <div className="lc-badge-popup-item locked">
-                <Star size={36} />
-                <div className="lc-badge-p-name">100 Problems Solved</div>
-                <div className="lc-badge-p-desc">Solve 100 distinct problems in the arena</div>
-              </div>
-              <div className="lc-badge-popup-item locked">
-                <Shield size={36} />
-                <div className="lc-badge-p-name">Guardian</div>
-                <div className="lc-badge-p-desc">Attain a contest rating above 2200</div>
-              </div>
+              {badgesData.badges.map((b) => (
+                <div
+                  key={b.id}
+                  className={`lc-badge-popup-item ${b.is_unlocked ? 'unlocked' : 'locked'}`}
+                >
+                  {b.is_unlocked ? (
+                    <Award size={36} className="icon-earned" />
+                  ) : (
+                    <Lock size={32} className="icon-locked" />
+                  )}
+                  <div className="lc-badge-p-name">{b.name}</div>
+                  <div className="lc-badge-p-desc">{b.description}</div>
+                  <div className="lc-badge-p-sub">
+                    {b.is_unlocked ? (
+                      <span className="badge-earned-tag">
+                        Earned {b.earned_at ? new Date(b.earned_at).toLocaleDateString() : ''}
+                      </span>
+                    ) : (
+                      <span>Requirement: {b.criteria || 'Solve challenges'}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1278,7 +2099,11 @@ export default function Profile() {
                 <input type="password" required placeholder="••••••••" />
               </div>
               <div className="lc-modal-actions">
-                <button type="button" className="lc-btn-outline" onClick={() => setIsPasswordModalOpen(false)}>
+                <button
+                  type="button"
+                  className="lc-btn-outline"
+                  onClick={() => setIsPasswordModalOpen(false)}
+                >
                   Cancel
                 </button>
                 <button type="submit" className="lc-btn-save-settings">

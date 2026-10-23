@@ -162,7 +162,7 @@ export default function Register() {
       if (res?.success) {
         setAlert({
           show: true,
-          message: 'Account created successfully! Welcome to SkillPrep. Redirecting to your dashboard...',
+          message: 'Account created successfully! Welcome. Redirecting to your dashboard...',
           type: 'success'
         });
         setTimeout(() => {
@@ -647,7 +647,7 @@ export default function Register() {
                   gap: '6px'
                 }}
               >
-                <span>← Back to SkillPrep Home</span>
+                <span>← Back to Home</span>
               </Link>
             </div>
           </div>

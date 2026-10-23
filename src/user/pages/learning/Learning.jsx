@@ -47,6 +47,7 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import Navbar from '../../../shared/components/navbar';
 import learningApi from '../../api/learningApi';
+import MenuBar from './menubar/MenuBar';
 import './Learning.css';
 
 export default function Learning() {
@@ -366,109 +367,20 @@ export default function Learning() {
           2. DASHBOARD BODY: SIDEBAR + MAIN CONTENT
           ========================================================== */}
       <div className="learning-body-container">
-        {/* SIDEBAR */}
-        <aside className={`learning-sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
-          <div className="sidebar-scrollable-content">
-            {/* Quick Navigation Sections */}
-            <div className="sidebar-group">
-              <div className="sidebar-group-title">LEARNING DASHBOARD</div>
-              <button
-                className={`sidebar-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('dashboard'); setCategoryFilter('all'); }}
-                id="sidebar-nav-dashboard"
-              >
-                <Sparkles size={16} className="nav-icon" />
-                <span>Dashboard</span>
-              </button>
-              <button
-                className={`sidebar-nav-item ${activeTab === 'tutorials' ? 'active' : ''}`}
-                onClick={() => { setActiveTab('tutorials'); setCategoryFilter('all'); }}
-                id="sidebar-nav-tutorials"
-              >
-                <BookOpen size={16} className="nav-icon" />
-                <span>All Tutorials</span>
-                {allTutorials.length > 0 && <span className="sidebar-badge">{allTutorials.length}</span>}
-              </button>
-              <button
-                className={`sidebar-nav-item ${activeTab === 'continue' ? 'active' : ''}`}
-                onClick={() => setActiveTab('continue')}
-                id="sidebar-nav-continue"
-              >
-                <Play size={16} className="nav-icon" />
-                <span>Continue Learning</span>
-                {continueItems.length > 0 && <span className="sidebar-badge active">{continueItems.length}</span>}
-              </button>
-              <button
-                className={`sidebar-nav-item ${activeTab === 'progress' ? 'active' : ''}`}
-                onClick={() => setActiveTab('progress')}
-                id="sidebar-nav-progress"
-              >
-                <TrendingUp size={16} className="nav-icon" />
-                <span>My Progress</span>
-              </button>
-              <button
-                className={`sidebar-nav-item ${activeTab === 'saved' ? 'active' : ''}`}
-                onClick={() => setActiveTab('saved')}
-                id="sidebar-nav-saved"
-              >
-                <Bookmark size={16} className="nav-icon" />
-                <span>Saved Tutorials</span>
-                {savedBookmarks.length > 0 && <span className="sidebar-badge">{savedBookmarks.length}</span>}
-              </button>
-              <button
-                className={`sidebar-nav-item ${activeTab === 'history' ? 'active' : ''}`}
-                onClick={() => setActiveTab('history')}
-                id="sidebar-nav-history"
-              >
-                <History size={16} className="nav-icon" />
-                <span>Learning History</span>
-              </button>
-            </div>
-
-            {/* Categories List (Dynamically loaded from MySQL) */}
-            <div className="sidebar-group categories-group">
-              <div className="sidebar-group-header">
-                <span className="sidebar-group-title">CATEGORIES</span>
-                <span className="categories-count-label">{categories.length} Topics</span>
-              </div>
-              <div className="sidebar-categories-list">
-                {categories.map((cat) => {
-                  const isSelected = categoryFilter === cat.slug;
-                  return (
-                    <button
-                      key={cat.id}
-                      className={`sidebar-category-btn ${isSelected ? 'active' : ''}`}
-                      onClick={() => {
-                        setCategoryFilter(cat.slug);
-                        setActiveTab('tutorials');
-                        if (window.innerWidth < 992) setSidebarOpen(false);
-                      }}
-                      title={cat.name}
-                      id={`sidebar-cat-${cat.slug}`}
-                    >
-                      <span className="category-btn-icon">
-                        {getCategoryIcon(cat.icon, cat.slug)}
-                      </span>
-                      <span className="category-btn-name">{cat.name}</span>
-                      <span className="category-count-badge">
-                        {cat.tutorial_count ?? 1}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Quick Live DB Health Indicator */}
-            <div className="sidebar-footer-card">
-              <div className="db-health-badge">
-                <span className="pulse-dot-green"></span>
-                <span>Live MySQL Connected</span>
-              </div>
-              <p className="db-sync-note">Data automatically synced with database.</p>
-            </div>
-          </div>
-        </aside>
+        {/* FIXED LEFT-SIDE MENUBAR (MATCHING SCREENSHOT 2) */}
+        <MenuBar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
+          categories={categories}
+          allTutorialsCount={allTutorials.length}
+          continueCount={continueItems.length}
+          savedCount={savedBookmarks.length}
+          user={currentUser || admin}
+          isCollapsed={!sidebarOpen}
+          onToggleCollapse={(isCol) => setSidebarOpen(!isCol)}
+        />
 
         {/* MAIN CONTENT AREA */}
         <main className="learning-main-content" role="main">
@@ -710,16 +622,12 @@ export default function Learning() {
               ========================================================== */}
           {activeTab === 'dashboard' && (
             <div className="dashboard-content-flow">
-              {/* SECTION: WELCOME HERO */}
+              {/* SECTION: WELCOME HERO (CLEAN, MODERN & USER FRIENDLY) */}
               <section className="dashboard-welcome-banner" aria-label="Welcome section">
                 <div className="welcome-left-content">
-                  <div className="welcome-greeting-badge">
-                    <Sparkles size={16} />
-                    <span>SkillPrep Learning Studio</span>
-                  </div>
                   <h1 className="welcome-heading">Welcome back, {userName}!</h1>
                   <p className="welcome-subtext">
-                    Resume your curriculum, track topic progress, and master engineering concepts with executable code examples.
+                    Resume where you left off or explore new concepts with interactive code examples.
                   </p>
 
                   <div className="welcome-cta-row">
@@ -741,98 +649,149 @@ export default function Learning() {
                       className="btn-secondary-explore"
                       onClick={() => setActiveTab('tutorials')}
                     >
-                      <SlidersHorizontal size={16} />
+                      <BookOpen size={16} />
                       <span>Browse All Tutorials</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="welcome-right-metric">
-                  <div className="progress-ring-card">
-                    <div className="progress-circle-wrap">
-                      <svg className="progress-ring-svg" viewBox="0 0 100 100">
-                        <circle className="progress-ring-bg" cx="50" cy="50" r="42" />
-                        <circle
-                          className="progress-ring-bar"
-                          cx="50"
-                          cy="50"
-                          r="42"
-                          style={{
-                            strokeDasharray: 264,
-                            strokeDashoffset: 264 - (264 * (summaryStats?.overall_progress_percentage || 0)) / 100
-                          }}
-                        />
-                      </svg>
-                      <div className="progress-ring-label">
-                        <span className="ring-pct-number">
-                          {summaryStats?.overall_progress_percentage ?? 0}%
-                        </span>
-                        <span className="ring-sub-text">Overall</span>
-                      </div>
+                  <div className="progress-summary-pill-card">
+                    <div className="pill-metric-header">
+                      <span className="pill-metric-title">Curriculum Progress</span>
+                      <span className="pill-metric-pct">{summaryStats?.overall_progress_percentage ?? 0}%</span>
                     </div>
-                    <div className="ring-status-text">Curriculum Progress</div>
+                    <div className="pill-progress-track">
+                      <div
+                        className="pill-progress-fill"
+                        style={{ width: `${summaryStats?.overall_progress_percentage ?? 0}%` }}
+                      ></div>
+                    </div>
+                    <div className="pill-metric-footer">
+                      <span>{summaryStats?.courses_started ?? continueItems.length} active track</span>
+                      <span>•</span>
+                      <span>{summaryStats?.completed_lessons ?? 0} topics completed</span>
+                    </div>
                   </div>
                 </div>
               </section>
 
-              {/* SECTION: STATISTICS CARDS (Values calculated strictly from DB) */}
+              {/* SECTION: STATISTICS CARDS (CLICKABLE & INTUITIVE) */}
               <section className="dashboard-stats-grid" aria-label="Key statistics">
                 {/* 1. Available Courses */}
-                <div className="stat-card" id="card-stat-available">
+                <button
+                  type="button"
+                  className="stat-card"
+                  id="card-stat-available"
+                  onClick={() => {
+                    if (setCategoryFilter) setCategoryFilter('all');
+                    setActiveTab('tutorials');
+                  }}
+                  title="Click to view all tutorials"
+                >
                   <div className="stat-card-icon blue">
-                    <BookOpen size={24} />
+                    <BookOpen size={22} />
                   </div>
                   <div className="stat-card-data">
                     <div className="stat-number">
                       {loadingDashboard ? '...' : (summaryStats?.available_courses ?? allTutorials.length)}
                     </div>
                     <div className="stat-title">Available Courses</div>
-                    <div className="stat-hint">Published interactive tutorials</div>
                   </div>
-                </div>
+                </button>
 
                 {/* 2. Courses Started */}
-                <div className="stat-card" id="card-stat-started">
+                <button
+                  type="button"
+                  className="stat-card"
+                  id="card-stat-started"
+                  onClick={() => setActiveTab('continue')}
+                  title="Click to view in-progress tutorials"
+                >
                   <div className="stat-card-icon purple">
-                    <Play size={24} />
+                    <Play size={22} />
                   </div>
                   <div className="stat-card-data">
                     <div className="stat-number">
                       {loadingDashboard ? '...' : (summaryStats?.courses_started ?? 0)}
                     </div>
                     <div className="stat-title">Courses Started</div>
-                    <div className="stat-hint">In-progress learning tracks</div>
                   </div>
-                </div>
+                </button>
 
                 {/* 3. Completed Lessons */}
-                <div className="stat-card" id="card-stat-completed">
+                <button
+                  type="button"
+                  className="stat-card"
+                  id="card-stat-completed"
+                  onClick={() => setActiveTab('progress')}
+                  title="Click to view your learning progress"
+                >
                   <div className="stat-card-icon emerald">
-                    <CheckCircle2 size={24} />
+                    <CheckCircle2 size={22} />
                   </div>
                   <div className="stat-card-data">
                     <div className="stat-number">
                       {loadingDashboard ? '...' : (summaryStats?.completed_lessons ?? 0)}
                     </div>
                     <div className="stat-title">Completed Lessons</div>
-                    <div className="stat-hint">Verified topics finished</div>
                   </div>
-                </div>
+                </button>
 
-                {/* 4. Saved Tutorials */}
-                <div className="stat-card" id="card-stat-saved">
-                  <div className="stat-card-icon amber">
-                    <Bookmark size={24} />
-                  </div>
-                  <div className="stat-card-data">
-                    <div className="stat-number">
-                      {loadingDashboard ? '...' : (summaryStats?.saved_tutorials ?? savedBookmarks.length)}
-                    </div>
-                    <div className="stat-title">Saved Tutorials</div>
-                    <div className="stat-hint">Bookmarked for quick revision</div>
-                  </div>
-                </div>
               </section>
+
+              {/* SECTION: EXPLORE TOPICS QUICK-ACCESS */}
+              {categories && categories.length > 0 && (
+                <section className="dashboard-content-block" aria-label="Explore topics">
+                  <div className="section-header-row">
+                    <div>
+                      <h2 className="section-title">Explore Topics</h2>
+                      <p className="section-subtitle">Pick a subject to explore interactive tutorials and code lessons.</p>
+                    </div>
+                    <button
+                      className="section-view-all-link"
+                      onClick={() => {
+                        if (setCategoryFilter) setCategoryFilter('all');
+                        setActiveTab('tutorials');
+                      }}
+                    >
+                      View All ({allTutorials.length})
+                    </button>
+                  </div>
+
+                  <div className="dashboard-categories-chips-grid">
+                    <button
+                      type="button"
+                      className={`dash-cat-chip ${categoryFilter === 'all' ? 'active' : ''}`}
+                      onClick={() => {
+                        if (setCategoryFilter) setCategoryFilter('all');
+                        setActiveTab('tutorials');
+                      }}
+                    >
+                      <span className="dash-cat-chip-icon">✨</span>
+                      <span className="dash-cat-chip-name">All Tracks</span>
+                      <span className="dash-cat-chip-count">{allTutorials.length}</span>
+                    </button>
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        className={`dash-cat-chip ${categoryFilter === cat.slug ? 'active' : ''}`}
+                        onClick={() => {
+                          if (setCategoryFilter) setCategoryFilter(cat.slug);
+                          setActiveTab('tutorials');
+                        }}
+                      >
+                        <span className="dash-cat-chip-icon">{getCategoryIcon(cat.icon, cat.slug)}</span>
+                        <span className="dash-cat-chip-name">{cat.name}</span>
+                        {cat.tutorial_count ? (
+                          <span className="dash-cat-chip-count">{cat.tutorial_count}</span>
+                        ) : null}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               {/* SECTION: CONTINUE LEARNING */}
               <section className="dashboard-content-block" aria-label="Continue learning section">
@@ -907,195 +866,6 @@ export default function Learning() {
                     >
                       Start First Tutorial
                     </button>
-                  </div>
-                )}
-              </section>
-
-              {/* SECTION: EXPLORE CATEGORIES */}
-              <section className="dashboard-content-block" aria-label="Explore categories">
-                <div className="section-header-row">
-                  <div>
-                    <h2 className="section-title">Explore Categories</h2>
-                    <p className="section-subtitle">Comprehensive documentation, syntax guides, and interview prep.</p>
-                  </div>
-                  <button className="section-view-all-link" onClick={() => setActiveTab('tutorials')}>
-                    Browse All ({categories.length})
-                  </button>
-                </div>
-
-                <div className="categories-grid">
-                  {categories.map(cat => (
-                    <div
-                      key={cat.id}
-                      className="category-showcase-card"
-                      onClick={() => {
-                        setCategoryFilter(cat.slug);
-                        setActiveTab('tutorials');
-                      }}
-                      id={`card-cat-${cat.slug}`}
-                    >
-                      <div className="category-card-top">
-                        <div className="category-card-icon-bubble">
-                          {getCategoryIcon(cat.icon, cat.slug)}
-                        </div>
-                        <span className="category-lesson-count">
-                          {cat.tutorial_count ?? 1} Tutorial{cat.tutorial_count !== 1 ? 's' : ''}
-                        </span>
-                      </div>
-                      <h3 className="category-card-name">{cat.name}</h3>
-                      <p className="category-card-desc">{cat.description}</p>
-                      <div className="category-card-footer">
-                        <span>Learn {cat.name}</span>
-                        <ChevronRight size={14} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* 2-COLUMN SECTION: RECOMMENDED TUTORIALS + RECENT ACTIVITY */}
-              <div className="dashboard-two-column-row">
-                {/* Left Column: Recommended Tutorials */}
-                <section className="column-block recommended-block" aria-label="Recommended tutorials">
-                  <div className="section-header-row">
-                    <div>
-                      <h2 className="section-title">Recommended Tutorials</h2>
-                      <p className="section-subtitle">Curated to boost your full-stack engineering proficiency.</p>
-                    </div>
-                  </div>
-
-                  <div className="recommended-list">
-                    {recommendedTutorials.slice(0, 4).map(tut => (
-                      <div key={tut.id} className="recommended-tutorial-card">
-                        <div className="rec-card-body">
-                          <div className="rec-badge-row">
-                            <span className="rec-category-tag">{tut.category_name}</span>
-                            <span className={`rec-diff-tag ${tut.difficulty?.toLowerCase()}`}>
-                              {tut.difficulty}
-                            </span>
-                            <span className="rec-time-tag">
-                              <Clock size={12} /> {tut.estimated_minutes}m
-                            </span>
-                          </div>
-                          <h4 className="rec-title">{tut.title}</h4>
-                          <p className="rec-desc">{tut.description}</p>
-                        </div>
-
-                        <div className="rec-card-actions">
-                          <button
-                            className={`btn-rec-bookmark ${tut.is_bookmarked ? 'active' : ''}`}
-                            onClick={() => handleToggleBookmark(tut.id, tut.is_bookmarked)}
-                            title={tut.is_bookmarked ? 'Remove bookmark' : 'Bookmark tutorial'}
-                            id={`btn-bookmark-${tut.id}`}
-                          >
-                            <Bookmark size={16} />
-                          </button>
-                          <button
-                            className="btn-rec-start"
-                            onClick={() => handleOpenTutorial(tut.slug)}
-                            id={`btn-open-rec-${tut.id}`}
-                          >
-                            <span>Learn</span>
-                            <ChevronRight size={14} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Right Column: Recent Activity */}
-                <section className="column-block activity-block" aria-label="Recent activity">
-                  <div className="section-header-row">
-                    <div>
-                      <h2 className="section-title">Recent Activity</h2>
-                      <p className="section-subtitle">Live log of completed lessons and accessed modules.</p>
-                    </div>
-                  </div>
-
-                  <div className="activity-stream">
-                    {recentActivities.length > 0 ? (
-                      recentActivities.slice(0, 6).map((act) => {
-                        const isComplete = act.activity_type === 'completed_topic';
-                        const isBookmark = act.activity_type === 'bookmarked';
-                        return (
-                          <div key={act.id} className="activity-stream-item">
-                            <div className={`activity-icon-bullet ${isComplete ? 'green' : isBookmark ? 'amber' : 'blue'}`}>
-                              {isComplete ? <Check size={12} /> : isBookmark ? <Bookmark size={12} /> : <BookOpen size={12} />}
-                            </div>
-                            <div className="activity-details">
-                              <div className="activity-action-text">
-                                {isComplete ? 'Completed lesson' : isBookmark ? 'Saved to bookmarks' : 'Accessed topic'}:
-                                <strong> {act.topic_title || act.tutorial_title || 'Study Material'}</strong>
-                              </div>
-                              <span className="activity-timestamp">
-                                {new Date(act.created_at).toLocaleString()}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="activity-empty-state">
-                        <History size={24} />
-                        <p>No recent activity records yet. Start a lesson to track your progress.</p>
-                      </div>
-                    )}
-                  </div>
-                </section>
-              </div>
-
-              {/* SECTION: SAVED TUTORIALS (BOOKMARKS) */}
-              <section className="dashboard-content-block" aria-label="Saved tutorials">
-                <div className="section-header-row">
-                  <div>
-                    <h2 className="section-title">Saved Tutorials</h2>
-                    <p className="section-subtitle">Your personal bookmarked reference guides and notes.</p>
-                  </div>
-                  {savedBookmarks.length > 0 && (
-                    <button className="section-view-all-link" onClick={() => setActiveTab('saved')}>
-                      View all ({savedBookmarks.length})
-                    </button>
-                  )}
-                </div>
-
-                {savedBookmarks.length > 0 ? (
-                  <div className="bookmarks-grid">
-                    {savedBookmarks.slice(0, 4).map(bm => {
-                      const tut = bm.tutorial;
-                      if (!tut) return null;
-                      return (
-                        <div key={bm.id} className="bookmark-card">
-                          <div className="bookmark-card-top">
-                            <span className="bookmark-cat-pill">{tut.category_name}</span>
-                            <button
-                              className="btn-remove-bookmark"
-                              onClick={() => handleToggleBookmark(tut.id, true)}
-                              title="Remove bookmark"
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                          <h4 className="bookmark-card-title">{tut.title}</h4>
-                          <p className="bookmark-card-desc">{tut.description}</p>
-                          <div className="bookmark-card-footer">
-                            <span className="bookmark-topics-count">{tut.total_topics} topics</span>
-                            <button
-                              className="btn-open-bookmark"
-                              onClick={() => handleOpenTutorial(tut.slug)}
-                            >
-                              <span>Open</span>
-                              <ArrowRight size={14} />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="empty-state-card small">
-                    <Bookmark size={24} />
-                    <p>You haven't saved any tutorials yet. Click the bookmark icon on any tutorial card to save it here.</p>
                   </div>
                 )}
               </section>

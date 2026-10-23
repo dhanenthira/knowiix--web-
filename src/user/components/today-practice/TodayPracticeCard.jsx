@@ -13,12 +13,12 @@ import './TodayPracticeCard.css';
  * - Interactive quick-action buttons and daily practice stats
  */
 export default function TodayPracticeCard({
-  userName = 'Courtney',
+  userName = 'Student',
   greeting = 'Welcome back',
-  subtitle = 'Nisi dolor pariatur anim quis dolor do. Ut duis eiusmod irure enim deserunt proident culpa',
-  streakDays = 12,
-  completedCount = 18,
-  totalCount = 21,
+  subtitle = 'Complete your daily curated drills in Aptitude, Technical and Coding to maintain your placement readiness.',
+  streakDays = 0,
+  completedCount = 0,
+  totalCount = 0,
   onStartPractice,
   actionText = 'Start Today\'s Practice',
   showActions = true,

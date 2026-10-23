@@ -37,16 +37,24 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   // Live Stats State
+  // Live Stats State - 100% fetched from Database
   const [stats, setStats] = useState({
-    totalStudents: 2,
-    activeStudents: 2,
-    codingProblems: 6,
-    questions: 4,
-    learningResources: 15,
-    assessments: 1
+    totalStudents: 0,
+    activeStudents: 0,
+    codingProblems: 0,
+    questions: 0,
+    learningResources: 0,
+    assessments: 0,
+    modulesCount: 0,
+    totalSubmissions: 0,
+    accuracyRate: 0
   });
 
   const [topStudents, setTopStudents] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [performanceCategories, setPerformanceCategories] = useState([]);
+  const [weeklyActivity, setWeeklyActivity] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activityTimeframe, setActivityTimeframe] = useState('7d'); // '7d' | '30d' | '3m'
   const [performanceView, setPerformanceView] = useState('accuracy'); // 'accuracy' | 'submissions'
@@ -85,99 +93,108 @@ export default function Dashboard() {
       const modData = modRes.status === 'fulfilled' ? modRes.value.data : [];
       const testData = testRes.status === 'fulfilled' ? testRes.value.data : [];
 
-      // Calculate total lesson items
+      // Calculate total lesson items from database
       const totalLessonsCount = Array.isArray(modData)
-        ? modData.reduce((acc, m) => acc + (m.total_lessons || (m.lessons ? m.lessons.length : 0)), 0)
-        : 15;
+        ? modData.reduce((acc, m) => acc + (m.total_lessons || (m.topics ? m.topics.length : 0)), 0)
+        : (dashData?.analytics?.learning_resources ?? 0);
 
+      // 1. Set real Stats (NO hardcoded fallback numbers!)
       setStats({
-        totalStudents: dashData?.analytics?.total_students || 2,
-        activeStudents: dashData?.analytics?.active_students || 2,
-        codingProblems: Array.isArray(codeData) && codeData.length > 0 ? codeData.length : 6,
-        questions: Array.isArray(questData) && questData.length > 0 ? questData.length : 4,
-        learningResources: totalLessonsCount > 0 ? totalLessonsCount : 15,
-        assessments: Array.isArray(testData) && testData.length > 0 ? testData.length : 1
+        totalStudents: dashData?.analytics?.total_students ?? (Array.isArray(leadData) ? leadData.length : 0),
+        activeStudents: dashData?.analytics?.active_students ?? 0,
+        codingProblems: dashData?.analytics?.coding_problems ?? (Array.isArray(codeData) ? codeData.length : 0),
+        questions: dashData?.analytics?.questions ?? (Array.isArray(questData) ? questData.length : 0),
+        learningResources: totalLessonsCount || (dashData?.analytics?.learning_resources ?? 0),
+        modulesCount: dashData?.analytics?.modules_count ?? (Array.isArray(modData) ? modData.length : 0),
+        assessments: dashData?.analytics?.assessments ?? (Array.isArray(testData) ? testData.length : 0),
+        totalSubmissions: dashData?.analytics?.total_submissions ?? 0,
+        accuracyRate: dashData?.analytics?.accuracy_rate ?? 0
       });
 
-      // Prepare Top 5 Students
+      // 2. Set Top 5 Students strictly from real leaderboard data (NO fake students!)
       if (Array.isArray(leadData) && leadData.length > 0) {
         setTopStudents(leadData.slice(0, 5));
       } else {
-        setTopStudents([
-          {
-            rank: 1,
-            user_id: 'user_student_01',
-            student_id: 'CA-2026-9042',
-            name: 'Alex Mercer',
-            avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
-            college_name: 'National Institute of Tech',
-            total_points: 4850,
-            coding_points: 4850,
-            problems_solved: 142,
-            questions_solved: 380,
-            accuracy: 88.2,
-            streak_days: 14
-          },
-          {
-            rank: 2,
-            user_id: 'user_student_skillprep',
-            student_id: 'SP-2026-1001',
-            name: 'Ananya Kumar',
-            avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya',
-            college_name: 'SkillPrep Academy',
-            total_points: 3450,
-            coding_points: 3450,
-            problems_solved: 142,
-            questions_solved: 280,
-            accuracy: 89.5,
-            streak_days: 12
-          },
-          {
-            rank: 3,
-            user_id: 'user_student_03',
-            student_id: 'CA-2026-7712',
-            name: 'Rohan Verma',
-            avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rohan',
-            college_name: 'Dept of Computer Science',
-            total_points: 2980,
-            coding_points: 2980,
-            problems_solved: 110,
-            questions_solved: 215,
-            accuracy: 84.0,
-            streak_days: 9
-          },
-          {
-            rank: 4,
-            user_id: 'user_student_04',
-            student_id: 'CA-2026-6540',
-            name: 'Priya Sharma',
-            avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya',
-            college_name: 'Institute of Engineering',
-            total_points: 2740,
-            coding_points: 2740,
-            problems_solved: 96,
-            questions_solved: 190,
-            accuracy: 86.5,
-            streak_days: 8
-          },
-          {
-            rank: 5,
-            user_id: 'user_student_05',
-            student_id: 'CA-2026-5120',
-            name: 'Karthik Raja',
-            avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Karthik',
-            college_name: 'Tech Campus University',
-            total_points: 2420,
-            coding_points: 2420,
-            problems_solved: 84,
-            questions_solved: 165,
-            accuracy: 81.0,
-            streak_days: 7
-          }
-        ]);
+        setTopStudents([]);
       }
+
+      // 3. Set Recent Activities strictly from real DB submissions (NO fake mock rows!)
+      if (dashData?.recent_activities && Array.isArray(dashData.recent_activities) && dashData.recent_activities.length > 0) {
+        setRecentActivities(dashData.recent_activities);
+      } else if (dashData?.recent_submissions && Array.isArray(dashData.recent_submissions) && dashData.recent_submissions.length > 0) {
+        setRecentActivities(dashData.recent_submissions.map(s => ({
+          id: s.id,
+          studentName: s.student_name,
+          studentId: s.student_id,
+          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${s.student_name}`,
+          action: `Solved ${s.problem}`,
+          category: 'coding',
+          status: s.status,
+          badgeColor: s.status === 'Accepted' ? '#10b981' : '#f59e0b',
+          time: s.time
+        })));
+      } else {
+        setRecentActivities([]);
+      }
+
+      // 4. Set Upcoming Assessment Events strictly from DB (NO fake mock events!)
+      if (dashData?.upcoming_events && Array.isArray(dashData.upcoming_events) && dashData.upcoming_events.length > 0) {
+        setUpcomingEvents(dashData.upcoming_events);
+      } else if (Array.isArray(testData) && testData.length > 0) {
+        setUpcomingEvents(testData.map(t => {
+          const sDate = t.start_time ? new Date(t.start_time) : new Date();
+          return {
+            id: t.id,
+            month: sDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+            day: sDate.getDate().toString(),
+            title: t.title,
+            type: (t.category || 'Assessment').toUpperCase(),
+            duration: `${t.duration_minutes || 30} Mins`,
+            enrolled: `${t.total_questions || 4} Questions`,
+            badgeColor: '#6366f1',
+            actionText: 'Manage',
+            path: '/assessments'
+          };
+        }));
+      } else {
+        setUpcomingEvents([]);
+      }
+
+      // 5. Set Real Performance Categories from Database
+      if (dashData?.category_performance && Array.isArray(dashData.category_performance) && dashData.category_performance.length > 0) {
+        const iconMap = {
+          aptitude: <HelpCircle size={15} />,
+          technical: <Code2 size={15} />,
+          coding: <Code2 size={15} />,
+          assessment: <ClipboardCheck size={15} />
+        };
+        const colorMap = {
+          aptitude: '#4f46e5',
+          technical: '#06b6d4',
+          coding: '#10b981',
+          assessment: '#f59e0b'
+        };
+
+        setPerformanceCategories(dashData.category_performance.map(cat => ({
+          name: cat.name,
+          accuracy: Math.round(cat.accuracy || 0),
+          submissions: cat.submissions || 0,
+          color: colorMap[cat.category_key] || '#6366f1',
+          icon: iconMap[cat.category_key] || <HelpCircle size={15} />
+        })));
+      } else {
+        setPerformanceCategories([]);
+      }
+
+      // 6. Set Weekly Activity from Database
+      if (dashData?.weekly_activity && Array.isArray(dashData.weekly_activity)) {
+        setWeeklyActivity(dashData.weekly_activity);
+      } else {
+        setWeeklyActivity([]);
+      }
+
     } catch (err) {
-      console.warn('Dashboard data fetch fallback:', err);
+      console.warn('Dashboard live data fetch error:', err);
     } finally {
       setLoading(false);
     }
@@ -187,205 +204,48 @@ export default function Dashboard() {
     fetchDashboardData();
   }, []);
 
-  // Activity Curve Chart Datapoints
+  // Activity Curve Chart Datapoints - Generated 100% from real database activity
   const chartData = useMemo(() => {
-    if (activityTimeframe === '7d') {
-      return {
-        pathArea: 'M 0,160 Q 100,130 200,90 T 400,60 T 600,30 L 600,200 L 0,200 Z',
-        pathLine: 'M 0,160 Q 100,130 200,90 T 400,60 T 600,30',
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        points: [
-          { cx: 0, cy: 160, val: 120 },
-          { cx: 100, cy: 130, val: 190 },
-          { cx: 200, cy: 90, val: 260 },
-          { cx: 300, cy: 75, val: 310 },
-          { cx: 400, cy: 60, val: 380 },
-          { cx: 500, cy: 45, val: 420 },
-          { cx: 600, cy: 30, val: 490 }
-        ],
-        peak: '490 Active',
-        avgTime: '42 min/day',
-        totalSubs: '1,840'
-      };
-    } else if (activityTimeframe === '30d') {
-      return {
-        pathArea: 'M 0,170 Q 150,140 300,90 T 450,55 T 600,20 L 600,200 L 0,200 Z',
-        pathLine: 'M 0,170 Q 150,140 300,90 T 450,55 T 600,20',
-        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-        points: [
-          { cx: 0, cy: 170, val: 320 },
-          { cx: 200, cy: 120, val: 680 },
-          { cx: 400, cy: 70, val: 950 },
-          { cx: 600, cy: 20, val: 1420 }
-        ],
-        peak: '1,420 Active',
-        avgTime: '48 min/day',
-        totalSubs: '7,250'
-      };
-    } else {
-      return {
-        pathArea: 'M 0,180 Q 200,150 400,80 T 600,15 L 600,200 L 0,200 Z',
-        pathLine: 'M 0,180 Q 200,150 400,80 T 600,15',
-        labels: ['Aug', 'Sep', 'Oct'],
-        points: [
-          { cx: 0, cy: 180, val: 850 },
-          { cx: 300, cy: 110, val: 1650 },
-          { cx: 600, cy: 15, val: 2940 }
-        ],
-        peak: '2,940 Active',
-        avgTime: '54 min/day',
-        totalSubs: '24,800'
-      };
-    }
-  }, [activityTimeframe]);
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const counts = days.map(d => {
+      const found = weeklyActivity.find(w => w.day === d);
+      return found ? found.submissions : 0;
+    });
 
-  // Performance Domains Data
-  const performanceCategories = [
-    {
-      name: 'Quantitative Aptitude',
-      accuracy: 89,
-      submissions: 420,
-      color: '#4f46e5',
-      icon: <HelpCircle size={15} />
-    },
-    {
-      name: 'Technical CS & Fundamentals',
-      accuracy: 84,
-      submissions: 340,
-      color: '#06b6d4',
-      icon: <Code2 size={15} />
-    },
-    {
-      name: 'Coding Problems Arena',
-      accuracy: 78,
-      submissions: 295,
-      color: '#10b981',
-      icon: <Code2 size={15} />
-    },
-    {
-      name: 'Mock Assessments & Tests',
-      accuracy: 92,
-      submissions: 180,
-      color: '#f59e0b',
-      icon: <ClipboardCheck size={15} />
-    }
-  ];
+    const maxVal = Math.max(1, ...counts);
+    const points = days.map((day, idx) => {
+      const cx = idx * 100;
+      const cy = Math.round(180 - (counts[idx] / maxVal) * 140);
+      return { cx, cy, val: counts[idx], day };
+    });
 
-  // Recent Activity Feed
-  const recentActivities = [
-    {
-      id: 'act_1',
-      studentName: 'Alex Mercer',
-      studentId: 'CA-2026-9042',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
-      action: 'Solved Two Sum Target Indices',
-      category: 'coding',
-      status: 'Accepted',
-      badgeColor: '#10b981',
-      time: '2 mins ago'
-    },
-    {
-      id: 'act_2',
-      studentName: 'Ananya Kumar',
-      studentId: 'SP-2026-1001',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya',
-      action: 'Scored 100% on Daily Aptitude Challenge #42',
-      category: 'practice',
-      status: 'Perfect Score',
-      badgeColor: '#6366f1',
-      time: '14 mins ago'
-    },
-    {
-      id: 'act_3',
-      studentName: 'Rohan Verma',
-      studentId: 'CA-2026-7712',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rohan',
-      action: 'Submitted Grand Assessment Screening Mock',
-      category: 'assessment',
-      status: 'Rank #2',
-      badgeColor: '#f59e0b',
-      time: '45 mins ago'
-    },
-    {
-      id: 'act_4',
-      studentName: 'Priya Sharma',
-      studentId: 'CA-2026-6540',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya',
-      action: 'Won 1v1 Battle Arena against CodeMaster',
-      category: 'coding',
-      status: 'Winner',
-      badgeColor: '#ec4899',
-      time: '2 hours ago'
-    },
-    {
-      id: 'act_5',
-      studentName: 'Karthik Raja',
-      studentId: 'CA-2026-5120',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Karthik',
-      action: 'Completed Python Functions & Lambda Study Notes',
-      category: 'practice',
-      status: 'Completed',
-      badgeColor: '#8b5cf6',
-      time: '4 hours ago'
+    let pathLine = `M ${points[0].cx},${points[0].cy}`;
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const midX = (prev.cx + curr.cx) / 2;
+      pathLine += ` Q ${prev.cx},${prev.cy} ${midX},${(prev.cy + curr.cy) / 2} T ${curr.cx},${curr.cy}`;
     }
-  ];
+    const pathArea = `${pathLine} L 600,200 L 0,200 Z`;
+
+    const totalPeriodSubs = counts.reduce((a, b) => a + b, 0);
+    const peakSubs = Math.max(...counts);
+
+    return {
+      pathArea,
+      pathLine,
+      labels: days,
+      points,
+      peak: `${peakSubs} Submissions`,
+      avgTime: `${stats.activeStudents} Active Learners`,
+      totalSubs: `${(stats.totalSubmissions || totalPeriodSubs).toLocaleString()} Total`
+    };
+  }, [weeklyActivity, stats]);
 
   const filteredActivities = useMemo(() => {
     if (activityFilter === 'all') return recentActivities;
     return recentActivities.filter(a => a.category === activityFilter);
-  }, [activityFilter]);
-
-  // Upcoming Events
-  const upcomingEvents = [
-    {
-      id: 'ev_1',
-      month: 'OCT',
-      day: '15',
-      title: 'All-India Coding & Aptitude Grand Assessment',
-      type: 'National Test',
-      duration: '45 Mins',
-      enrolled: '340+ Students',
-      badgeColor: '#6366f1',
-      actionText: 'View Test',
-      path: '/assessments'
-    },
-    {
-      id: 'ev_2',
-      month: 'OCT',
-      day: '17',
-      title: 'TCS / Infosys National Qualifier Mock Drive',
-      type: 'Campus Mock',
-      duration: '60 Mins',
-      enrolled: '215 Students',
-      badgeColor: '#10b981',
-      actionText: 'Manage',
-      path: '/assessments'
-    },
-    {
-      id: 'ev_3',
-      month: 'OCT',
-      day: '19',
-      title: 'Weekly Lightning Algorithm Sprint #12',
-      type: 'Battle Contest',
-      duration: '30 Mins',
-      enrolled: '85 Enrolled',
-      badgeColor: '#f59e0b',
-      actionText: 'Lobby',
-      path: '/battles'
-    },
-    {
-      id: 'ev_4',
-      month: 'OCT',
-      day: '22',
-      title: 'Database & SQL Placement Readiness Review',
-      type: 'Curriculum Exam',
-      duration: '40 Mins',
-      enrolled: '120 Students',
-      badgeColor: '#ec4899',
-      actionText: 'Details',
-      path: '/learning'
-    }
-  ];
+  }, [activityFilter, recentActivities]);
 
   // Open User Profile Modal for any student
   const handleOpenStudentModal = (student) => {
@@ -447,7 +307,7 @@ export default function Dashboard() {
                   title="Platform Notifications & Alerts"
                 >
                   <Bell size={18} />
-                  <span className="notification-badge-count">3</span>
+                  <span className="notification-badge-count">{stats.assessments > 0 ? stats.assessments + 1 : 1}</span>
                 </button>
 
             {/* Notification Dropdown Popover */}
@@ -456,30 +316,32 @@ export default function Dashboard() {
                 <div className="notif-popover-header">
                   <span>System Notifications</span>
                   <span style={{ fontSize: '11px', color: '#818cf8', cursor: 'pointer' }} onClick={() => setNotificationOpen(false)}>
-                    Mark all read
+                    Close
                   </span>
                 </div>
                 <div className="notif-item">
                   <div style={{ color: '#10b981', marginTop: '2px' }}><CheckCircle2 size={16} /></div>
                   <div>
                     <div style={{ fontWeight: 600, color: '#f8fafc' }}>MySQL Database Connected</div>
-                    <div style={{ color: '#94a3b8', fontSize: '11px' }}>All 10 tables synchronized successfully on port 3306.</div>
+                    <div style={{ color: '#94a3b8', fontSize: '11px' }}>Synchronized with live backend database.</div>
                   </div>
                 </div>
                 <div className="notif-item">
-                  <div style={{ color: '#6366f1', marginTop: '2px' }}><Sparkles size={16} /></div>
+                  <div style={{ color: '#6366f1', marginTop: '2px' }}><Users size={16} /></div>
                   <div>
-                    <div style={{ fontWeight: 600, color: '#f8fafc' }}>Grand Assessment Window</div>
-                    <div style={{ color: '#94a3b8', fontSize: '11px' }}>Active screening contest starting in 2 hours.</div>
+                    <div style={{ fontWeight: 600, color: '#f8fafc' }}>Student Roster</div>
+                    <div style={{ color: '#94a3b8', fontSize: '11px' }}>{stats.totalStudents} verified campus learners registered.</div>
                   </div>
                 </div>
-                <div className="notif-item">
-                  <div style={{ color: '#f59e0b', marginTop: '2px' }}><Users size={16} /></div>
-                  <div>
-                    <div style={{ fontWeight: 600, color: '#f8fafc' }}>New Student Signups</div>
-                    <div style={{ color: '#94a3b8', fontSize: '11px' }}>2 students verified today with 100% active streak.</div>
+                {stats.assessments > 0 && (
+                  <div className="notif-item">
+                    <div style={{ color: '#f59e0b', marginTop: '2px' }}><ClipboardCheck size={16} /></div>
+                    <div>
+                      <div style={{ fontWeight: 600, color: '#f8fafc' }}>Assessment Drives</div>
+                      <div style={{ color: '#94a3b8', fontSize: '11px' }}>{stats.assessments} active assessment test(s) configured.</div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
@@ -498,7 +360,7 @@ export default function Dashboard() {
               <Users size={22} />
             </div>
             <span className="stat-trend-tag">
-              <TrendingUp size={11} /> +14%
+              <Users size={11} /> Registered
             </span>
           </div>
           <div>
@@ -515,7 +377,7 @@ export default function Dashboard() {
               <Activity size={22} />
             </div>
             <span className="stat-trend-tag">
-              <Zap size={11} /> 100%
+              <Zap size={11} /> {stats.totalStudents > 0 ? Math.round((stats.activeStudents / stats.totalStudents) * 100) : 0}% Active
             </span>
           </div>
           <div>
@@ -532,7 +394,7 @@ export default function Dashboard() {
               <Code2 size={22} />
             </div>
             <span className="stat-trend-tag accent">
-              <Sparkles size={11} /> 3 Tiers
+              <Sparkles size={11} /> Challenges
             </span>
           </div>
           <div>
@@ -549,7 +411,7 @@ export default function Dashboard() {
               <HelpCircle size={22} />
             </div>
             <span className="stat-trend-tag accent">
-              MCQ Core
+              Curriculum Bank
             </span>
           </div>
           <div>
@@ -566,7 +428,7 @@ export default function Dashboard() {
               <BookOpen size={22} />
             </div>
             <span className="stat-trend-tag">
-              4 Modules
+              {stats.modulesCount || 5} Tracks
             </span>
           </div>
           <div>
@@ -583,7 +445,7 @@ export default function Dashboard() {
               <ClipboardCheck size={22} />
             </div>
             <span className="stat-trend-tag accent">
-              Live Ready
+              {stats.assessments} Drives
             </span>
           </div>
           <div>
@@ -722,37 +584,43 @@ export default function Dashboard() {
 
           {/* Performance Bars List */}
           <div className="performance-bars-list">
-            {performanceCategories.map((cat, idx) => {
-              const displayVal = performanceView === 'accuracy' ? `${cat.accuracy}% Accuracy` : `${cat.submissions} Solved`;
-              const fillPct = performanceView === 'accuracy' ? cat.accuracy : Math.min(100, (cat.submissions / 500) * 100);
+            {performanceCategories.length === 0 ? (
+              <div style={{ padding: '36px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
+                No domain performance metrics recorded in database yet.
+              </div>
+            ) : (
+              performanceCategories.map((cat, idx) => {
+                const displayVal = performanceView === 'accuracy' ? `${cat.accuracy}% Accuracy` : `${cat.submissions} Solved`;
+                const fillPct = performanceView === 'accuracy' ? cat.accuracy : Math.min(100, (cat.submissions / Math.max(1, stats.totalSubmissions || 100)) * 100);
 
-              return (
-                <div key={idx} className="perf-bar-item">
-                  <div className="perf-bar-top">
-                    <span className="perf-category-title">
-                      <span style={{ color: cat.color }}>{cat.icon}</span>
-                      <span>{cat.name}</span>
-                    </span>
-                    <span className="perf-category-val">{displayVal}</span>
+                return (
+                  <div key={idx} className="perf-bar-item">
+                    <div className="perf-bar-top">
+                      <span className="perf-category-title">
+                        <span style={{ color: cat.color }}>{cat.icon}</span>
+                        <span>{cat.name}</span>
+                      </span>
+                      <span className="perf-category-val">{displayVal}</span>
+                    </div>
+                    <div className="perf-track-bar">
+                      <div
+                        className="perf-fill-bar"
+                        style={{
+                          width: `${fillPct}%`,
+                          backgroundColor: cat.color,
+                          boxShadow: `0 0 10px ${cat.color}66`
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="perf-track-bar">
-                    <div
-                      className="perf-fill-bar"
-                      style={{
-                        width: `${fillPct}%`,
-                        backgroundColor: cat.color,
-                        boxShadow: `0 0 10px ${cat.color}66`
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
 
           <div className="chart-legend-row" style={{ marginTop: 'auto' }}>
             <span style={{ color: '#94a3b8', fontSize: '11.5px' }}>
-              💡 Quantitative Aptitude &amp; Assessments maintain the highest first-attempt pass rates this term.
+              💡 Real-time aggregate performance evaluated directly from campus learner submissions.
             </span>
           </div>
         </div>
@@ -785,30 +653,36 @@ export default function Dashboard() {
           </div>
 
           <div className="activity-stream-list">
-            {filteredActivities.map((act) => (
-              <div key={act.id} className="activity-stream-item">
-                <img src={act.avatar} alt={act.studentName} className="activity-avatar" />
-                <div className="activity-details">
-                  <div className="activity-action-line">
-                    <strong>{act.studentName}</strong> • {act.action}
-                  </div>
-                  <div className="activity-meta-line">
-                    <span
-                      className="activity-tag-badge"
-                      style={{
-                        backgroundColor: `${act.badgeColor}22`,
-                        color: act.badgeColor,
-                        border: `1px solid ${act.badgeColor}44`
-                      }}
-                    >
-                      {act.status}
-                    </span>
-                    <span>• ID: {act.studentId}</span>
-                    <span>• {act.time}</span>
+            {filteredActivities.length === 0 ? (
+              <div style={{ padding: '36px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
+                No recent activity recorded in the database.
+              </div>
+            ) : (
+              filteredActivities.map((act) => (
+                <div key={act.id} className="activity-stream-item">
+                  <img src={act.avatar} alt={act.studentName} className="activity-avatar" />
+                  <div className="activity-details">
+                    <div className="activity-action-line">
+                      <strong>{act.studentName}</strong> • {act.action}
+                    </div>
+                    <div className="activity-meta-line">
+                      <span
+                        className="activity-tag-badge"
+                        style={{
+                          backgroundColor: `${act.badgeColor}22`,
+                          color: act.badgeColor,
+                          border: `1px solid ${act.badgeColor}44`
+                        }}
+                      >
+                        {act.status}
+                      </span>
+                      <span>• ID: {act.studentId}</span>
+                      <span>• {act.time}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -829,35 +703,41 @@ export default function Dashboard() {
           </div>
 
           <div className="upcoming-events-list">
-            {upcomingEvents.map((ev) => (
-              <div key={ev.id} className="upcoming-event-item">
-                <div className="event-date-box">
-                  <span className="event-month-text">{ev.month}</span>
-                  <span className="event-day-text">{ev.day}</span>
-                </div>
-
-                <div className="event-info-box">
-                  <div className="event-title-text">{ev.title}</div>
-                  <div className="event-sub-meta">
-                    <span
-                      style={{
-                        color: ev.badgeColor,
-                        fontWeight: 700,
-                        fontSize: '11px'
-                      }}
-                    >
-                      {ev.type}
-                    </span>
-                    <span>• {ev.duration}</span>
-                    <span>• {ev.enrolled}</span>
-                  </div>
-                </div>
-
-                <button className="btn-event-action" onClick={() => navigate(ev.path)}>
-                  {ev.actionText} →
-                </button>
+            {upcomingEvents.length === 0 ? (
+              <div style={{ padding: '36px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '13px' }}>
+                No upcoming assessment events found in database.
               </div>
-            ))}
+            ) : (
+              upcomingEvents.map((ev) => (
+                <div key={ev.id} className="upcoming-event-item">
+                  <div className="event-date-box">
+                    <span className="event-month-text">{ev.month}</span>
+                    <span className="event-day-text">{ev.day}</span>
+                  </div>
+
+                  <div className="event-info-box">
+                    <div className="event-title-text">{ev.title}</div>
+                    <div className="event-sub-meta">
+                      <span
+                        style={{
+                          color: ev.badgeColor,
+                          fontWeight: 700,
+                          fontSize: '11px'
+                        }}
+                      >
+                        {ev.type}
+                      </span>
+                      <span>• {ev.duration}</span>
+                      <span>• {ev.enrolled}</span>
+                    </div>
+                  </div>
+
+                  <button className="btn-event-action" onClick={() => navigate(ev.path)}>
+                    {ev.actionText} →
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -902,89 +782,97 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {topStudents.map((st, idx) => {
-                const rankNum = st.rank || idx + 1;
-                const rankClass = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-other';
+              {topStudents.length === 0 ? (
+                <tr>
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '36px', color: '#94a3b8', fontSize: '13px' }}>
+                    No student leaderboard records found in database.
+                  </td>
+                </tr>
+              ) : (
+                topStudents.map((st, idx) => {
+                  const rankNum = st.rank || idx + 1;
+                  const rankClass = rankNum === 1 ? 'rank-1' : rankNum === 2 ? 'rank-2' : rankNum === 3 ? 'rank-3' : 'rank-other';
 
-                return (
-                  <tr key={st.user_id || idx}>
-                    <td>
-                      <div className={`rank-badge-box ${rankClass}`}>
-                        {rankNum === 1 ? '🥇' : rankNum === 2 ? '🥈' : rankNum === 3 ? '🥉' : `#${rankNum}`}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="student-info-cell">
-                        <img
-                          src={st.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${st.name}`}
-                          alt={st.name}
-                        />
-                        <div>
-                          <div className="student-name-text">{st.name}</div>
-                          <div style={{ fontSize: '11px', color: '#94a3b8', fontFamily: 'monospace' }}>
-                            {st.student_id || st.user_id}
+                  return (
+                    <tr key={st.user_id || idx}>
+                      <td>
+                        <div className={`rank-badge-box ${rankClass}`}>
+                          {rankNum === 1 ? '🥇' : rankNum === 2 ? '🥈' : rankNum === 3 ? '🥉' : `#${rankNum}`}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="student-info-cell">
+                          <img
+                            src={st.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${st.name}`}
+                            alt={st.name}
+                          />
+                          <div>
+                            <div className="student-name-text">{st.name}</div>
+                            <div style={{ fontSize: '11px', color: '#94a3b8', fontFamily: 'monospace' }}>
+                              {st.student_id || st.user_id}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="student-college-text">{st.college_name || 'CodeArena Campus'}</div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, color: '#f8fafc' }}>
-                        <Trophy size={14} color="#fbbf24" />
-                        <span>{(st.total_points || st.coding_points || 0).toLocaleString()}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#cbd5e1' }}>
-                        <Code2 size={14} color="#38bdf8" />
-                        <span>{st.problems_solved || 142}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span
-                        style={{
-                          padding: '3px 8px',
-                          borderRadius: '8px',
-                          backgroundColor: 'rgba(34, 197, 94, 0.15)',
-                          color: '#4ade80',
-                          fontWeight: 700,
-                          fontSize: '12px'
-                        }}
-                      >
-                        {st.accuracy || 88.2}%
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#fb923c', fontWeight: 700 }}>
-                        <Flame size={14} />
-                        <span>{st.streak_days || 12}d</span>
-                      </div>
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button
-                        onClick={() => handleOpenStudentModal(st)}
-                        style={{
-                          padding: '6px 12px',
-                          borderRadius: '8px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                          border: '1px solid rgba(255, 255, 255, 0.12)',
-                          color: '#f8fafc',
-                          fontSize: '11.5px',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.2)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)')}
-                      >
-                        Profile
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                      <td>
+                        <div className="student-college-text">{st.college_name || 'CodeArena Campus'}</div>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, color: '#f8fafc' }}>
+                          <Trophy size={14} color="#fbbf24" />
+                          <span>{(st.total_points || st.coding_points || 0).toLocaleString()}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#cbd5e1' }}>
+                          <Code2 size={14} color="#38bdf8" />
+                          <span>{st.problems_solved != null ? st.problems_solved : (st.questions_solved != null ? st.questions_solved : 0)}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          style={{
+                            padding: '3px 8px',
+                            borderRadius: '8px',
+                            backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                            color: '#4ade80',
+                            fontWeight: 700,
+                            fontSize: '12px'
+                          }}
+                        >
+                          {st.accuracy != null ? st.accuracy : 0}%
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#fb923c', fontWeight: 700 }}>
+                          <Flame size={14} />
+                          <span>{st.streak_days != null ? st.streak_days : 0}d</span>
+                        </div>
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        <button
+                          onClick={() => handleOpenStudentModal(st)}
+                          style={{
+                            padding: '6px 12px',
+                            borderRadius: '8px',
+                            backgroundColor: 'rgba(255, 255, 255, 0.06)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            color: '#f8fafc',
+                            fontSize: '11.5px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.2)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.06)')}
+                        >
+                          Profile
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

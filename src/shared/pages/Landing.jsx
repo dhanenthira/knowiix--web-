@@ -16,7 +16,7 @@ export default function Landing() {
     }}>
       <iframe
         src="/landing.html"
-        title="SkillPrep Landing"
+        title="Knowiix Landing"
         style={{
           width: '100%',
           height: '100%',

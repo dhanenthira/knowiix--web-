@@ -134,7 +134,7 @@ export default function Sidebar() {
           >
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Globe size={14} />
-              <span>SkillPrep Website</span>
+              <span>Student Portal</span>
             </span>
             <ExternalLink size={14} />
           </button>

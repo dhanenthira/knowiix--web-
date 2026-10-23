@@ -1,0 +1,341 @@
+/* ==========================================================================
+   OFFICIAL MENUBAR STYLING (FIXED ON RIGHT SIDE, COMPACT & CONTENT-HUGGING)
+   Features:
+   - Fixed sticky position on the right side while scrolling
+   - Natural upward scroll of the In-Progress Tutorials & main content
+   - Clean card layout with zero awkward empty space (height: fit-content)
+   - Header with collapse toggle
+   - MENU group with active capsule & black vertical pill indicator
+   - Collapsed icon-only mode support
+   ========================================================================== */
+
+.oa-menubar-container {
+  flex-shrink: 0;
+  width: 236px;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: sticky;
+  top: 84px;
+  height: fit-content;
+  max-height: calc(100vh - 100px);
+  padding: 8px 0 24px 24px;
+  box-sizing: border-box;
+  z-index: 40;
+}
+
+.oa-menubar-container.collapsed {
+  width: 82px;
+  padding-left: 16px;
+  padding-right: 0;
+}
+
+/* Outer Floating Card */
+.oa-menubar-card {
+  width: 100%;
+  height: auto;
+  background: #FFFFFF;
+  border: 1px solid #EBECEF;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* TOP HEADER: TOGGLE COLLAPSE BUTTON */
+.oa-menubar-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #F1F3F5;
+  margin-bottom: 8px;
+}
+
+.oa-menubar-container.collapsed .oa-menubar-header {
+  justify-content: center;
+}
+
+.oa-collapse-toggle-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.oa-collapse-toggle-btn:hover {
+  background: #EFF6FF;
+  color: #2563EB;
+  border-color: #BFDBFE;
+}
+
+/* SCROLLABLE NAV BODY (CONSTRAINED TO CONTENT) */
+.oa-menubar-nav-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 1px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.oa-menubar-nav-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.oa-menubar-nav-body::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 4px;
+}
+
+/* SECTION HEADINGS */
+.oa-section-heading {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94A3B8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px 6px 10px;
+  user-select: none;
+}
+
+.oa-menubar-container.collapsed .oa-section-heading {
+  text-align: center;
+  padding: 4px 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.oa-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* NAVIGATION ITEMS (PILLS) */
+.oa-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #4B5563;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  user-select: none;
+}
+
+.oa-menubar-container.collapsed .oa-nav-item {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.oa-nav-item:hover {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+/* ACTIVE STATE (SOLID VIBRANT BLUE THEME MATCHING SCREENSHOT) */
+.oa-nav-item.active {
+  background: #2563EB;
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.32);
+}
+
+/* Subtle active indicator bar hidden or styled smoothly */
+.oa-active-indicator {
+  display: none;
+}
+
+.oa-nav-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748B;
+  flex-shrink: 0;
+  transition: color 0.15s ease;
+}
+
+.oa-nav-item.active .oa-nav-icon-wrap {
+  color: #FFFFFF;
+}
+
+.oa-nav-item:hover .oa-nav-icon-wrap {
+  color: #2563EB;
+}
+
+.oa-nav-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.oa-nav-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: #E5E7EB;
+  color: #4B5563;
+  margin-left: auto;
+}
+
+.oa-nav-item.active .oa-nav-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+.oa-nav-badge.highlight {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.oa-nav-item.active .oa-nav-badge.highlight {
+  background: rgba(255, 255, 255, 0.3);
+  color: #FFFFFF;
+}
+
+/* CATEGORIES ACCORDION IN SIDEBAR */
+.oa-categories-accordion {
+  margin-top: 4px;
+}
+
+.oa-categories-sublist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 28px;
+  margin-top: 4px;
+}
+
+.oa-category-subitem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  font-size: 12.5px;
+  color: #64748B;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+
+.oa-category-subitem:hover {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.oa-category-subitem.active {
+  background: #EFF6FF;
+  color: #2563EB;
+  font-weight: 600;
+}
+
+.oa-cat-sub-count {
+  font-size: 10.5px;
+  color: #64748B;
+  background: #F1F5F9;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.oa-category-subitem.active .oa-cat-sub-count {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+/* DARK MODE HARMONIZATION (BLUE THEME) */
+[data-theme="dark"] .oa-menubar-card,
+.dark .oa-menubar-card {
+  background: #111827;
+  border-color: #1F2937;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .oa-menubar-header,
+.dark .oa-menubar-header {
+  border-bottom-color: #1F2937;
+}
+
+[data-theme="dark"] .oa-collapse-toggle-btn,
+.dark .oa-collapse-toggle-btn {
+  background: #1E293B;
+  border-color: #334155;
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .oa-collapse-toggle-btn:hover,
+.dark .oa-collapse-toggle-btn:hover {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60A5FA;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="dark"] .oa-nav-item,
+.dark .oa-nav-item {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .oa-nav-item:hover,
+.dark .oa-nav-item:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: #93C5FD;
+}
+
+[data-theme="dark"] .oa-nav-item.active,
+.dark .oa-nav-item.active {
+  background: #2563EB;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+[data-theme="dark"] .oa-nav-icon-wrap,
+.dark .oa-nav-icon-wrap {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .oa-nav-item.active .oa-nav-icon-wrap,
+.dark .oa-nav-item.active .oa-nav-icon-wrap {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .oa-category-subitem:hover,
+.dark .oa-category-subitem:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: #93C5FD;
+}
+
+[data-theme="dark"] .oa-category-subitem.active,
+.dark .oa-category-subitem.active {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60A5FA;
+}
+
+/* RESPONSIVE HIDE ON MOBILE DRAWER */
+@media (max-width: 900px) {
+  .oa-menubar-container {
+    display: none;
+  }
+}

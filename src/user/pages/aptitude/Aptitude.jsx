@@ -286,6 +286,9 @@ export default function Aptitude() {
           progress_percentage: res.data.progress_percentage,
           solved_question_ids: Array.from(new Set([...(prev.solved_question_ids || []), qId]))
         }));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('student_performance_updated'));
+        }
       }
     } catch (err) {
       console.warn('Error saving question solve:', err);
@@ -304,6 +307,9 @@ export default function Aptitude() {
           progress_percentage: res.data.progress_percentage,
           solved_question_ids: Array.from(new Set([...(prev.solved_question_ids || []), ...qIds]))
         }));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('student_performance_updated'));
+        }
       }
     } catch (err) {
       console.warn('Error saving batch solve:', err);

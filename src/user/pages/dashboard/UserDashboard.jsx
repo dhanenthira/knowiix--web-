@@ -105,24 +105,36 @@ export default function UserDashboard() {
         setDashboardData(res.data);
         if (res.data?.skill_progress) {
           const sp = res.data.skill_progress;
+          const aptTotal = Math.max(0, Number(sp.aptitude?.total_problems) || 100);
+          const aptSolved = Math.min(aptTotal, Math.max(0, Number(sp.aptitude?.problems_solved) || 0));
+          const aptRemaining = Math.max(0, aptTotal - aptSolved);
+
+          const techTotal = Math.max(0, Number(sp.technical?.total_problems) || 50);
+          const techSolved = Math.min(techTotal, Math.max(0, Number(sp.technical?.problems_solved) || 0));
+          const techRemaining = Math.max(0, techTotal - techSolved);
+
+          const codeTotal = Math.max(0, Number(sp.coding?.total_problems) || 67);
+          const codeSolved = Math.min(codeTotal, Math.max(0, Number(sp.coding?.problems_solved) || 0));
+          const codeRemaining = Math.max(0, codeTotal - codeSolved);
+
           setLiveSkillStats({
             aptitude: {
-              total: sp.aptitude?.total_problems ?? 0,
-              solved: sp.aptitude?.problems_solved ?? 0,
-              remaining: sp.aptitude?.problems_remaining ?? 0,
-              progress: sp.aptitude?.progress_percentage ?? 0.0
+              total: aptTotal,
+              solved: aptSolved,
+              remaining: aptRemaining,
+              progress: sp.aptitude?.progress_percentage ?? (aptTotal > 0 ? Math.round((aptSolved / aptTotal) * 100) : 0)
             },
             technical: {
-              total: sp.technical?.total_problems ?? 0,
-              solved: sp.technical?.problems_solved ?? 0,
-              remaining: sp.technical?.problems_remaining ?? 0,
-              progress: sp.technical?.progress_percentage ?? 0.0
+              total: techTotal,
+              solved: techSolved,
+              remaining: techRemaining,
+              progress: sp.technical?.progress_percentage ?? (techTotal > 0 ? Math.round((techSolved / techTotal) * 100) : 0)
             },
             coding: {
-              total: sp.coding?.total_problems ?? 0,
-              solved: sp.coding?.problems_solved ?? 0,
-              remaining: sp.coding?.problems_remaining ?? 0,
-              progress: sp.coding?.progress_percentage ?? 0.0
+              total: codeTotal,
+              solved: codeSolved,
+              remaining: codeRemaining,
+              progress: sp.coding?.progress_percentage ?? (codeTotal > 0 ? Math.round((codeSolved / codeTotal) * 100) : 0)
             }
           });
         }
@@ -252,12 +264,12 @@ export default function UserDashboard() {
       path: '/aptitude'
     },
     {
-      id: 'technical',
+      id: 'technical-mcqs',
       date: 'Active Session',
       tag: liveSkillStats.technical.solved > 0 ? 'In Progress' : 'Not Started',
       tagColor: 'blue',
-      title: 'Technical (DSA & Core)',
-      subtitle: 'Data Structures, Algorithms & OS',
+      title: 'Technical Core (MCQs)',
+      subtitle: 'Data Structures, OS & CS Fundamentals',
       totalProblems: liveSkillStats.technical.total,
       solvedProblems: liveSkillStats.technical.solved,
       remainingProblems: liveSkillStats.technical.remaining,
@@ -267,23 +279,24 @@ export default function UserDashboard() {
       path: '/questions?category=Technical'
     },
     {
-      id: 'coding',
+      id: 'technical-practice',
       date: 'Daily Target',
       tag: liveSkillStats.coding.solved > 0 ? 'Working' : 'Not Started',
       tagColor: 'purple',
-      title: 'Coding & Algorithms',
-      subtitle: 'Competitive Programming Drills',
+      title: 'Technical Practice',
+      subtitle: 'Multi-Language Problems (Java, Python, C, C++)',
       totalProblems: liveSkillStats.coding.total,
       solvedProblems: liveSkillStats.coding.solved,
       remainingProblems: liveSkillStats.coding.remaining,
       progress: liveSkillStats.coding.progress,
       theme: 'purple',
       deadlineBadge: `${liveSkillStats.coding.remaining} Problems Left`,
-      path: '/coding/practice'
+      path: '/technical'
     }
   ];
 
-  const recentAssessmentsList = dashboardData?.recent_assessments || [];
+  // Display only the first two tests in Recent Assessments
+  const recentAssessmentsList = (dashboardData?.recent_assessments || []).slice(0, 2);
 
 
   return (
@@ -299,7 +312,7 @@ export default function UserDashboard() {
       <TodayPracticeCard
         userName={displayName?.split(' ')[0] || 'Student'}
         greeting="Welcome back"
-        subtitle="Complete your daily curated drills in Aptitude, Technical and Coding to maintain your placement readiness."
+        subtitle="Complete your daily curated drills in Aptitude and Technical problem solving to maintain your placement readiness."
         streakDays={stats.streak_days || 0}
         completedCount={(stats.questions_solved || 0) + (stats.coding_problems_solved || 0)}
         totalCount={(stats.total_questions || 0) + (stats.coding_breakdown?.total || 0)}
@@ -618,12 +631,30 @@ export default function UserDashboard() {
 
 
           {/* ==========================================================
-                8. RECENT ASSESSMENTS TABLE
+                8. RECENT ASSESSMENTS TABLE (SHOWING EXACTLY 2 TESTS)
                 ========================================================== */}
           <section className="card" id="recent-assessments-section">
-            <div className="card-header-row">
-              <h3 className="card-title">📝 Recent Assessments</h3>
-              <Link to="/assessments" style={{ color: '#4f46e5', fontSize: '0.875rem', fontWeight: 700, textDecoration: 'none' }}>
+            <div className="card-header-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h3 className="card-title" style={{ margin: 0 }}>📝 Recent Assessments</h3>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', backgroundColor: '#f1f5f9', padding: '2px 8px', borderRadius: '12px' }}>
+                  Latest 2 Tests
+                </span>
+              </div>
+              <Link
+                to="/assessments"
+                id="btn-view-all-results"
+                style={{
+                  color: '#2563eb',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
                 View All Results →
               </Link>
             </div>
@@ -641,19 +672,30 @@ export default function UserDashboard() {
                 </thead>
                 <tbody>
                   {recentAssessmentsList && recentAssessmentsList.length > 0 ? (
-                    recentAssessmentsList.map((test, idx) => {
+                    recentAssessmentsList.slice(0, 2).map((test, idx) => {
                       const scoreNum = test.score_num !== undefined ? test.score_num : (parseInt(test.score) || 0);
-                      const pillStyle = scoreNum >= 85
-                        ? { background: '#ecfdf5', color: '#059669' }
+                      const isCompleted = test.score !== 'Not Attempted' && test.accuracy !== '-';
+                      const pillStyle = !isCompleted
+                        ? { background: '#f1f5f9', color: '#64748b', border: '1px solid #e2e8f0' }
+                        : scoreNum >= 85
+                        ? { background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0' }
                         : scoreNum >= 75
-                        ? { background: '#eef2ff', color: '#4338ca' }
-                        : { background: '#fffbeb', color: '#d97706' };
+                        ? { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' }
+                        : { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
 
                       return (
                         <tr key={test.id || idx}>
                           <td>
-                            <div className="test-title-cell">
-                              <span>{test.icon || '📝'}</span> {test.title}
+                            <div className="test-title-cell" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <span style={{ fontSize: '1.2rem' }}>{test.icon || '📝'}</span>
+                              <div>
+                                <div style={{ fontWeight: 600, color: '#0f172a' }}>{test.title}</div>
+                                {test.duration && (
+                                  <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                                    ⏱ {test.duration} {test.status ? `• ${test.status}` : ''}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </td>
                           <td>
@@ -661,13 +703,17 @@ export default function UserDashboard() {
                               {test.score}
                             </span>
                           </td>
-                          <td>{test.accuracy}</td>
-                          <td>{test.date}</td>
+                          <td>
+                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{test.accuracy}</span>
+                          </td>
+                          <td>
+                            <span style={{ color: '#475569', fontSize: '0.84rem' }}>{test.date || test.raw_date || 'Today'}</span>
+                          </td>
                           <td>
                             <button
                               className="btn-table-view"
                               onClick={() => {
-                                if (test.action_url) {
+                                if (test.action_url && test.action_url !== '/assessments') {
                                   navigate(test.action_url);
                                 } else if (test.status === 'active' || test.action_label === 'Launch') {
                                   navigate('/aptitude?mode=mock');
@@ -676,7 +722,7 @@ export default function UserDashboard() {
                                 }
                               }}
                             >
-                              {test.action_label || (test.status === 'active' ? 'Launch' : 'View')}
+                              {test.action_label || (test.status === 'active' ? 'Launch' : 'Review')}
                             </button>
                           </td>
                         </tr>

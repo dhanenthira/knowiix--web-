@@ -7,7 +7,7 @@ import Sidebar from './admin/components/Sidebar';
 import Dashboard from './admin/pages/Dashboard';
 import Students from './admin/pages/Students';
 import Questions from './admin/pages/Questions';
-import CodingManagement from './admin/pages/CodingManagement';
+import TechnicalManagement from './admin/pages/TechnicalManagement';
 import Assessments from './admin/pages/Assessments';
 import BattlesMonitor from './admin/pages/BattlesMonitor';
 import Analytics from './admin/pages/Analytics';
@@ -17,8 +17,10 @@ import UserDashboard from './user/pages/dashboard/UserDashboard';
 import Learning from './user/pages/learning/Learning';
 import Profile from './user/pages/profile/Profile';
 import Aptitude from './user/pages/aptitude/Aptitude';
-import CodingPractice from './user/pages/coding/CodingPractice';
-import CodingWorkspace from './user/pages/coding/CodingWorkspace';
+import TechnicalPractice from './user/pages/technical/TechnicalPractice';
+import TechnicalWorkspace from './user/pages/technical/TechnicalWorkspace';
+import AssessmentResults from './user/pages/assessments/AssessmentResults';
+import DailyPractice from './user/pages/daily-practice/DailyPractice';
 
 // Shared Components & Pages
 import Navbar from './shared/components/navbar';
@@ -73,25 +75,44 @@ function MainRoutes() {
       <Route path="/student/aptitude" element={<Aptitude />} />
       <Route path="/aptitude/test" element={<Aptitude />} />
 
-      {/* Student Coding Practice & Two-Panel Workspace */}
-      <Route path="/coding/practice" element={<CodingPractice />} />
-      <Route path="/coding/problem/:id" element={<CodingWorkspace />} />
-      <Route path="/student/coding" element={<CodingPractice />} />
-      <Route path="/student/coding/:id" element={<CodingWorkspace />} />
-      <Route path="/practice/coding" element={<CodingPractice />} />
-      <Route path="/practice/coding/:id" element={<CodingWorkspace />} />
+      {/* Assessments & Results Page */}
+      <Route path="/assessments" element={<AssessmentResults />} />
+      <Route path="/student/assessments" element={<AssessmentResults />} />
+      <Route path="/assessments/results" element={<AssessmentResults />} />
+
+      {/* Daily Practice (5 Aptitude + 1 Technical Problem) */}
+      <Route path="/daily-practice" element={<DailyPractice />} />
+      <Route path="/student/daily-practice" element={<DailyPractice />} />
+
+      {/* Student Technical Practice & Multi-Language Workspace (Java, Python, C, C++) */}
+      <Route path="/technical" element={<TechnicalPractice />} />
+      <Route path="/technical/practice" element={<TechnicalPractice />} />
+      <Route path="/technical/problem/:id" element={<TechnicalWorkspace />} />
+      <Route path="/student/technical" element={<TechnicalPractice />} />
+      <Route path="/student/technical/:id" element={<TechnicalWorkspace />} />
+      <Route path="/practice/technical" element={<TechnicalPractice />} />
+      <Route path="/practice/technical/:id" element={<TechnicalWorkspace />} />
+
+      {/* Aliases for backwards compatibility */}
+      <Route path="/coding/practice" element={<TechnicalPractice />} />
+      <Route path="/coding/problem/:id" element={<TechnicalWorkspace />} />
+      <Route path="/student/coding" element={<TechnicalPractice />} />
+      <Route path="/student/coding/:id" element={<TechnicalWorkspace />} />
+      <Route path="/practice/coding" element={<TechnicalPractice />} />
+      <Route path="/practice/coding/:id" element={<TechnicalWorkspace />} />
       {(!admin || admin?.role !== 'admin') && (
-        <Route path="/coding" element={<CodingPractice />} />
+        <Route path="/coding" element={<TechnicalPractice />} />
       )}
 
-      {/* Protected Routes with Unified Layout (Uses Outlet, eliminating descendant Routes warning) */}
+      {/* Protected Routes with Unified Layout */}
       <Route element={<ProtectedLayout />}>
         {admin && <Route path="/" element={<Dashboard />} />}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/students" element={<Students />} />
         <Route path="/questions" element={<Questions />} />
-        <Route path="/coding" element={<CodingManagement />} />
-        <Route path="/assessments" element={<Assessments />} />
+        <Route path="/coding" element={<TechnicalManagement />} />
+        <Route path="/technical-admin" element={<TechnicalManagement />} />
+        <Route path="/admin/assessments" element={<Assessments />} />
         <Route path="/battles" element={<BattlesMonitor />} />
         <Route path="/analytics" element={<Analytics />} />
       </Route>

@@ -57,7 +57,7 @@ import {
 } from 'recharts';
 import { useAuth } from '../../../context/AuthContext';
 import Navbar from '../../../shared/components/navbar';
-import codingApi from '../../api/codingApi';
+import technicalApi, { codingApi } from '../../api/technicalApi';
 import './Profile.css';
 
 const AVATAR_PRESETS = [
@@ -538,7 +538,7 @@ export default function Profile() {
               onClick={() => setActiveView('leetcode')}
             >
               <Code2 size={16} />
-              <span>Coding Profile</span>
+              <span>Technical Profile</span>
             </button>
             <button
               className={`lc-banner-tab-btn ${activeView === 'settings' ? 'active' : ''}`}
@@ -778,63 +778,6 @@ export default function Profile() {
                 </div>
               </div>
 
-              {/* Card 4: Skills & Topic Progress */}
-              <div className="lc-card lc-skills-card">
-                <div className="lc-skills-card-header">
-                  <h3 className="lc-card-section-title">Skills</h3>
-                  <button
-                    className="lc-link-text-btn"
-                    onClick={() => setActiveTab('skills')}
-                  >
-                    View All
-                  </button>
-                </div>
-
-                {/* Advanced */}
-                <div className="lc-skill-group">
-                  <div className="lc-skill-group-title">
-                    <span className="lc-skill-level-dot dot-advanced"></span>
-                    <span>Advanced</span>
-                  </div>
-                  <div className="lc-skill-tags-wrap">
-                    {skillsData.advanced.slice(0, 4).map((s) => (
-                      <span key={s.name} className="lc-skill-tag" title={`${s.solved}/${s.total} solved`}>
-                        {s.name} <span className="lc-tag-count">×{s.solved}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Intermediate */}
-                <div className="lc-skill-group">
-                  <div className="lc-skill-group-title">
-                    <span className="lc-skill-level-dot dot-intermediate"></span>
-                    <span>Intermediate</span>
-                  </div>
-                  <div className="lc-skill-tags-wrap">
-                    {skillsData.intermediate.slice(0, 4).map((s) => (
-                      <span key={s.name} className="lc-skill-tag" title={`${s.solved}/${s.total} solved`}>
-                        {s.name} <span className="lc-tag-count">×{s.solved}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Fundamental */}
-                <div className="lc-skill-group">
-                  <div className="lc-skill-group-title">
-                    <span className="lc-skill-level-dot dot-fundamental"></span>
-                    <span>Fundamental</span>
-                  </div>
-                  <div className="lc-skill-tags-wrap">
-                    {skillsData.fundamental.slice(0, 4).map((s) => (
-                      <span key={s.name} className="lc-skill-tag" title={`${s.solved}/${s.total} solved`}>
-                        {s.name} <span className="lc-tag-count">×{s.solved}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </aside>
 
             {/* =========================================================
@@ -1356,7 +1299,7 @@ export default function Profile() {
                     </button>
                   </div>
 
-                  <Link to="/coding/practice" className="lc-view-all-link">
+                  <Link to="/technical" className="lc-view-all-link">
                     <span>Arena Practice</span>
                     <ChevronRight size={14} />
                   </Link>
@@ -1447,7 +1390,7 @@ export default function Profile() {
                             <div key={sub.id} className="lc-submission-table-row">
                               <div className="col-title">
                                 <Link
-                                  to={`/coding/problem/${sub.problem_id}`}
+                                  to={`/technical/problem/${sub.problem_id}`}
                                   className="lc-problem-title-link"
                                 >
                                   {sub.problem_title}
@@ -1531,7 +1474,7 @@ export default function Profile() {
                         <Code2 size={36} color="#9aa0a6" />
                         <h4>No submissions match the selected filters</h4>
                         <p>Solve problems in the Arena to see your submission history and performance benchmarks.</p>
-                        <Link to="/coding/practice" className="lc-btn-save-settings">
+                        <Link to="/technical" className="lc-btn-save-settings">
                           Start Solving Problems
                         </Link>
                       </div>
@@ -1800,7 +1743,7 @@ export default function Profile() {
               <div className="lc-sub-plan-box">
                 <div className="lc-plan-info">
                   <div className="lc-plan-name">Student Plan</div>
-                  <div className="lc-plan-price">₹10 / Year · Unlimited Coding &amp; Aptitude</div>
+                  <div className="lc-plan-price">₹10 / Year · Unlimited Technical &amp; Aptitude</div>
                   <div className="lc-plan-expiry">Valid until August 2027 · Active Status</div>
                 </div>
                 <span className="lc-plan-active-badge">● Active</span>
@@ -2004,7 +1947,7 @@ export default function Profile() {
                   rows="3"
                   value={formData.bio}
                   onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  placeholder="Tell others about your coding journey..."
+                  placeholder="Tell others about your technical journey..."
                 ></textarea>
               </div>
 

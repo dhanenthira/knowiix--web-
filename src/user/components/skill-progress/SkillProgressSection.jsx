@@ -65,25 +65,31 @@ export default function SkillProgressSection({
     return () => { isMounted = false; };
   }, [propAptitudeProgress, skillProgress]);
 
-  const activeAptitude = skillProgress?.aptitude || {
-    total_problems: aptitudeProgress?.total_problems ?? 0,
-    problems_solved: aptitudeProgress?.problems_solved ?? 0,
-    problems_remaining: aptitudeProgress?.problems_remaining ?? 0,
-    progress_percentage: aptitudeProgress?.progress_percentage ?? 0.0
+  const aptTotal = Math.max(0, Number(skillProgress?.aptitude?.total_problems ?? aptitudeProgress?.total_problems) || 100);
+  const aptSolved = Math.min(aptTotal, Math.max(0, Number(skillProgress?.aptitude?.problems_solved ?? aptitudeProgress?.problems_solved) || 0));
+  const activeAptitude = {
+    total_problems: aptTotal,
+    problems_solved: aptSolved,
+    problems_remaining: Math.max(0, aptTotal - aptSolved),
+    progress_percentage: skillProgress?.aptitude?.progress_percentage ?? (aptTotal > 0 ? Math.round((aptSolved / aptTotal) * 100) : 0)
   };
 
-  const activeTechnical = skillProgress?.technical || {
-    total_problems: 0,
-    problems_solved: 0,
-    problems_remaining: 0,
-    progress_percentage: 0.0
+  const techTotal = Math.max(0, Number(skillProgress?.technical?.total_problems) || 50);
+  const techSolved = Math.min(techTotal, Math.max(0, Number(skillProgress?.technical?.problems_solved) || 0));
+  const activeTechnical = {
+    total_problems: techTotal,
+    problems_solved: techSolved,
+    problems_remaining: Math.max(0, techTotal - techSolved),
+    progress_percentage: skillProgress?.technical?.progress_percentage ?? (techTotal > 0 ? Math.round((techSolved / techTotal) * 100) : 0)
   };
 
-  const activeCoding = skillProgress?.coding || {
-    total_problems: 0,
-    problems_solved: 0,
-    problems_remaining: 0,
-    progress_percentage: 0.0
+  const codeTotal = Math.max(0, Number(skillProgress?.coding?.total_problems) || 67);
+  const codeSolved = Math.min(codeTotal, Math.max(0, Number(skillProgress?.coding?.problems_solved) || 0));
+  const activeCoding = {
+    total_problems: codeTotal,
+    problems_solved: codeSolved,
+    problems_remaining: Math.max(0, codeTotal - codeSolved),
+    progress_percentage: skillProgress?.coding?.progress_percentage ?? (codeTotal > 0 ? Math.round((codeSolved / codeTotal) * 100) : 0)
   };
 
   // Exactly 3 cards (Communication card removed)
@@ -123,15 +129,15 @@ export default function SkillProgressSection({
       date: 'Daily Target',
       tag: 'Working',
       tagColor: 'purple',
-      title: 'Coding & Algorithms',
-      subtitle: 'Competitive Programming Drills',
+      title: 'Technical Practice',
+      subtitle: 'Multi-Language Problems (Java, Python, C, C++)',
       totalProblems: activeCoding.total_problems,
       solvedProblems: activeCoding.problems_solved,
       remainingProblems: activeCoding.problems_remaining,
       progress: activeCoding.progress_percentage,
       theme: 'purple',
       deadlineBadge: `${activeCoding.problems_remaining} Problems Left`,
-      path: '/coding/practice'
+      path: '/technical'
     }
   ];
 

@@ -431,8 +431,11 @@
 /* Layout container */
 .student-dashboard-body {
     width: 100%;
+    max-width: 100vw;
     min-height: calc(100vh - 74px);
     background-color: #f8fafc;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .dashboard-content {
@@ -443,6 +446,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    box-sizing: border-box;
 }
 
 .top-header {
@@ -2432,18 +2436,33 @@ body {
     }
 
     .full-width-chart-container {
+        width: 100%;
+        max-width: 100%;
         height: 220px;
         overflow-x: auto;
+        overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
     }
 
     .full-width-chart-container svg {
-        min-width: 600px;
+        min-width: 480px;
+        width: 100%;
+        display: block;
     }
 
     .assessments-table-wrapper {
-        margin: 0 -4px;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        display: block;
+        scrollbar-width: thin;
+    }
+
+    .assessments-table {
+        min-width: 460px;
+        width: 100%;
     }
 
     .assessments-table th {
@@ -2461,33 +2480,59 @@ body {
 
 @media (max-width: 480px) {
     .dashboard-content {
-        padding: 12px 8px 36px;
+        padding: 12px 10px 36px;
         gap: 14px;
+        max-width: 100vw;
+        overflow-x: hidden;
     }
 
     .card {
-        padding: 16px 12px;
+        padding: 16px 14px;
         border-radius: 16px;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
     .performance-overview-full-card {
-        padding: 16px 12px;
+        padding: 16px 14px;
         border-radius: 16px;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .performance-overview-full-card .card-header-row {
+        gap: 10px;
+    }
+
+    .filter-button-group {
+        width: 100%;
+        display: flex;
+        gap: 4px;
     }
 
     .filter-button-group .btn-filter {
+        flex: 1;
         padding: 6px 4px;
-        font-size: 11.5px;
+        font-size: 11px;
+        text-align: center;
+        white-space: nowrap;
     }
 
     .chart-stats-summary {
         grid-template-columns: 1fr 1fr;
         gap: 8px;
+        margin: 14px 0;
     }
 
     .chart-stat-item {
         padding: 10px 12px;
         border-radius: 12px;
+    }
+
+    .chart-stat-item h4 {
+        font-size: 11px;
     }
 
     .chart-stat-item p {
@@ -2498,12 +2543,49 @@ body {
         font-size: 10px;
     }
 
+    .chart-metric-selector-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .chart-metric-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .metric-pill-btn {
+        padding: 5px 9px;
+        font-size: 11px;
+    }
+
     .full-width-chart-container {
         height: 190px;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
     }
 
     .full-width-chart-container svg {
-        min-width: 520px;
+        min-width: 420px;
+        width: 100%;
+    }
+
+    .assessments-table-wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+        margin: 0;
+    }
+
+    .assessments-table {
+        min-width: 440px;
     }
 
     .assessments-table th {

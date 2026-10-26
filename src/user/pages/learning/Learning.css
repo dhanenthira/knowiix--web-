@@ -28,7 +28,8 @@
 }
 
 .learning-dashboard-app {
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: var(--learning-bg);
@@ -36,7 +37,8 @@
   font-family: var(--font-primary, 'Inter', sans-serif);
   font-size: var(--font-size-base, 16px);
   font-weight: var(--font-weight-body, 400);
-  overflow-x: hidden;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* ==========================================================
@@ -456,9 +458,11 @@
 .learning-body-container {
   display: flex;
   flex: 1;
+  min-height: 0;
   position: relative;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
+  overflow: hidden;
 }
 
 /* SIDEBAR */
@@ -666,13 +670,143 @@
 }
 
 /* ==========================================================
-   3. MAIN CONTENT
+   3. MAIN CONTENT (INDEPENDENT SCROLL AREA)
    ========================================================== */
 .learning-main-content {
   flex: 1;
   min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 8px 32px 60px 24px;
   width: 100%;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* SLEEK CUSTOM SCROLLBAR */
+.learning-main-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.learning-main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.learning-main-content::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+.learning-main-content::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+[data-theme="dark"] .learning-main-content::-webkit-scrollbar-thumb,
+.dark .learning-main-content::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+[data-theme="dark"] .learning-main-content::-webkit-scrollbar-thumb:hover,
+.dark .learning-main-content::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* MOBILE QUICK ACTION TOOLBAR (MOBILE ONLY) */
+.learning-mobile-toolbar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #FFFFFF;
+  border: 1px solid var(--learning-border);
+  border-radius: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.learning-mobile-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: #2563EB;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  transition: all 0.15s ease;
+}
+
+.learning-mobile-menu-trigger:active {
+  transform: scale(0.97);
+}
+
+.mobile-trigger-text {
+  max-width: 85px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.learning-mobile-pills-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.learning-mobile-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-pill-tab {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.mobile-pill-tab.active {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  color: #2563EB;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .learning-mobile-toolbar,
+.dark .learning-mobile-toolbar {
+  background: #111827;
+  border-color: #1F2937;
+}
+
+[data-theme="dark"] .mobile-pill-tab,
+.dark .mobile-pill-tab {
+  background: #1E293B;
+  border-color: #334155;
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .mobile-pill-tab.active,
+.dark .mobile-pill-tab.active {
+  background: rgba(37, 99, 235, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #60A5FA;
 }
 
 .dashboard-alert-banner {
@@ -880,83 +1014,101 @@
 }
 
 /* ==========================================================
-   4. STATISTICS CARDS (CLICKABLE, USER-FRIENDLY & CLEAN)
+   4. STATISTICS CARDS (CLICKABLE, COMPACT & CLEAN)
    ========================================================== */
+.learning-dashboard-app .dashboard-stats-grid,
 .dashboard-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+  max-width: 680px;
 }
 
-.stat-card {
-  background: var(--learning-surface);
-  border: 1px solid var(--learning-border);
-  border-radius: 14px;
-  padding: 16px 18px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
+.learning-dashboard-app .stat-card,
+.dashboard-stats-grid .stat-card {
+  background: var(--learning-surface, #ffffff);
+  border: 1px solid var(--learning-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
   width: 100%;
+  min-height: auto;
 }
 
-.stat-card:hover {
+.learning-dashboard-app .stat-card:hover,
+.dashboard-stats-grid .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
-  border-color: #bfdbfe;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.08);
+  border-color: #93c5fd;
 }
 
-.stat-card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 11px;
+.learning-dashboard-app .stat-card-icon,
+.dashboard-stats-grid .stat-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.stat-card-icon.blue {
+.learning-dashboard-app .stat-card-icon.blue,
+.dashboard-stats-grid .stat-card-icon.blue {
   background: #eff6ff;
   color: #2563eb;
 }
 
-.stat-card-icon.purple {
+.learning-dashboard-app .stat-card-icon.purple,
+.dashboard-stats-grid .stat-card-icon.purple {
   background: #f0f9ff;
   color: #0284c7;
 }
 
-.stat-card-icon.emerald {
-  background: var(--learning-emerald-light);
-  color: var(--learning-emerald);
+.learning-dashboard-app .stat-card-icon.emerald,
+.dashboard-stats-grid .stat-card-icon.emerald {
+  background: var(--learning-emerald-light, #ecfdf5);
+  color: var(--learning-emerald, #059669);
 }
 
-.stat-card-icon.amber {
-  background: var(--learning-amber-light);
-  color: var(--learning-amber);
+.learning-dashboard-app .stat-card-icon.amber,
+.dashboard-stats-grid .stat-card-icon.amber {
+  background: var(--learning-amber-light, #fffbeb);
+  color: var(--learning-amber, #d97706);
 }
 
-.stat-card-data {
+.learning-dashboard-app .stat-card-data,
+.dashboard-stats-grid .stat-card-data {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
-.stat-number {
-  font-size: 1.55rem;
+.learning-dashboard-app .stat-number,
+.dashboard-stats-grid .stat-number {
+  font-size: 1.25rem;
   font-weight: 800;
-  color: var(--learning-text-main);
+  color: var(--learning-text-main, #0f172a);
   line-height: 1.1;
 }
 
-.stat-title {
-  font-size: 0.84rem;
+.learning-dashboard-app .stat-title,
+.dashboard-stats-grid .stat-title {
+  font-size: 0.76rem;
   font-weight: 600;
   color: #64748b;
-  margin-top: 3px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ==========================================================
@@ -2474,11 +2626,165 @@
     justify-content: center;
   }
 
+  .learning-mobile-toolbar {
+    display: flex;
+  }
+
   .learning-main-content {
-    padding: 20px 16px 40px;
+    padding: 12px 16px 40px;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .studio-top-bar {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .studio-back-btn {
+    order: 1;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .studio-progress-pill {
+    order: 2;
+    margin-left: auto;
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+
+  .mini-progress-track {
+    width: 60px;
+  }
+
+  .studio-tutorial-info {
+    order: 3;
+    width: 100%;
+    text-align: left;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .studio-tut-title {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    margin-top: 4px;
+  }
+
+  .studio-split-layout {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .studio-topics-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--learning-border);
+    max-height: 240px;
   }
 
   .studio-reader-area {
-    padding: 20px 16px;
+    padding: 20px 14px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .topic-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .topic-main-title {
+    font-size: 1.25rem;
+    line-height: 1.35;
+  }
+
+  .btn-mark-complete {
+    width: 100%;
+    justify-content: center;
+    padding: 11px 16px;
+    font-size: 0.88rem;
+  }
+
+  .topic-navigation-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer-nav-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .w3-code-editor {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.8rem;
+    padding: 12px;
   }
 }
+
+@media (max-width: 640px) {
+  .learning-main-content {
+    padding: 8px 10px 30px;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .learning-dashboard-app .dashboard-stats-grid,
+  .dashboard-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .learning-dashboard-app .stat-card,
+  .dashboard-stats-grid .stat-card {
+    padding: 8px 6px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+
+  .learning-dashboard-app .stat-card-icon,
+  .dashboard-stats-grid .stat-card-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+  }
+
+  .learning-dashboard-app .stat-number,
+  .dashboard-stats-grid .stat-number {
+    font-size: 1rem;
+  }
+
+  .learning-dashboard-app .stat-title,
+  .dashboard-stats-grid .stat-title {
+    font-size: 0.65rem;
+  }
+
+  .categories-grid,
+  .tutorials-grid,
+  .courses-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .welcome-cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .btn-primary-continue,
+  .btn-secondary-explore {
+    width: 100%;
+    justify-content: center;
+  }
+}

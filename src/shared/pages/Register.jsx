@@ -205,7 +205,7 @@ export default function Register() {
               <span className="gradient-text">Success Story.</span>
             </h2>
             <p className="visual-subtext">
-              Join thousands of college students leveling up their Aptitude, Technical DSA, Communication and Live Coding skills every day.
+              Join thousands of college students leveling up their Aptitude, Technical DSA, Communication and Multi-Language Problem Solving skills every day.
             </p>
 
             {/* Perks Cards */}

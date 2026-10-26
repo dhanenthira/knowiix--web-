@@ -9,16 +9,33 @@
      Text (#202124), Muted (#5F6368), Border (#DADCE0), Accent (#4285F4)
    ========================================================================== */
 
-/* Outer sticky header wrapper (floating over the light grey page background) */
+/* Outer fixed header wrapper (floating over the light grey page background) */
 .bolt-navbar-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   width: 100%;
   padding: 12px 24px;
-  background: transparent;
+  background: linear-gradient(180deg, rgba(248, 249, 250, 0.96) 0%, rgba(248, 249, 250, 0.85) 65%, rgba(248, 249, 250, 0) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-sizing: border-box;
   pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .bolt-navbar-header,
+.dark .bolt-navbar-header {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(15, 23, 42, 0.85) 65%, rgba(15, 23, 42, 0) 100%);
+}
+
+/* Spacer ensuring page content starts right beneath the fixed header */
+.bolt-navbar-spacer {
+  height: 88px;
+  width: 100%;
+  flex-shrink: 0;
 }
 
 .bolt-navbar-header * {
@@ -263,21 +280,26 @@
   align-items: center;
 }
 
-/* User Profile Avatar with Caret (Matching Reference Image) */
+/* User Profile Avatar Capsule - Clean Direct Button */
 .bolt-profile-avatar-capsule {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 6px 2px 2px;
+  justify-content: center;
+  padding: 2px;
   border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.18s ease;
+  background: transparent;
+  border: 2px solid transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   flex-shrink: 0;
+  outline: none;
 }
 
 .bolt-profile-avatar-capsule:hover {
-  background: var(--color-bg, #F8F9FA);
+  transform: scale(1.06);
+  border-color: var(--color-accent, #4285F4);
+  box-shadow: 0 2px 10px rgba(66, 133, 244, 0.25);
 }
 
 .bolt-avatar-wrapper {
@@ -481,6 +503,9 @@
   .bolt-navbar-header {
     padding: 10px 16px;
   }
+  .bolt-navbar-spacer {
+    height: 84px;
+  }
   .bolt-nav-pill-btn {
     padding: 6px 14px;
     font-size: 13px;
@@ -490,6 +515,9 @@
 @media (max-width: 1024px) {
   .bolt-navbar-header {
     padding: 8px 12px;
+  }
+  .bolt-navbar-spacer {
+    height: 74px;
   }
   .bolt-navbar-container {
     padding: 4px 12px;
@@ -506,6 +534,9 @@
 @media (max-width: 640px) {
   .bolt-navbar-header {
     padding: 6px 8px;
+  }
+  .bolt-navbar-spacer {
+    height: 64px;
   }
   .bolt-navbar-container {
     padding: 4px 8px 4px 12px;
@@ -652,6 +683,29 @@
 .bolt-mobile-drawer-footer {
   padding-top: 10px;
   border-top: 1px solid var(--color-border, #DADCE0);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bolt-mobile-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #E8F0FE;
+  color: #1A73E8;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.bolt-mobile-profile-btn:hover {
+  background: #D2E3FC;
 }
 
 .bolt-mobile-logout-btn {

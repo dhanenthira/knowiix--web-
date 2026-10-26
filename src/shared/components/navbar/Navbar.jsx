@@ -20,23 +20,22 @@ import KnowiixLogo from '../KnowiixLogo';
 import logoImage from '../../../assets/knowiix-logo.jpg';
 import './Navbar.css';
 
-// User navigation items (functionality and menu items 100% preserved)
+// User navigation items (Technical section updated)
 const USER_NAV_ITEMS = [
   { name: 'Dashboard', path: '/student' },
   { name: 'Learning & Notes', path: '/learning' },
-  { name: 'Daily Practice', path: '/student#daily-practice-focus', isAnchor: true },
+  { name: 'Daily Practice', path: '/daily-practice' },
   { name: 'Aptitude', path: '/aptitude' },
-  { name: 'Technical', path: '/questions?category=Technical' },
-  { name: 'Coding', path: '/coding/practice' }
+  { name: 'Technical', path: '/technical' }
 ];
 
-// Admin navigation items (functionality and menu items 100% preserved)
+// Admin navigation items
 const ADMIN_NAV_ITEMS = [
   { name: 'Dashboard', path: '/dashboard' },
   { name: 'Students', path: '/students' },
   { name: 'Question Bank', path: '/questions' },
   { name: 'Aptitude Arena', path: '/aptitude' },
-  { name: 'Coding Problems', path: '/coding' },
+  { name: 'Technical Problems', path: '/coding' },
   { name: 'Learning & Notes', path: '/learning' },
   { name: 'Assessments', path: '/assessments' },
   { name: 'Battle Rooms', path: '/battles' },
@@ -133,7 +132,7 @@ export default function Navbar({ variant }) {
     if (itemPath === '/dashboard' && (location.pathname === '/' || location.pathname === '/dashboard')) {
       return true;
     }
-    if (itemPath === '/coding/practice' && (location.pathname.startsWith('/coding') || location.pathname.startsWith('/practice/coding'))) {
+    if ((itemPath === '/technical' || itemPath === '/coding/practice') && (location.pathname.startsWith('/technical') || location.pathname.startsWith('/coding') || location.pathname.startsWith('/practice/coding') || location.pathname.startsWith('/practice/technical'))) {
       return true;
     }
     return location.pathname === itemPath || location.pathname.startsWith(`${itemPath}/`);
@@ -250,8 +249,8 @@ export default function Navbar({ variant }) {
                   <div className="bolt-notif-item">
                     <span className="bolt-notif-bullet"></span>
                     <div>
-                      <div className="bolt-notif-title">New Coding Challenge Live</div>
-                      <div className="bolt-notif-desc">Weekly Algorithm Contest is now live in Coding Practice!</div>
+                      <div className="bolt-notif-title">New Technical Challenge Live</div>
+                      <div className="bolt-notif-desc">Weekly Algorithm Contest is now live in Technical Practice Arena!</div>
                     </div>
                   </div>
                   <div className="bolt-notif-item">
@@ -265,89 +264,42 @@ export default function Navbar({ variant }) {
               )}
             </div>
 
-            {/* 3.3 User Profile Avatar with Caret (Matching Reference Image) */}
-            <div ref={profileRef} style={{ position: 'relative' }}>
-              <div
-                className="bolt-profile-avatar-capsule"
-                onClick={() => setIsProfileMenuOpen(prev => !prev)}
-                title="Account menu"
-                role="button"
-                tabIndex={0}
-              >
-                <div className="bolt-avatar-wrapper">
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt={displayName}
-                      className="bolt-avatar-img"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.nextSibling) {
-                          e.currentTarget.nextSibling.style.display = 'flex';
-                        }
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className="bolt-avatar-fallback"
-                    style={{ display: avatarUrl ? 'none' : 'flex' }}
-                  >
-                    {initials}
-                  </div>
+            {/* 3.3 User Profile Avatar - Directly Moves to Profile Page */}
+            <button
+              type="button"
+              className="bolt-profile-avatar-capsule"
+              onClick={() => {
+                if (isVariantAdmin) {
+                  setIsProfileModalOpen(true);
+                } else {
+                  navigate('/profile');
+                }
+              }}
+              title="My Profile"
+              aria-label="My Profile"
+            >
+              <div className="bolt-avatar-wrapper">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={displayName}
+                    className="bolt-avatar-img"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      if (e.currentTarget.nextSibling) {
+                        e.currentTarget.nextSibling.style.display = 'flex';
+                      }
+                    }}
+                  />
+                ) : null}
+                <div
+                  className="bolt-avatar-fallback"
+                  style={{ display: avatarUrl ? 'none' : 'flex' }}
+                >
+                  {initials}
                 </div>
-                <ChevronDown size={14} className={`bolt-profile-caret ${isProfileMenuOpen ? 'open' : ''}`} />
               </div>
-
-              {/* Profile Dropdown Menu */}
-              {isProfileMenuOpen && (
-                <div className="bolt-dropdown-menu">
-                  <div className="bolt-dropdown-header">
-                    <div className="bolt-dropdown-user-name">{displayName}</div>
-                    <div className="bolt-dropdown-user-email">{userEmail}</div>
-                  </div>
-
-                  <button
-                    className="bolt-dropdown-item"
-                    onClick={() => {
-                      setIsProfileMenuOpen(false);
-                      if (isVariantAdmin) {
-                        setIsProfileModalOpen(true);
-                      } else {
-                        navigate('/profile');
-                      }
-                    }}
-                  >
-                    <User size={15} />
-                    <span>My Profile</span>
-                  </button>
-
-                  <button
-                    className="bolt-dropdown-item"
-                    onClick={() => {
-                      setIsProfileMenuOpen(false);
-                      if (isVariantAdmin) {
-                        setIsProfileModalOpen(true);
-                      } else {
-                        navigate('/profile');
-                      }
-                    }}
-                  >
-                    <Settings size={15} />
-                    <span>Account Settings</span>
-                  </button>
-
-                  <div className="bolt-dropdown-divider"></div>
-
-                  <button
-                    className="bolt-dropdown-item danger"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={15} />
-                    <span>Sign Out</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            </button>
 
             {/* Mobile Hamburger Toggle */}
             <button
@@ -409,6 +361,20 @@ export default function Navbar({ variant }) {
           </div>
           <div className="bolt-mobile-drawer-footer">
             <button
+              className="bolt-mobile-profile-btn"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                if (isVariantAdmin) {
+                  setIsProfileModalOpen(true);
+                } else {
+                  navigate('/profile');
+                }
+              }}
+            >
+              <User size={16} />
+              <span>My Profile</span>
+            </button>
+            <button
               className="bolt-mobile-logout-btn"
               onClick={handleLogout}
             >
@@ -418,6 +384,7 @@ export default function Navbar({ variant }) {
           </div>
         </div>
       </header>
+      <div className="bolt-navbar-spacer" aria-hidden="true" />
 
       {/* Admin Profile Modal */}
       {isVariantAdmin && (

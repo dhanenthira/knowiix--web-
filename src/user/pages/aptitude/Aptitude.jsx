@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import KnowiixLogo from '../../../shared/components/KnowiixLogo';
+import SkillProgressCard from '../../components/skill-progress/SkillProgressCard';
 import Navbar from '../../../shared/components/navbar';
 import './Aptitude.css';
 
@@ -267,7 +268,14 @@ export default function Aptitude() {
     try {
       const res = await axios.get('/api/v1/questions/aptitude/progress');
       if (res.data) {
-        setAptitudeProgress(res.data);
+        const tot = Number(res.data.total_problems) || 100;
+        const sol = Math.min(tot, Math.max(0, Number(res.data.problems_solved) || 0));
+        setAptitudeProgress({
+          ...res.data,
+          total_problems: tot,
+          problems_solved: sol,
+          problems_remaining: Math.max(0, tot - sol)
+        });
       }
     } catch (err) {
       console.warn('Could not fetch aptitude progress:', err);
@@ -559,127 +567,7 @@ export default function Aptitude() {
           ========================================================= */}
       {viewMode === 'hub' && (
         <main className="aptitude-hub-content">
-          {/* Hero Banner */}
-          <section className="aptitude-hero-card">
-            <div className="hero-decor-orb orb-1"></div>
-            <div className="hero-decor-orb orb-2"></div>
-            <div className="hero-text-side">
-              <div className="hero-badge">
-                <Sparkles size={14} /> Comprehensive Placement Prep
-              </div>
-              <h1 className="hero-title">
-                Master Quantitative, Logical & Verbal Aptitude
-              </h1>
-              <p className="hero-subtitle">
-                Target high-impact placement patterns for TCS, Infosys, Accenture, Wipro, and Cognizant with timed mocks and instant step-by-step shortcuts.
-              </p>
-              <div className="hero-action-row">
-                <button
-                  className="btn-hero-primary"
-                  onClick={() => startQuiz('mock', 'Placement Readiness Mock 01', questions)}
-                >
-                  <Timer size={18} />
-                  <span>Launch 15-Min Mock Exam</span>
-                </button>
-                <button
-                  className="btn-hero-secondary"
-                  onClick={() => startQuiz('practice', 'Daily Speed Drill', questions)}
-                >
-                  <Zap size={18} />
-                  <span>Quick 10-Q Practice Drill</span>
-                </button>
-              </div>
-            </div>
 
-            <div className="hero-stats-panel">
-              <div className="hero-stat-box">
-                <div className="stat-icon-wrapper quant">
-                  <Target size={20} />
-                </div>
-                <div className="stat-meta">
-                  <span className="stat-val">84.2%</span>
-                  <span className="stat-lbl">Average Accuracy</span>
-                </div>
-              </div>
-              <div className="hero-stat-box">
-                <div className="stat-icon-wrapper speed">
-                  <Clock size={20} />
-                </div>
-                <div className="stat-meta">
-                  <span className="stat-val">42s</span>
-                  <span className="stat-lbl">Avg Solving Speed</span>
-                </div>
-              </div>
-              <div className="hero-stat-box">
-                <div className="stat-icon-wrapper streak">
-                  <Award size={20} />
-                </div>
-                <div className="stat-meta">
-                  <span className="stat-val">120+</span>
-                  <span className="stat-lbl">Solved Questions</span>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* =========================================================
-              APTITUDE PROGRESS TRACKING SYSTEM (DATABASE PERSISTED)
-              ========================================================= */}
-          <section className="aptitude-progress-tracking-banner">
-            <div className="progress-banner-inner">
-              <div className="progress-banner-top">
-                <div className="progress-banner-heading-group">
-                  <span className="progress-live-pill">
-                    <span className="live-dot" /> Database Synchronized
-                  </span>
-                  <h2 className="progress-banner-title">Aptitude &amp; Problem Solving Progress</h2>
-                  <p className="progress-banner-sub">
-                    Track your total problems, completed solutions, and placement readiness automatically saved per user.
-                  </p>
-                </div>
-
-                <div className="progress-banner-pct-box">
-                  <span className="banner-pct-num">{aptitudeProgress.progress_percentage}%</span>
-                  <span className="banner-pct-sub">Completed</span>
-                </div>
-              </div>
-
-              {/* Progress Bar Track */}
-              <div className="progress-banner-track">
-                <div
-                  className="progress-banner-fill"
-                  style={{ width: `${Math.min(100, Math.max(0, aptitudeProgress.progress_percentage))}%` }}
-                />
-              </div>
-
-              {/* 4 Core Statistics matching requirements */}
-              <div className="progress-banner-stats-grid">
-                <div className="progress-banner-stat-card">
-                  <span className="stat-card-title">Total Problems</span>
-                  <span className="stat-card-number">{aptitudeProgress.total_problems}</span>
-                  <span className="stat-card-sub">Available in Question Bank</span>
-                </div>
-
-                <div className="progress-banner-stat-card highlight-solved">
-                  <span className="stat-card-title">Problems Solved</span>
-                  <span className="stat-card-number">{aptitudeProgress.problems_solved}</span>
-                  <span className="stat-card-sub">Completed by You</span>
-                </div>
-
-                <div className="progress-banner-stat-card highlight-remaining">
-                  <span className="stat-card-title">Problems Remaining</span>
-                  <span className="stat-card-number">{aptitudeProgress.problems_remaining}</span>
-                  <span className="stat-card-sub">To Reach 100% Mastery</span>
-                </div>
-
-                <div className="progress-banner-stat-card highlight-progress">
-                  <span className="stat-card-title">Overall Progress</span>
-                  <span className="stat-card-number">{aptitudeProgress.progress_percentage}%</span>
-                  <span className="stat-card-sub">Calculated for Your Account</span>
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* Placement Company Sprint Tracks */}
           <section className="company-packs-section">
@@ -742,49 +630,77 @@ export default function Aptitude() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className="search-clear-btn"
+                    onClick={() => setSearchQuery('')}
+                    title="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Questions Bank Grid */}
-            <div className="questions-catalog-grid">
-              {filteredQuestions.map((q, idx) => (
-                <div key={q.id || idx} className="question-preview-card">
-                  <div className="q-card-header">
-                    <div className="q-tags-group">
-                      <span className={`difficulty-pill ${q.difficulty}`}>
-                        {q.difficulty?.toUpperCase()}
-                      </span>
-                      <span className="topic-pill">{q.topic}</span>
+            {filteredQuestions.length === 0 ? (
+              <div className="aptitude-empty-state">
+                <div className="empty-icon-box">🔍</div>
+                <h3>No matching questions found</h3>
+                <p>Try searching for another topic or keyword, or reset your filters.</p>
+                <button
+                  type="button"
+                  className="btn-reset-filters"
+                  onClick={() => {
+                    setActiveTopic('all');
+                    setSearchQuery('');
+                  }}
+                >
+                  Reset All Filters
+                </button>
+              </div>
+            ) : (
+              <div className="questions-catalog-grid">
+                {filteredQuestions.map((q, idx) => (
+                  <div key={q.id || idx} className="question-preview-card">
+                    <div className="q-card-header">
+                      <div className="q-tags-group">
+                        <span className={`difficulty-pill ${q.difficulty}`}>
+                          {q.difficulty?.toUpperCase()}
+                        </span>
+                        <span className="topic-pill">{q.topic}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {aptitudeProgress.solved_question_ids?.includes(q.id) && (
+                          <span className="q-solved-badge">✓ Solved</span>
+                        )}
+                        <span className="marks-badge">+{q.marks || 1} Mark</span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {aptitudeProgress.solved_question_ids?.includes(q.id) && (
-                        <span className="q-solved-badge">✓ Solved</span>
-                      )}
-                      <span className="marks-badge">+{q.marks || 1} Mark</span>
+
+                    <h3 className="q-card-title">{q.title}</h3>
+                    <p className="q-card-snippet">{q.content}</p>
+
+                    <div className="q-card-footer">
+                      <div className="q-tags-mini">
+                        {q.tags?.slice(0, 2).map((tag, tIdx) => (
+                          <span key={tIdx} className="mini-tag">#{tag}</span>
+                        ))}
+                      </div>
+                      <div className="q-actions-mini">
+                        <button
+                          className="btn-mini-practice"
+                          onClick={() => startQuiz('practice', `${q.topic} Practice`, [q])}
+                        >
+                          <Zap size={14} /> Practice
+                        </button>
+                      </div>
                     </div>
                   </div>
-
-                  <h3 className="q-card-title">{q.title}</h3>
-                  <p className="q-card-snippet">{q.content}</p>
-
-                  <div className="q-card-footer">
-                    <div className="q-tags-mini">
-                      {q.tags?.slice(0, 2).map((tag, tIdx) => (
-                        <span key={tIdx} className="mini-tag">#{tag}</span>
-                      ))}
-                    </div>
-                    <div className="q-actions-mini">
-                      <button
-                        className="btn-mini-practice"
-                        onClick={() => startQuiz('practice', `${q.topic} Practice`, [q])}
-                      >
-                        <Zap size={14} /> Practice
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
         </main>
       )}

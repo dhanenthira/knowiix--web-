@@ -175,6 +175,22 @@
   user-select: none;
 }
 
+.today-dashboard-img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  max-height: 290px;
+  object-fit: contain;
+  display: block;
+  border-radius: 18px;
+  filter: drop-shadow(0 10px 25px rgba(66, 133, 244, 0.18));
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.today-dashboard-img:hover {
+  transform: translateY(-3px) scale(1.01);
+}
+
 /* ================= RESPONSIVE BREAKPOINTS ================= */
 @media (max-width: 1200px) {
   .today-practice-card {

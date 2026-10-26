@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowRight, Flame, CheckCircle2 } from 'lucide-react';
-import PracticeIllustration from './PracticeIllustration';
+import dashboardIcon from '../../../assets/dashbord icon.png';
 import './TodayPracticeCard.css';
 
 /**
@@ -15,7 +15,7 @@ import './TodayPracticeCard.css';
 export default function TodayPracticeCard({
   userName = 'Student',
   greeting = 'Welcome back',
-  subtitle = 'Complete your daily curated drills in Aptitude, Technical and Coding to maintain your placement readiness.',
+  subtitle = 'Complete your daily curated drills in Aptitude and Technical problem solving to maintain your placement readiness.',
   streakDays = 0,
   completedCount = 0,
   totalCount = 0,
@@ -78,9 +78,13 @@ export default function TodayPracticeCard({
           {children && <div className="today-card-children">{children}</div>}
         </div>
 
-        {/* Right Section: Vector Student Illustration */}
+        {/* Right Section: Student & Learning Illustration */}
         <div className="today-card-illustration">
-          <PracticeIllustration />
+          <img
+            src={dashboardIcon}
+            alt="Student Learning Illustration"
+            className="today-dashboard-img"
+          />
         </div>
       </div>
     </div>

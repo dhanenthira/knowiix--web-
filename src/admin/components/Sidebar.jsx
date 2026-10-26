@@ -31,9 +31,9 @@ export default function Sidebar() {
     { name: 'Students', path: '/students', icon: Users },
     { name: 'Question Bank', path: '/questions', icon: HelpCircle },
     { name: 'Aptitude Arena', path: '/aptitude', icon: Brain },
-    { name: 'Coding Problems', path: '/coding', icon: Code2 },
+    { name: 'Technical Problems', path: '/coding', icon: Code2 },
     { name: 'Learning & Notes', path: '/learning', icon: BookOpen },
-    { name: 'Assessments', path: '/assessments', icon: ClipboardCheck },
+    { name: 'Assessments', path: '/admin/assessments', icon: ClipboardCheck },
     { name: 'Battle Rooms', path: '/battles', icon: Swords },
     { name: 'Analytics', path: '/analytics', icon: BarChart3 },
   ];

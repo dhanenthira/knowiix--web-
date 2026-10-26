@@ -267,7 +267,7 @@ export default function RealtimeUsageFlow({
             <div className="node-content">
               <span className="node-step">STAGE 1</span>
               <h5 className="node-title">Student Action</h5>
-              <p className="node-desc">Aptitude, Technical & Coding drills</p>
+              <p className="node-desc">Aptitude & Technical drills</p>
             </div>
             {pipelineState.activeStage === 0 && <span className="node-ping-indicator"></span>}
           </div>

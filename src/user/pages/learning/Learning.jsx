@@ -59,6 +59,7 @@ export default function Learning() {
   // viewMode: 'dashboard' | 'studio' | 'tutorials' | 'progress' | 'saved' | 'history'
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -380,10 +381,71 @@ export default function Learning() {
           user={currentUser || admin}
           isCollapsed={!sidebarOpen}
           onToggleCollapse={(isCol) => setSidebarOpen(!isCol)}
+          mobileOpen={mobileMenuOpen}
+          onCloseMobile={() => setMobileMenuOpen(false)}
         />
 
-        {/* MAIN CONTENT AREA */}
+        {/* MAIN CONTENT AREA (INDEPENDENT SCROLL) */}
         <main className="learning-main-content" role="main">
+          {/* MOBILE QUICK ACTION TOOLBAR (MOBILE ONLY) */}
+          <div className="learning-mobile-toolbar">
+            <button
+              type="button"
+              className="learning-mobile-menu-trigger"
+              onClick={() => setMobileMenuOpen(true)}
+              id="btn-mobile-learning-menu"
+              aria-label="Open learning menu"
+            >
+              <Menu size={16} />
+              <span className="mobile-trigger-text">
+                {activeTab === 'dashboard' ? 'Home' :
+                 activeTab === 'tutorials' ? 'Tutorials' :
+                 activeTab === 'continue' ? 'In Progress' :
+                 activeTab === 'saved' ? 'Saved Notes' :
+                 activeTab === 'progress' ? 'Progress' :
+                 activeTab === 'history' ? 'History' :
+                 activeTab === 'studio' ? 'Studio' : 'Menu'}
+              </span>
+            </button>
+
+            <div className="learning-mobile-pills-scroll">
+              <button
+                type="button"
+                className={`mobile-pill-tab ${activeTab === 'dashboard' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('dashboard'); if (setCategoryFilter) setCategoryFilter('all'); }}
+              >
+                Home
+              </button>
+              <button
+                type="button"
+                className={`mobile-pill-tab ${activeTab === 'tutorials' ? 'active' : ''}`}
+                onClick={() => { setActiveTab('tutorials'); if (setCategoryFilter) setCategoryFilter('all'); }}
+              >
+                Tutorials
+              </button>
+              <button
+                type="button"
+                className={`mobile-pill-tab ${activeTab === 'continue' ? 'active' : ''}`}
+                onClick={() => setActiveTab('continue')}
+              >
+                In Progress {continueItems.length > 0 ? `(${continueItems.length})` : ''}
+              </button>
+              <button
+                type="button"
+                className={`mobile-pill-tab ${activeTab === 'saved' ? 'active' : ''}`}
+                onClick={() => setActiveTab('saved')}
+              >
+                Saved {savedBookmarks.length > 0 ? `(${savedBookmarks.length})` : ''}
+              </button>
+              <button
+                type="button"
+                className={`mobile-pill-tab ${activeTab === 'progress' ? 'active' : ''}`}
+                onClick={() => setActiveTab('progress')}
+              >
+                Progress
+              </button>
+            </div>
+          </div>
           {/* Error Banner if API fails */}
           {dashboardError && (
             <div className="dashboard-alert-banner">
@@ -676,69 +738,6 @@ export default function Learning() {
                 </div>
               </section>
 
-              {/* SECTION: STATISTICS CARDS (CLICKABLE & INTUITIVE) */}
-              <section className="dashboard-stats-grid" aria-label="Key statistics">
-                {/* 1. Available Courses */}
-                <button
-                  type="button"
-                  className="stat-card"
-                  id="card-stat-available"
-                  onClick={() => {
-                    if (setCategoryFilter) setCategoryFilter('all');
-                    setActiveTab('tutorials');
-                  }}
-                  title="Click to view all tutorials"
-                >
-                  <div className="stat-card-icon blue">
-                    <BookOpen size={22} />
-                  </div>
-                  <div className="stat-card-data">
-                    <div className="stat-number">
-                      {loadingDashboard ? '...' : (summaryStats?.available_courses ?? allTutorials.length)}
-                    </div>
-                    <div className="stat-title">Available Courses</div>
-                  </div>
-                </button>
-
-                {/* 2. Courses Started */}
-                <button
-                  type="button"
-                  className="stat-card"
-                  id="card-stat-started"
-                  onClick={() => setActiveTab('continue')}
-                  title="Click to view in-progress tutorials"
-                >
-                  <div className="stat-card-icon purple">
-                    <Play size={22} />
-                  </div>
-                  <div className="stat-card-data">
-                    <div className="stat-number">
-                      {loadingDashboard ? '...' : (summaryStats?.courses_started ?? 0)}
-                    </div>
-                    <div className="stat-title">Courses Started</div>
-                  </div>
-                </button>
-
-                {/* 3. Completed Lessons */}
-                <button
-                  type="button"
-                  className="stat-card"
-                  id="card-stat-completed"
-                  onClick={() => setActiveTab('progress')}
-                  title="Click to view your learning progress"
-                >
-                  <div className="stat-card-icon emerald">
-                    <CheckCircle2 size={22} />
-                  </div>
-                  <div className="stat-card-data">
-                    <div className="stat-number">
-                      {loadingDashboard ? '...' : (summaryStats?.completed_lessons ?? 0)}
-                    </div>
-                    <div className="stat-title">Completed Lessons</div>
-                  </div>
-                </button>
-
-              </section>
 
               {/* SECTION: EXPLORE TOPICS QUICK-ACCESS */}
               {categories && categories.length > 0 && (

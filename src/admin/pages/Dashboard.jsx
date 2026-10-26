@@ -399,8 +399,8 @@ export default function Dashboard() {
           </div>
           <div>
             <div className="stat-value-display">{stats.codingProblems}</div>
-            <div className="stat-title-label">Coding Problems</div>
-            <div className="stat-detail-subtext">Python, C++ &amp; JS sandbox</div>
+            <div className="stat-title-label">Technical Problems</div>
+            <div className="stat-detail-subtext">Java, Python, C, C++ sandbox</div>
           </div>
         </div>
 
@@ -561,7 +561,7 @@ export default function Dashboard() {
             <div className="chart-header-info">
               <h3>
                 <Target size={18} color="#10b981" />
-                <span>Learning &amp; Coding Performance</span>
+                <span>Learning &amp; Technical Performance</span>
               </h3>
               <p>Average accuracy rates across primary skill assessment tracks</p>
             </div>

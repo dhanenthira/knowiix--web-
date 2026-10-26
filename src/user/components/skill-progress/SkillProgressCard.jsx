@@ -34,13 +34,12 @@ export default function SkillProgressCard({
     setMenuOpen(prev => !prev);
   };
 
-  const calculatedPct = totalProblems > 0
-    ? Math.round((solvedProblems / totalProblems) * 100)
-    : progress;
-
-  const actualRemaining = remainingProblems !== undefined
-    ? remainingProblems
-    : Math.max(0, totalProblems - solvedProblems);
+  const total = Math.max(0, Number(totalProblems) || 0);
+  const solved = Math.min(total, Math.max(0, Number(solvedProblems) || 0));
+  const actualRemaining = Math.max(0, total - solved);
+  const calculatedPct = total > 0
+    ? Math.min(100, Math.round((solved / total) * 100))
+    : (Number(progress) || 0);
 
   return (
     <div
@@ -95,12 +94,12 @@ export default function SkillProgressCard({
       <div className="skill-card-stats-strip">
         <div className="skill-card-stat-col">
           <span className="stat-label">Total</span>
-          <span className="stat-value">{totalProblems}</span>
+          <span className="stat-value">{total}</span>
         </div>
         <div className="skill-card-stat-divider" />
         <div className="skill-card-stat-col">
           <span className="stat-label">Solved</span>
-          <span className="stat-value text-solved">{solvedProblems}</span>
+          <span className="stat-value text-solved">{solved}</span>
         </div>
         <div className="skill-card-stat-divider" />
         <div className="skill-card-stat-col">
@@ -112,12 +111,12 @@ export default function SkillProgressCard({
       {/* Footer Row: Progress summary + Remaining Badge */}
       <div className="skill-card-footer">
         <div className="skill-card-progress-count">
-          <span className="count-highlight">{solvedProblems}</span>
-          <span className="count-muted"> / {totalProblems} Solved</span>
+          <span className="count-highlight">{solved}</span>
+          <span className="count-muted"> / {total} Solved</span>
         </div>
 
         <div className="skill-card-deadline-badge">
-          {deadlineBadge || `${actualRemaining} Remaining`}
+          {actualRemaining === 0 ? 'Completed' : `${actualRemaining} Remaining`}
         </div>
       </div>
     </div>

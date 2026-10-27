@@ -55,6 +55,44 @@ export default function Navbar({ variant }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Auto-hide navbar on scroll down, show on scroll up or click
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollYRef = useRef(0);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+
+          // Always visible near top of page
+          if (currentScrollY <= 30) {
+            setIsVisible(true);
+          } else if (currentScrollY > lastScrollYRef.current && currentScrollY > 70) {
+            // Scrolling down -> hide navbar & close open popups/mobile menu
+            setIsVisible(false);
+            setIsMobileMenuOpen(false);
+            setIsProfileMenuOpen(false);
+            setIsNotifOpen(false);
+            setIsSearchOpen(false);
+          } else if (currentScrollY < lastScrollYRef.current) {
+            // Scrolling up -> show navbar
+            setIsVisible(true);
+          }
+
+          lastScrollYRef.current = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const profileRef = useRef(null);
   const notifRef = useRef(null);
   const searchRef = useRef(null);
@@ -140,7 +178,20 @@ export default function Navbar({ variant }) {
 
   return (
     <>
-      <header className="bolt-navbar-header">
+      {!isVisible && (
+        <div
+          className="bolt-navbar-reveal-trigger"
+          onClick={() => setIsVisible(true)}
+          title="Click to show navigation bar"
+          aria-hidden="true"
+        />
+      )}
+      <header
+        className={`bolt-navbar-header ${!isVisible ? 'navbar-hidden' : ''}`}
+        onClick={() => {
+          if (!isVisible) setIsVisible(true);
+        }}
+      >
         <div className="bolt-navbar-container">
           {/* ================= 1. BRAND SECTION (LEFT) ================= */}
           <Link to={brandLink} className="bolt-navbar-brand" title="Knowiix Learning Arena">

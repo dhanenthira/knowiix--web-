@@ -17,13 +17,33 @@
   right: 0;
   z-index: 1000;
   width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
   padding: 12px 24px;
   background: linear-gradient(180deg, rgba(248, 249, 250, 0.96) 0%, rgba(248, 249, 250, 0.85) 65%, rgba(248, 249, 250, 0) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-sizing: border-box;
   pointer-events: none;
-  transition: all 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.bolt-navbar-header.navbar-hidden {
+  transform: translateY(-120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bolt-navbar-reveal-trigger {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  z-index: 999;
+  cursor: pointer;
+  background: transparent;
 }
 
 [data-theme="dark"] .bolt-navbar-header,
@@ -44,7 +64,9 @@
 
 /* Floating White Capsule Card (The "Bakside" Pill) */
 .bolt-navbar-container {
+  width: 100%;
   max-width: 1540px;
+  box-sizing: border-box;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -515,6 +537,9 @@
 @media (max-width: 1024px) {
   .bolt-navbar-header {
     padding: 8px 12px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
   .bolt-navbar-spacer {
     height: 74px;
@@ -522,6 +547,8 @@
   .bolt-navbar-container {
     padding: 4px 12px;
     height: 58px;
+    width: 100%;
+    box-sizing: border-box;
   }
   .bolt-nav-track-wrapper {
     display: none;
@@ -533,15 +560,20 @@
 
 @media (max-width: 640px) {
   .bolt-navbar-header {
-    padding: 6px 8px;
+    padding: 6px 10px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
   }
   .bolt-navbar-spacer {
     height: 64px;
   }
   .bolt-navbar-container {
-    padding: 4px 8px 4px 12px;
+    padding: 4px 10px;
     height: 52px;
     gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
   }
   .bolt-brand-title {
     font-size: 18px;

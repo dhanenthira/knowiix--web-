@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Zap,
@@ -89,7 +89,31 @@ export default function Learning() {
   const [newNote, setNewNote] = useState('');
   const [localNotes, setLocalNotes] = useState([]);
 
+  // Topics horizontal scroll tracking
+  const topicsScrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
+  const checkTopicsScroll = useCallback(() => {
+    const el = topicsScrollRef.current;
+    if (el) {
+      setCanScrollLeft(el.scrollLeft > 6);
+      setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 6);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = topicsScrollRef.current;
+    if (el) {
+      checkTopicsScroll();
+      el.addEventListener('scroll', checkTopicsScroll, { passive: true });
+      window.addEventListener('resize', checkTopicsScroll);
+      return () => {
+        el.removeEventListener('scroll', checkTopicsScroll);
+        window.removeEventListener('resize', checkTopicsScroll);
+      };
+    }
+  }, [categories, checkTopicsScroll]);
 
   // Map category slug to Lucide Icon
   const getCategoryIcon = (iconName, slug) => {
@@ -758,36 +782,62 @@ export default function Learning() {
                     </button>
                   </div>
 
-                  <div className="dashboard-categories-chips-grid">
+                  <div className="w3-topics-scroll-wrapper">
                     <button
                       type="button"
-                      className={`dash-cat-chip ${categoryFilter === 'all' ? 'active' : ''}`}
+                      className="w3-scroll-arrow left"
                       onClick={() => {
-                        if (setCategoryFilter) setCategoryFilter('all');
-                        setActiveTab('tutorials');
+                        topicsScrollRef.current?.scrollBy({ left: -260, behavior: 'smooth' });
                       }}
+                      disabled={!canScrollLeft}
+                      aria-label="Scroll left"
                     >
-                      <span className="dash-cat-chip-icon">✨</span>
-                      <span className="dash-cat-chip-name">All Tracks</span>
-                      <span className="dash-cat-chip-count">{allTutorials.length}</span>
+                      <ChevronLeft size={16} />
                     </button>
-                    {categories.map((cat) => (
+
+                    <div className="dashboard-categories-chips-grid" id="explore-topics-scroll-container" ref={topicsScrollRef}>
                       <button
-                        key={cat.id}
                         type="button"
-                        className={`dash-cat-chip ${categoryFilter === cat.slug ? 'active' : ''}`}
+                        className={`dash-cat-chip ${categoryFilter === 'all' ? 'active' : ''}`}
                         onClick={() => {
-                          if (setCategoryFilter) setCategoryFilter(cat.slug);
+                          if (setCategoryFilter) setCategoryFilter('all');
                           setActiveTab('tutorials');
                         }}
                       >
-                        <span className="dash-cat-chip-icon">{getCategoryIcon(cat.icon, cat.slug)}</span>
-                        <span className="dash-cat-chip-name">{cat.name}</span>
-                        {cat.tutorial_count ? (
-                          <span className="dash-cat-chip-count">{cat.tutorial_count}</span>
-                        ) : null}
+                        <span className="dash-cat-chip-icon">✨</span>
+                        <span className="dash-cat-chip-name">All Tracks</span>
+                        <span className="dash-cat-chip-count">{allTutorials.length}</span>
                       </button>
-                    ))}
+                      {categories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          className={`dash-cat-chip ${categoryFilter === cat.slug ? 'active' : ''}`}
+                          onClick={() => {
+                            if (setCategoryFilter) setCategoryFilter(cat.slug);
+                            setActiveTab('tutorials');
+                          }}
+                        >
+                          <span className="dash-cat-chip-icon">{getCategoryIcon(cat.icon, cat.slug)}</span>
+                          <span className="dash-cat-chip-name">{cat.name}</span>
+                          {cat.tutorial_count ? (
+                            <span className="dash-cat-chip-count">{cat.tutorial_count}</span>
+                          ) : null}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      className="w3-scroll-arrow right"
+                      onClick={() => {
+                        topicsScrollRef.current?.scrollBy({ left: 260, behavior: 'smooth' });
+                      }}
+                      disabled={!canScrollRight}
+                      aria-label="Scroll right"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
                 </section>
               )}
@@ -995,22 +1045,24 @@ export default function Learning() {
                     {userProgressData.completed_topics.map((item) => (
                       <div key={item.id} className="table-row-item">
                         <div className="table-cell-title">
-                          <CheckCircle2 size={16} className="text-emerald" />
-                          <div>
+                          <CheckCircle2 size={16} className="text-emerald table-check-icon" />
+                          <div className="table-title-text-group">
                             <strong>{item.topic_title}</strong>
                             <div className="sub-crumb">{item.tutorial_title}</div>
                           </div>
                         </div>
-                        <div className="table-cell-date">
-                          {item.completed_at ? new Date(item.completed_at).toLocaleDateString() : 'Completed'}
-                        </div>
-                        <div className="table-cell-action">
-                          <button
-                            className="btn-review-topic"
-                            onClick={() => handleOpenTutorial(item.tutorial_id, item.topic_id)}
-                          >
-                            Review Topic
-                          </button>
+                        <div className="table-cell-meta-group">
+                          <div className="table-cell-date">
+                            {item.completed_at ? new Date(item.completed_at).toLocaleDateString() : 'Completed'}
+                          </div>
+                          <div className="table-cell-action">
+                            <button
+                              className="btn-review-topic"
+                              onClick={() => handleOpenTutorial(item.tutorial_id, item.topic_id)}
+                            >
+                              Review Topic
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}

@@ -333,6 +333,7 @@ export default function UserDashboard() {
                 YOUR SKILL PROGRESS CARDS (EXACT REFERENCE DESIGN)
                 ========================================================== */}
           <SkillProgressSection
+            id="skill-progress-section"
             skillsData={skillCardsData}
             skillProgress={dashboardData?.skill_progress}
             aptitudeProgress={dashboardData?.aptitude_progress}

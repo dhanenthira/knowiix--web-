@@ -2519,16 +2519,26 @@
   }
 
   .lc-submissions-header-bar {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 0 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    gap: 8px;
+    border-bottom: 1px solid var(--lc-border, #e2e8f0);
+    background: #fafafa;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .lc-sub-tabs-list {
+    display: flex;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
     gap: 2px;
   }
 
@@ -2537,15 +2547,74 @@
   }
 
   .lc-sub-tab-item {
-    padding: 10px 10px;
-    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 11px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
     white-space: nowrap;
-    gap: 4px;
+    flex-shrink: 0;
+    gap: 5px;
   }
 
   .lc-view-all-link {
-    padding: 6px 10px 8px;
-    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--lc-primary, #2563eb);
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 4px 6px;
+    border-radius: 6px;
+  }
+
+  .lc-submissions-filter-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 10px 0 12px 0;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--lc-border-subtle, #f1f5f9);
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .lc-filter-select-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .lc-filter-select-group label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .lc-filter-select {
+    width: 100%;
+    height: 34px;
+    padding: 4px 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    border: 1px solid var(--lc-border, #e2e8f0);
+    border-radius: 8px;
+    background: #ffffff;
+    color: #0f172a;
+    outline: none;
+    min-width: 0;
+    box-sizing: border-box;
+    cursor: pointer;
   }
 
   .lc-modal-backdrop {
@@ -2574,7 +2643,35 @@
 
   .lc-sub-table-header,
   .lc-submissions-table .lc-submission-table-row {
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2.2fr 1fr 1fr;
+    gap: 8px;
+    padding: 10px 8px;
+  }
+
+  .lc-submissions-table .lc-submission-table-row .col-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .lc-submissions-table .lc-submission-table-row .lc-problem-title-link {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--lc-text, #1E293B);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lc-diff-badge {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    padding: 2px 6px;
+    border-radius: 4px;
   }
 
   .col-runtime,
@@ -2714,6 +2811,177 @@
     font-size: 0.76rem;
     gap: 4px;
   }
+
+  .lc-submissions-filter-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lc-filter-select-group:last-child {
+    grid-column: 1 / -1;
+  }
 }
+
+/* ==========================================================================
+   SETTINGS TAB: Subscription & Security Credentials Card Styles
+   ========================================================================== */
+.lc-settings-card {
+  padding: 24px;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border: 1px solid var(--lc-border, #e2e8f0);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.lc-settings-section-heading {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 18px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lc-sub-plan-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+}
+
+.lc-plan-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 4px;
+}
+
+.lc-plan-price {
+  font-size: 0.88rem;
+  color: #334155;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.lc-plan-expiry {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.lc-plan-active-badge {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lc-security-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.15s ease;
+}
+
+.lc-security-row:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.lc-security-row > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.lc-security-row h4 {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.lc-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: #ffffff;
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08);
+}
+
+.lc-btn-outline:hover {
+  background: #eff6ff;
+  border-color: #1d4ed8;
+  color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+}
+
+.lc-btn-outline.danger {
+  color: #ef4444;
+  border-color: #ef4444;
+  box-shadow: 0 1px 2px rgba(239, 68, 68, 0.08);
+}
+
+.lc-btn-outline.danger:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #dc2626;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.15);
+}
+
+@media (max-width: 640px) {
+  .lc-settings-card {
+    padding: 16px 14px;
+    border-radius: 12px;
+  }
+
+  .lc-sub-plan-box {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .lc-plan-active-badge {
+    align-self: flex-start;
+  }
+
+  .lc-security-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .lc-btn-outline {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+    box-sizing: border-box;
+  }
+}
+
 
 

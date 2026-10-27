@@ -1390,13 +1390,14 @@ export default function Profile() {
                             <div key={sub.id} className="lc-submission-table-row">
                               <div className="col-title">
                                 <Link
-                                  to={`/technical/problem/${sub.problem_id}`}
+                                  to={sub.slug ? `/technical/problem/${sub.slug}` : `/technical/problem/${sub.problem_id}`}
                                   className="lc-problem-title-link"
+                                  title={sub.title || sub.problem_title || 'Coding Problem'}
                                 >
-                                  {sub.problem_title}
+                                  {sub.title || sub.problem_title || 'Coding Problem'}
                                 </Link>
                                 <span className={`lc-diff-badge ${diffClass}`}>
-                                  {sub.difficulty}
+                                  {sub.difficulty || 'Easy'}
                                 </span>
                               </div>
 

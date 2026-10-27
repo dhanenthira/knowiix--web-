@@ -347,6 +347,50 @@
   overflow: hidden;
 }
 
+/* HackerRank-Style Category Quick Scroll Chips */
+.category-quick-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 2px 8px;
+  margin-bottom: 2px;
+}
+
+.category-quick-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-quick-chip {
+  padding: 7px 15px;
+  border-radius: 20px;
+  border: 1px solid var(--hr-border, #e2e8f0);
+  background: #ffffff;
+  color: var(--hr-text-muted, #475569);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.cat-quick-chip:hover {
+  background: #f8fafc;
+  color: var(--hr-text-dark, #0f172a);
+  border-color: #cbd5e1;
+}
+
+.cat-quick-chip.active {
+  background: var(--color-accent, #4285F4);
+  color: #ffffff;
+  border-color: var(--color-accent, #4285F4);
+  box-shadow: 0 2px 6px rgba(66, 133, 244, 0.25);
+}
+
 /* Filter Bar */
 .coding-filter-bar {
   background: #ffffff;
@@ -358,6 +402,13 @@
   align-items: center;
   gap: 14px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.filter-dropdowns-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .search-input-box {
@@ -1213,11 +1264,255 @@
   font-family: var(--font-primary, sans-serif);
 }
 
-/* Responsive adjustments */
-@media (max-width: 900px) {
+/* ==========================================================================
+   TECHNICAL WORKSPACE RESPONSIVE & MOBILE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Mobile view switcher tab bar & bottom bar (hidden on desktop) */
+.workspace-mobile-nav-tabs {
+  display: none;
+}
+
+.workspace-mobile-bottom-bar {
+  display: none;
+}
+
+@media (max-width: 900px) and (min-width: 769px) {
   .workspace-split-body {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .workspace-container {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  /* Compact Single-Line Top Bar on Mobile */
+  .workspace-top-bar {
+    height: 48px;
+    min-height: 48px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+    box-shadow: none;
+  }
+
+  .workspace-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .workspace-back-btn {
+    padding: 5px 8px;
+    font-size: 0.78rem;
+    border-radius: 6px;
+    flex-shrink: 0;
+    gap: 4px;
+  }
+
+  .workspace-back-btn span {
+    display: none;
+  }
+
+  .workspace-back-btn::after {
+    content: "Arena";
+  }
+
+  .workspace-prob-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .workspace-prob-title > span:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+    font-size: 0.86rem;
+  }
+
+  .workspace-bar-right {
+    display: none; /* Replaced by bottom action bar on mobile */
+  }
+
+  /* Segmented Mobile View Switcher */
+  .workspace-mobile-nav-tabs {
+    display: flex;
+    background: var(--ws-border-subtle, #f1f3f4);
+    border-bottom: 1px solid var(--ws-border, #dadce0);
+    padding: 4px 8px;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .ws-mob-tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 4px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ws-text-muted, #5f6368);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .ws-mob-tab-btn.active {
+    background: var(--ws-card-bg, #ffffff);
+    color: var(--color-accent, #4285f4);
+    border-color: var(--ws-border, #dadce0);
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Split body on mobile takes full remaining height between top bars & bottom action bar */
+  .workspace-split-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: auto;
+    overflow: hidden;
+    position: relative;
+    grid-template-columns: none;
+    grid-template-rows: none;
+  }
+
+  .workspace-left-panel {
+    display: none;
+    width: 100%;
+    height: 100%;
+    border-right: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .workspace-left-panel.mob-active {
+    display: flex;
+    flex: 1;
+  }
+
+  .workspace-tab-content {
+    padding: 16px 14px 40px;
+  }
+
+  .workspace-right-panel {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .workspace-right-panel.mob-active {
+    display: flex;
+    flex: 1;
+  }
+
+  /* Mobile Code Editor Tab View */
+  .workspace-right-panel.mob-tab-editor .editor-wrapper-area {
+    flex: 1;
+    height: 100%;
+    min-height: 250px;
+  }
+
+  .workspace-right-panel.mob-tab-editor .workspace-console-drawer {
+    display: none;
+  }
+
+  /* Mobile Console Tab View */
+  .workspace-right-panel.mob-tab-console .workspace-editor-subbar,
+  .workspace-right-panel.mob-tab-console .editor-wrapper-area {
+    display: none;
+  }
+
+  .workspace-right-panel.mob-tab-console .workspace-console-drawer {
+    display: flex;
+    flex: 1;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    border-top: none;
+  }
+
+  .console-drawer-content {
+    padding: 12px 14px 30px;
+  }
+
+  /* Mobile Sticky Bottom Action Bar */
+  .workspace-mobile-bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: var(--ws-card-bg, #ffffff);
+    border-top: 1px solid var(--ws-border, #dadce0);
+    height: 52px;
+    box-sizing: border-box;
+    z-index: 20;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .mobile-lang-select {
+    background: var(--ws-border-subtle, #f1f3f4);
+    border: 1px solid var(--ws-border, #dadce0);
+    color: var(--ws-text-primary, #202124);
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    max-width: 110px;
+    outline: none;
+  }
+
+  .btn-ws-mobile-reset {
+    background: var(--ws-border-subtle, #f1f3f4);
+    border: 1px solid var(--ws-border, #dadce0);
+    color: var(--ws-text-secondary, #5f6368);
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .mobile-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mobile-actions-group .btn-ws-action {
+    padding: 7px 13px;
+    font-size: 0.8rem;
   }
 }
 
@@ -1259,49 +1554,163 @@
     font-size: 1.6rem;
   }
 
+  /* HackerRank-Style 2x2 Compact Filter Bar on Mobile */
   .coding-filter-bar {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
-    padding: 12px 14px;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 12px;
   }
 
   .search-input-box {
     width: 100%;
-    flex: auto;
+    min-width: 0;
+  }
+
+  .filter-dropdowns-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 10px;
+    width: 100%;
   }
 
   .filter-select {
     width: 100%;
+    min-width: 0;
+    padding: 9px 10px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+    box-sizing: border-box;
   }
 
   .btn-reset-filters {
     justify-content: center;
     width: 100%;
-    padding: 8px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+    border: 1px dashed var(--hr-border);
   }
 
+  /* HackerRank-Style Mobile Challenge Cards (No Horizontal Scroll) */
   .problems-table-card {
-    overflow-x: auto;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    overflow: visible;
     width: 100%;
-    max-width: 100%;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 10px;
   }
 
   .problems-table {
-    min-width: 580px;
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .problems-table thead {
+    display: none;
+  }
+
+  .problems-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     width: 100%;
   }
 
-  .problems-table th {
-    padding: 10px 12px;
-    font-size: 0.72rem;
+  .problems-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 10px;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid var(--hr-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+  }
+
+  .problems-table tr:hover {
+    border-color: var(--hr-green);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   }
 
   .problems-table td {
-    padding: 10px 12px;
-    font-size: 0.82rem;
+    padding: 0;
+    border: none;
+    white-space: normal;
+  }
+
+  /* Row 1: Left = Status Badge (Solved/Unsolved) */
+  .problems-table td:nth-child(1) {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Row 1: Right = Difficulty Pill (EASY / MEDIUM / HARD) */
+  .problems-table td:nth-child(4) {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* Row 2: Full Width = Problem Title & Topic */
+  .problems-table td:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2 / 3;
+    min-width: 0;
+  }
+
+  .problem-title-link {
+    font-size: 0.96rem;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  .problem-topic-tag {
+    font-size: 0.74rem;
+    margin-top: 2px;
+  }
+
+  /* Row 3: Category */
+  .problems-table td:nth-child(3) {
+    grid-column: 1 / -1;
+    grid-row: 3 / 4;
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  /* Row 4: Supported Language Badges */
+  .problems-table td:nth-child(5) {
+    grid-column: 1 / -1;
+    grid-row: 4 / 5;
+  }
+
+  /* Row 5: Action Button (Full Width like HackerRank) */
+  .problems-table td:nth-child(6) {
+    grid-column: 1 / -1;
+    grid-row: 5 / 6;
+    margin-top: 4px;
+    border-top: 1px dashed var(--hr-border);
+    padding-top: 10px;
+  }
+
+  .btn-solve-action {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 16px;
+    font-size: 0.86rem;
+    border-radius: 8px;
+    box-sizing: border-box;
   }
 }
 

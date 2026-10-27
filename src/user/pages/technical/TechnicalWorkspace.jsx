@@ -63,6 +63,9 @@ export default function TechnicalWorkspace() {
   const [useCustomInput, setUseCustomInput] = useState(false);
   const [isConsoleExpanded, setIsConsoleExpanded] = useState(false);
 
+  // Mobile active panel state: 'description' | 'editor' | 'console'
+  const [mobileTab, setMobileTab] = useState('description');
+
   // Load problem details
   useEffect(() => {
     setLoading(true);
@@ -214,11 +217,17 @@ export default function TechnicalWorkspace() {
       const result = await technicalApi.runCode(payload);
       setExecResult(result);
       setSelectedTestCaseIdx(0);
+      if (window.innerWidth <= 768) {
+        setMobileTab('console');
+      }
     } catch (err) {
       // If backend execution fails, run resilient local simulation
       const sim = runFallbackSimulation(false);
       setExecResult(sim);
       setSelectedTestCaseIdx(0);
+      if (window.innerWidth <= 768) {
+        setMobileTab('console');
+      }
     } finally {
       setIsRunning(false);
     }
@@ -244,12 +253,18 @@ export default function TechnicalWorkspace() {
       if (result.status === 'Accepted') {
         setProblem(prev => prev ? { ...prev, is_solved: true } : null);
       }
+      if (window.innerWidth <= 768) {
+        setMobileTab('console');
+      }
     } catch (err) {
       // If server submit offline, evaluate test cases locally
       const sim = runFallbackSimulation(true);
       setExecResult(sim);
       setSelectedTestCaseIdx(0);
       setProblem(prev => prev ? { ...prev, is_solved: true } : null);
+      if (window.innerWidth <= 768) {
+        setMobileTab('console');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -374,10 +389,35 @@ export default function TechnicalWorkspace() {
         </div>
       </header>
 
+      {/* 1.1 MOBILE SEGMENTED VIEW SWITCHER */}
+      <div className="workspace-mobile-nav-tabs">
+        <button
+          className={`ws-mob-tab-btn ${mobileTab === 'description' ? 'active' : ''}`}
+          onClick={() => setMobileTab('description')}
+        >
+          <FileText size={14} />
+          <span>Problem</span>
+        </button>
+        <button
+          className={`ws-mob-tab-btn ${mobileTab === 'editor' ? 'active' : ''}`}
+          onClick={() => setMobileTab('editor')}
+        >
+          <Cpu size={14} />
+          <span>Code Editor</span>
+        </button>
+        <button
+          className={`ws-mob-tab-btn ${mobileTab === 'console' ? 'active' : ''}`}
+          onClick={() => setMobileTab('console')}
+        >
+          <Terminal size={14} />
+          <span>Console / Tests</span>
+        </button>
+      </div>
+
       {/* 2. DUAL-PANEL WORKSPACE BODY */}
       <div className="workspace-split-body">
         {/* ================= LEFT PANEL: STATEMENT & SUBMISSIONS ================= */}
-        <section className="workspace-left-panel">
+        <section className={`workspace-left-panel ${mobileTab === 'description' ? 'mob-active' : ''}`}>
           {/* Tab nav */}
           <div className="workspace-tab-nav">
             <button
@@ -525,7 +565,7 @@ export default function TechnicalWorkspace() {
         </section>
 
         {/* ================= RIGHT PANEL: CODE EDITOR & CONSOLE ================= */}
-        <section className="workspace-right-panel">
+        <section className={`workspace-right-panel ${mobileTab !== 'description' ? 'mob-active' : ''} ${mobileTab === 'editor' ? 'mob-tab-editor' : 'mob-tab-console'}`}>
           {/* Language notification banner */}
           <div className="workspace-editor-subbar">
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -749,6 +789,49 @@ export default function TechnicalWorkspace() {
           </div>
         </section>
       </div>
+
+      {/* 3. MOBILE FLOATING ACTION TOOLBAR */}
+      <footer className="workspace-mobile-bottom-bar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <select
+            className="mobile-lang-select"
+            value={language}
+            onChange={(e) => handleLanguageChange(e.target.value)}
+          >
+            <option value="python">🐍 Python 3</option>
+            <option value="java">☕ Java</option>
+            <option value="cpp">⚡ C++</option>
+            <option value="c">⚙️ C</option>
+            <option value="javascript">🌐 JavaScript</option>
+          </select>
+          <button
+            className="btn-ws-mobile-reset"
+            onClick={handleResetCode}
+            title="Reset code to default"
+          >
+            <RotateCcw size={15} />
+          </button>
+        </div>
+
+        <div className="mobile-actions-group">
+          <button
+            className="btn-ws-action btn-ws-run"
+            onClick={handleRunCode}
+            disabled={isRunning || isSubmitting}
+          >
+            <Play size={14} />
+            <span>{isRunning ? 'Running...' : 'Run'}</span>
+          </button>
+          <button
+            className="btn-ws-action btn-ws-submit"
+            onClick={handleSubmitCode}
+            disabled={isRunning || isSubmitting}
+          >
+            <Send size={14} />
+            <span>{isSubmitting ? 'Evaluating...' : 'Submit'}</span>
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }

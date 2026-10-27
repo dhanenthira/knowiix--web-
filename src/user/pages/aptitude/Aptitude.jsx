@@ -420,12 +420,12 @@ export default function Aptitude() {
   }, [questions, activeTopic, searchQuery]);
 
   // Start a Quiz
-  const startQuiz = (mode, title, pool = null) => {
+  const startQuiz = (mode, title, pool = null, startIndex = 0) => {
     const list = pool && pool.length > 0 ? pool : (filteredQuestions.length > 0 ? filteredQuestions : questions);
-    // Shuffle or pick questions
-    const selected = [...list].slice(0, 10);
+    // If pool is specifically provided (e.g. category pool), keep all questions in that pool
+    const selected = pool && pool.length > 0 ? [...list] : [...list].slice(0, 10);
     setActiveQuestions(selected);
-    setCurrentIdx(0);
+    setCurrentIdx(startIndex >= 0 && startIndex < selected.length ? startIndex : 0);
     setSelectedAnswers({});
     setFlaggedForReview({});
     setInstantChecked({});
@@ -445,6 +445,47 @@ export default function Aptitude() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Start practice with all questions belonging to that category, starting from the selected question
+  const startCategoryPractice = (clickedQ) => {
+    // 1. Gather all questions matching the clicked question's category
+    let categoryQuestions = [];
+
+    if (clickedQ.category) {
+      const targetCat = clickedQ.category.trim().toLowerCase();
+      categoryQuestions = questions.filter(item => {
+        if (!item.category) return false;
+        const itemCat = item.category.trim().toLowerCase();
+        return itemCat === targetCat || itemCat.includes(targetCat) || targetCat.includes(itemCat);
+      });
+    }
+
+    // If no category match or only 1, check by topic
+    if (categoryQuestions.length <= 1 && clickedQ.topic) {
+      const targetTopic = clickedQ.topic.trim().toLowerCase();
+      const byTopic = questions.filter(item => 
+        item.topic && item.topic.trim().toLowerCase() === targetTopic
+      );
+      if (byTopic.length > 1) {
+        categoryQuestions = byTopic;
+      }
+    }
+
+    // Fallback to active filteredQuestions or all questions if somehow empty
+    if (categoryQuestions.length === 0) {
+      categoryQuestions = filteredQuestions.length > 0 ? filteredQuestions : questions;
+    }
+
+    // 2. Place the clicked question first, followed by all remaining questions in the category
+    const remainingInCat = categoryQuestions.filter(item => item.id !== clickedQ.id);
+    const orderedCategoryPool = [clickedQ, ...remainingInCat];
+
+    const categoryTitle = clickedQ.category 
+      ? `${clickedQ.category} Practice (${orderedCategoryPool.length} Questions)` 
+      : `${clickedQ.topic || 'Aptitude'} Practice`;
+
+    startQuiz('practice', categoryTitle, orderedCategoryPool, 0);
+  };
+
   // Handle Option Select
   const handleSelectOption = (qId, option) => {
     setSelectedAnswers(prev => ({ ...prev, [qId]: option }));
@@ -454,6 +495,44 @@ export default function Aptitude() {
   const toggleReviewFlag = (qId) => {
     setFlaggedForReview(prev => ({ ...prev, [qId]: !prev[qId] }));
   };
+
+  // Advance to next question or directly complete & show results on last question
+  const handleNextQuestion = () => {
+    if (currentIdx < activeQuestions.length - 1) {
+      setCurrentIdx(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Last question completed -> directly display final score and performance summary
+      finishQuiz();
+    }
+  };
+
+  // Scroll detection for aptitude navbar auto-hide on scroll down
+  const [isAptNavVisible, setIsAptNavVisible] = useState(true);
+  const aptLastScrollY = useRef(0);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleAptScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          if (currentScrollY <= 30) {
+            setIsAptNavVisible(true);
+          } else if (currentScrollY > aptLastScrollY.current && currentScrollY > 70) {
+            setIsAptNavVisible(false);
+          } else if (currentScrollY < aptLastScrollY.current) {
+            setIsAptNavVisible(true);
+          }
+          aptLastScrollY.current = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleAptScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleAptScroll);
+  }, []);
 
   // Calculate & Finish Quiz
   const finishQuiz = () => {
@@ -515,10 +594,14 @@ export default function Aptitude() {
       {viewMode === 'hub' ? (
         <Navbar variant="user" />
       ) : (
-        <header className="aptitude-navbar">
+        <header
+          className={`aptitude-navbar ${!isAptNavVisible ? 'nav-hidden' : ''}`}
+          onClick={() => { if (!isAptNavVisible) setIsAptNavVisible(true); }}
+        >
           <div className="aptitude-nav-left">
             <button
               className="btn-back-nav"
+              title="Return to Aptitude Hub"
               onClick={() => {
                 if (window.confirm('Do you want to leave the active screen and return to the Aptitude Hub?')) {
                   clearInterval(timerRef.current);
@@ -527,7 +610,8 @@ export default function Aptitude() {
               }}
             >
               <ArrowLeft size={18} />
-              <span>Aptitude Hub</span>
+              <span className="btn-back-text-full">Aptitude Hub</span>
+              <span className="btn-back-text-mobile">Hub</span>
             </button>
             <div className="aptitude-brand-pill" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <KnowiixLogo size="sm" />
@@ -539,7 +623,8 @@ export default function Aptitude() {
             {viewMode === 'quiz' && (
               <div className="quiz-status-pill">
                 <span className={`quiz-mode-tag ${quizMode}`}>
-                  {quizMode === 'mock' ? 'Timed Exam Mode' : 'Practice & Solutions'}
+                  <span className="mode-text-full">{quizMode === 'mock' ? 'Timed Exam Mode' : 'Practice & Solutions'}</span>
+                  <span className="mode-text-mobile">{quizMode === 'mock' ? 'Exam' : 'Practice'}</span>
                 </span>
                 {quizMode === 'mock' && (
                   <div className={`timer-display ${timeRemaining < 120 ? 'timer-danger' : ''}`}>
@@ -663,7 +748,12 @@ export default function Aptitude() {
             ) : (
               <div className="questions-catalog-grid">
                 {filteredQuestions.map((q, idx) => (
-                  <div key={q.id || idx} className="question-preview-card">
+                  <div
+                    key={q.id || idx}
+                    className="question-preview-card"
+                    onClick={() => startCategoryPractice(q)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className="q-card-header">
                       <div className="q-tags-group">
                         <span className={`difficulty-pill ${q.difficulty}`}>
@@ -691,7 +781,10 @@ export default function Aptitude() {
                       <div className="q-actions-mini">
                         <button
                           className="btn-mini-practice"
-                          onClick={() => startQuiz('practice', `${q.topic} Practice`, [q])}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startCategoryPractice(q);
+                          }}
                         >
                           <Zap size={14} /> Practice
                         </button>
@@ -767,11 +860,13 @@ export default function Aptitude() {
               </div>
             </div>
 
-            {/* Question Statement */}
-            <div className="quiz-question-box">
-              <h2 className="quiz-question-title">{currentQ.title}</h2>
-              <div className="quiz-question-content">{currentQ.content}</div>
-            </div>
+            {/* Question Statement & Options with Smooth Transition */}
+            <div key={currentQ?.id || currentIdx} className="quiz-question-fade-area">
+              {/* Question Statement */}
+              <div className="quiz-question-box">
+                <h2 className="quiz-question-title">{currentQ.title}</h2>
+                <div className="quiz-question-content">{currentQ.content}</div>
+              </div>
 
             {/* Options List */}
             <div className="quiz-options-grid">
@@ -813,6 +908,7 @@ export default function Aptitude() {
                   </button>
                 );
               })}
+            </div>
             </div>
 
             {/* Instant Solution Explainer in Practice Mode */}
@@ -871,7 +967,10 @@ export default function Aptitude() {
               <button
                 className="btn-quiz-nav btn-prev"
                 disabled={currentIdx === 0}
-                onClick={() => setCurrentIdx(prev => Math.max(0, prev - 1))}
+                onClick={() => {
+                  setCurrentIdx(prev => Math.max(0, prev - 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               >
                 <ArrowLeft size={16} />
                 <span>Previous</span>
@@ -881,27 +980,13 @@ export default function Aptitude() {
                 <span>{Object.keys(selectedAnswers).length} of {activeQuestions.length} Answered</span>
               </div>
 
-              {currentIdx < activeQuestions.length - 1 ? (
-                <button
-                  className="btn-quiz-nav btn-next"
-                  onClick={() => setCurrentIdx(prev => prev + 1)}
-                >
-                  <span>Next Question</span>
-                  <ArrowRight size={16} />
-                </button>
-              ) : (
-                <button
-                  className="btn-quiz-nav btn-submit-test"
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to submit your aptitude assessment?')) {
-                      finishQuiz();
-                    }
-                  }}
-                >
-                  <CheckCircle2 size={16} />
-                  <span>Submit Assessment</span>
-                </button>
-              )}
+              <button
+                className="btn-quiz-nav btn-next"
+                onClick={handleNextQuestion}
+              >
+                <span>Next Question</span>
+                <ArrowRight size={16} />
+              </button>
             </div>
           </div>
 
@@ -946,13 +1031,9 @@ export default function Aptitude() {
             <div className="palette-footer-actions">
               <button
                 className="btn-finish-sidebar"
-                onClick={() => {
-                  if (window.confirm('Ready to submit your aptitude test?')) {
-                    finishQuiz();
-                  }
-                }}
+                onClick={finishQuiz}
               >
-                Submit Test
+                Finish & View Score
               </button>
             </div>
           </aside>

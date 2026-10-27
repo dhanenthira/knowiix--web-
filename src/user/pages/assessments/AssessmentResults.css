@@ -11,6 +11,10 @@
   flex-direction: column;
   color: #0f172a;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .assessments-main-container {
@@ -21,6 +25,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  box-sizing: border-box;
 }
 
 /* 1. Breadcrumb Row */
@@ -1074,30 +1079,347 @@
 }
 
 @media (max-width: 768px) {
-  .assessments-header-card {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 20px;
+  .assessments-main-container {
+    padding: 16px 14px 48px;
+    gap: 16px;
   }
 
+  .assessments-breadcrumb-row {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-back-dash {
+    padding: 7px 12px;
+    font-size: 0.8rem;
+  }
+
+  .breadcrumb-pill {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+
+  /* Hero Header Card */
+  .assessments-header-card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px 16px;
+    gap: 14px;
+    border-radius: 14px;
+  }
+
+  .assessments-badge {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+    margin-bottom: 8px;
+  }
+
+  .assessments-page-title {
+    font-size: 1.3rem;
+    margin: 0 0 6px;
+    line-height: 1.3;
+  }
+
+  .assessments-page-subtitle {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .assessments-header-action {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .btn-start-mock {
+    width: 100%;
+    justify-content: center;
+    padding: 11px 16px;
+    font-size: 0.88rem;
+  }
+
+  /* Aggregate KPI Grid: 2x2 Clean Dashboard Layout */
   .assessments-kpi-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .assessment-kpi-card {
+    padding: 12px 10px;
+    border-radius: 12px;
+    gap: 10px;
+  }
+
+  .kpi-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .kpi-label {
+    font-size: 0.72rem;
+  }
+
+  .kpi-value {
+    font-size: 1.25rem;
+  }
+
+  .kpi-subtext {
+    font-size: 0.7rem;
+  }
+
+  .kpi-pill {
+    font-size: 0.68rem;
+    padding: 2px 6px;
+  }
+
+  /* Control & Filter Bar */
+  .assessments-control-bar {
+    padding: 14px 12px;
+    gap: 12px;
+    border-radius: 14px;
   }
 
   .control-row-top {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
 
   .search-input-box {
     max-width: 100%;
+    width: 100%;
+    min-width: 0;
   }
 
   .controls-right-group {
-    justify-content: flex-start;
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .picker-wrapper {
+    flex: 1 1 auto;
+    min-width: 140px;
+  }
+
+  .picker-wrapper .shadcn-picker-trigger {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .status-dropdown {
+    flex: 1 1 auto;
+    min-width: 110px;
+  }
+
+  .control-row-bottom {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .category-chips-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    padding-bottom: 2px;
+  }
+
+  .category-chips-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Results Table to Mobile Card Transformation */
+  .assessments-table-card {
+    padding: 16px 12px;
+    border-radius: 14px;
+  }
+
+  .results-table-wrapper {
+    overflow-x: visible;
+  }
+
+  .results-table {
+    display: block;
+    width: 100%;
+  }
+
+  .results-table thead {
+    display: none;
+  }
+
+  .results-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .assessment-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding: 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.15s ease;
+  }
+
+  .assessment-row:hover {
+    border-color: #93c5fd;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.08);
+  }
+
+  .results-table td {
+    padding: 0;
+    border: none;
+    white-space: normal;
+  }
+
+  /* Col 1, Row 1: Test Title & Info */
+  .results-table td:nth-child(1) {
+    grid-column: 1 / 2;
+    min-width: 0;
+  }
+
+  /* Col 2, Row 1: Score Badge */
+  .results-table td:nth-child(2) {
+    grid-column: 2 / 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  /* Col 1, Row 2: Accuracy */
+  .results-table td:nth-child(3) {
+    grid-column: 1 / 2;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Col 2, Row 2: Status Badge */
+  .results-table td:nth-child(6) {
+    grid-column: 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* Col 1, Row 3: Date */
+  .results-table td:nth-child(4) {
+    grid-column: 1 / 2;
+    display: flex;
+    align-items: center;
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  /* Col 2, Row 3: Duration */
+  .results-table td:nth-child(5) {
+    grid-column: 2 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 0.78rem;
+    color: #64748b;
+  }
+
+  /* Col 1-2, Row 4: View Details Button Full Width */
+  .results-table td:nth-child(7) {
+    grid-column: 1 / -1;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 10px;
+    margin-top: 2px;
+  }
+
+  .btn-action-view {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 16px;
+    font-size: 0.84rem;
+  }
+
+  .test-name-cell {
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .test-icon-badge {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+  }
+
+  .test-name-info {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .test-title-text {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    word-break: break-word;
+    line-height: 1.35;
+  }
+
+  /* Modal on Mobile */
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .modal-content-card {
+    max-height: 92vh;
+    border-radius: 14px;
+  }
+
+  .modal-header {
+    padding: 16px 18px;
+  }
+
+  .modal-body {
+    padding: 16px 18px;
+    gap: 16px;
   }
 
   .modal-metrics-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .modal-footer {
+    padding: 14px 18px;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .modal-footer button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .assessments-main-container {
+    padding: 12px 10px 40px;
+  }
+
+  .breadcrumb-pill span:not(.current) {
+    display: none;
+  }
+
+  .breadcrumb-pill svg {
+    display: none;
   }
 }

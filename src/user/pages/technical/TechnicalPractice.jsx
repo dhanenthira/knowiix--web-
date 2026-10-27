@@ -435,6 +435,27 @@ export default function TechnicalPractice() {
             </div>
           </div>
 
+          {/* Quick Category Chips (HackerRank Style) */}
+          <div className="category-quick-scroll">
+            <button
+              type="button"
+              className={`cat-quick-chip ${category === 'all' ? 'active' : ''}`}
+              onClick={() => { setCategory('all'); setPage(1); }}
+            >
+              All Categories
+            </button>
+            {categories.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className={`cat-quick-chip ${category === c.name ? 'active' : ''}`}
+                onClick={() => { setCategory(c.name); setPage(1); }}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
+
           <div className="coding-filter-bar">
             {/* Search */}
             <div className="search-input-box">
@@ -450,72 +471,75 @@ export default function TechnicalPractice() {
               />
             </div>
 
-            {/* Difficulty Filter */}
-            <select
-              className="filter-select"
-              value={difficulty}
-              onChange={(e) => {
-                setDifficulty(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="all">All Difficulties</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
+            {/* Filter Dropdowns Group (2x2 on mobile like HackerRank) */}
+            <div className="filter-dropdowns-group">
+              {/* Difficulty Filter */}
+              <select
+                className="filter-select"
+                value={difficulty}
+                onChange={(e) => {
+                  setDifficulty(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="all">All Difficulties</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
 
-            {/* Category Filter */}
-            <select
-              className="filter-select"
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="all">All Categories</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.name}>{c.name}</option>
-              ))}
-            </select>
+              {/* Category Filter */}
+              <select
+                className="filter-select"
+                value={category}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="all">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
+                ))}
+              </select>
 
-            {/* Language Filter */}
-            <select
-              className="filter-select"
-              value={language}
-              onChange={(e) => {
-                setLanguage(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="all">All Languages</option>
-              <option value="java">Java (OpenJDK)</option>
-              <option value="python">Python 3</option>
-              <option value="c">C (GCC)</option>
-              <option value="cpp">C++ (G++)</option>
-              <option value="javascript">JavaScript</option>
-            </select>
+              {/* Language Filter */}
+              <select
+                className="filter-select"
+                value={language}
+                onChange={(e) => {
+                  setLanguage(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="all">All Languages</option>
+                <option value="java">Java (OpenJDK)</option>
+                <option value="python">Python 3</option>
+                <option value="c">C (GCC)</option>
+                <option value="cpp">C++ (G++)</option>
+                <option value="javascript">JavaScript</option>
+              </select>
 
-            {/* Solved Status Filter */}
-            <select
-              className="filter-select"
-              value={solvedStatus}
-              onChange={(e) => {
-                setSolvedStatus(e.target.value);
-                setPage(1);
-              }}
-            >
-              <option value="all">All Statuses</option>
-              <option value="solved">Solved</option>
-              <option value="unsolved">Unsolved</option>
-            </select>
+              {/* Solved Status Filter */}
+              <select
+                className="filter-select"
+                value={solvedStatus}
+                onChange={(e) => {
+                  setSolvedStatus(e.target.value);
+                  setPage(1);
+                }}
+              >
+                <option value="all">All Statuses</option>
+                <option value="solved">Solved</option>
+                <option value="unsolved">Unsolved</option>
+              </select>
+            </div>
 
             {/* Reset */}
             {(search || difficulty !== 'all' || category !== 'all' || language !== 'all' || solvedStatus !== 'all' || isRandomMode) && (
               <button className="btn-reset-filters" onClick={handleResetFilters}>
                 <RotateCcw size={14} />
-                <span>Reset</span>
+                <span>Reset Filters</span>
               </button>
             )}
           </div>

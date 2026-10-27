@@ -210,51 +210,117 @@
   }
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
   .today-practice-card {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 26px 22px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px;
+    gap: 20px;
+    min-height: auto;
   }
   .today-card-content {
-    max-width: 100%;
-  }
-  .today-card-illustration {
-    flex: auto;
-    width: 100%;
-    max-width: 420px;
-    margin: 12px auto 0 auto;
-  }
-}
-
-@media (max-width: 640px) {
-  .today-practice-card-wrapper {
-    margin: 8px auto 18px auto;
-  }
-  .today-practice-card {
-    border-radius: 18px;
-    padding: 20px 16px;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 62%;
   }
   .today-card-title {
-    font-size: 24px;
+    font-size: 28px;
+    gap: 10px;
   }
   .today-name-badge {
-    font-size: 22px;
+    font-size: 26px;
+    padding: 2px 14px;
   }
   .today-card-subtitle {
     font-size: 14px;
-    margin: 10px 0 18px 0;
+    line-height: 1.55;
+    margin: 10px 0 20px 0;
   }
   .today-card-actions {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
+    gap: 10px;
   }
-  .today-primary-btn,
+  .today-primary-btn {
+    padding: 10px 22px;
+    font-size: 14px;
+  }
   .today-streak-badge,
   .today-goal-pill {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .today-card-illustration {
+    flex: 0 0 260px;
+    max-width: 280px;
+    margin: 0;
+    display: flex;
+    align-items: center;
     justify-content: center;
+  }
+  .today-dashboard-img {
+    max-width: 100%;
+    max-height: 190px;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .today-practice-card-wrapper {
+    margin: 6px auto 14px auto;
+    padding: 0 12px;
+  }
+  .today-practice-card {
+    border-radius: 16px;
+    padding: 16px 14px;
+    min-height: auto;
+    gap: 10px;
+  }
+  .today-practice-card::before {
+    display: none;
+  }
+  /* Hide giant illustration on mobile to save ~300px of vertical screen real estate */
+  .today-card-illustration {
+    display: none;
+  }
+  .today-card-title {
+    font-size: 20px;
+    gap: 8px;
+    line-height: 1.25;
+  }
+  .today-name-badge {
+    font-size: 18px;
+    padding: 2px 10px;
+    border-radius: 6px;
+  }
+  .today-card-subtitle {
+    font-size: 12.5px;
+    line-height: 1.45;
+    margin: 6px 0 12px 0;
+    max-width: 100%;
+  }
+  .today-card-actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     width: 100%;
-    box-sizing: border-box;
+  }
+  .today-primary-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    gap: 6px;
+    flex: 1 1 auto;
+    justify-content: center;
+    border-radius: 10px;
+  }
+  .today-streak-badge,
+  .today-goal-pill {
+    padding: 6px 12px;
+    font-size: 12px;
+    gap: 5px;
+    flex: 0 0 auto;
+    justify-content: center;
+    border-radius: 10px;
   }
 }

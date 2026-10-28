@@ -642,3 +642,50 @@
     background: #FFFFFF;
     white-space: nowrap;
 }
+
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR REALTIME USAGE FLOW
+   ========================================================================== */
+[data-theme="dark"] .realtime-usage-flow-card,
+.dark .realtime-usage-flow-card {
+  background: #131A2A !important;
+  border-color: #1E293B !important;
+}
+
+[data-theme="dark"] .flow-title-with-pill .card-title,
+.dark .flow-title-with-pill .card-title {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .flow-subtitle,
+.dark .flow-subtitle {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .flow-telemetry-item,
+.dark .flow-telemetry-item {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .telemetry-label,
+.dark .telemetry-label {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .telemetry-value,
+.dark .telemetry-value {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .flow-node-card,
+.dark .flow-node-card {
+  background: #1A2234 !important;
+  border-color: #273449 !important;
+}
+
+[data-theme="dark"] .flow-node-name,
+.dark .flow-node-name {
+  color: #F1F5F9 !important;
+}

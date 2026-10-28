@@ -324,3 +324,40 @@
     border-radius: 10px;
   }
 }
+
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR TODAY'S PRACTICE CARD
+   ========================================================================== */
+[data-theme="dark"] .today-practice-card,
+.dark .today-practice-card {
+  background: linear-gradient(135deg, #131A2A 0%, #17233F 100%) !important;
+  border-color: #253350 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="dark"] .today-card-title,
+.dark .today-card-title {
+  color: #F8FAFC !important;
+}
+
+[data-theme="dark"] .today-card-subtitle,
+.dark .today-card-subtitle {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .today-quick-stat-item,
+.dark .today-quick-stat-item {
+  background: rgba(30, 41, 59, 0.7) !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .today-stat-number,
+.dark .today-stat-number {
+  color: #F8FAFC !important;
+}
+
+[data-theme="dark"] .today-stat-label,
+.dark .today-stat-label {
+  color: #94A3B8 !important;
+}

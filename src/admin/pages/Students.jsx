@@ -62,7 +62,7 @@ export default function Students() {
 
       <div className="admin-content">
         {/* Search & Filter Bar */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'center' }}>
+        <div className="flex-responsive-row" style={{ marginBottom: '24px' }}>
           <div style={{ position: 'relative', flex: 1 }}>
             <input
               type="text"

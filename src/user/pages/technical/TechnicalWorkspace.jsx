@@ -21,6 +21,7 @@ import {
   Cpu
 } from 'lucide-react';
 import technicalApi from '../../api/technicalApi';
+import { useUI } from '../../../context/UIContext';
 import {
   getCachedProblem,
   registerProblemInCache,
@@ -34,6 +35,7 @@ import './TechnicalPractice.css';
 export default function TechnicalWorkspace() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { theme } = useUI();
 
   // Problem State
   const [problem, setProblem] = useState(null);
@@ -576,7 +578,7 @@ export default function TechnicalWorkspace() {
               <span className="lang-save-notice">· Auto-saved per language</span>
             </span>
             <span className="editor-theme-label">
-              Monaco Editor
+              Monaco Editor ({theme === 'dark' ? 'Dark' : 'Light'})
             </span>
           </div>
 
@@ -584,7 +586,7 @@ export default function TechnicalWorkspace() {
           <div className="editor-wrapper-area">
             <Editor
               height="100%"
-              theme="vs"
+              theme={theme === 'dark' ? 'vs-dark' : 'vs'}
               language={getMonacoLang(language)}
               value={code}
               onChange={handleCodeChange}

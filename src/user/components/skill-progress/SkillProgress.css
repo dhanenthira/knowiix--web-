@@ -423,3 +423,129 @@
     padding: 4px 9px;
   }
 }
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR SKILL PROGRESS SECTION & CARDS
+   ========================================================================== */
+[data-theme="dark"] .skill-progress-section,
+.dark .skill-progress-section {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .skill-progress-section-title,
+.dark .skill-progress-section-title {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .skill-progress-section-subtitle,
+.dark .skill-progress-section-subtitle {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .skill-progress-readiness-pill,
+.dark .skill-progress-readiness-pill {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .skill-card,
+.dark .skill-card {
+  background: #131A2A !important;
+  border-color: #1E293B !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme="dark"] .skill-card:hover,
+.dark .skill-card:hover {
+  border-color: #3B82F6 !important;
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .skill-card-date,
+.dark .skill-card-date {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .skill-card-more-btn,
+.dark .skill-card-more-btn {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .skill-card-more-btn:hover,
+.dark .skill-card-more-btn:hover {
+  background: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .skill-card-title,
+.dark .skill-card-title {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .skill-card-subtitle,
+.dark .skill-card-subtitle {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .skill-card-progress-title,
+.dark .skill-card-progress-title {
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .skill-card-progress-pct,
+.dark .skill-card-progress-pct {
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .skill-card-progress-bar-bg,
+.dark .skill-card-progress-bar-bg {
+  background: #1E293B !important;
+}
+
+[data-theme="dark"] .skill-card-meta-label,
+.dark .skill-card-meta-label {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .skill-card-meta-value,
+.dark .skill-card-meta-value {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .skill-deadline-pill,
+.dark .skill-deadline-pill {
+  background: #1E293B !important;
+  border-color: #334155 !important;
+  color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .skill-problem-count-pill,
+.dark .skill-problem-count-pill {
+  background: #1E293B !important;
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .skill-card-tag.tag-purple,
+.dark .skill-card-tag.tag-purple {
+  background: rgba(168, 85, 247, 0.15) !important;
+  color: #C084FC !important;
+}
+
+[data-theme="dark"] .skill-card-tag.tag-blue,
+.dark .skill-card-tag.tag-blue {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .skill-card-tag.tag-emerald,
+.dark .skill-card-tag.tag-emerald {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34D399 !important;
+}
+
+[data-theme="dark"] .skill-card-tag.tag-amber,
+.dark .skill-card-tag.tag-amber {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #FBBF24 !important;
+}

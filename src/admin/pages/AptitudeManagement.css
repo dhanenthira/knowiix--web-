@@ -1,0 +1,763 @@
+/* ==========================================================================
+   AptitudeManagement.css
+   Official Admin Aptitude Management & Question Bank Styling
+   ========================================================================== */
+
+.aptitude-admin-page {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Actions Bar */
+.apt-admin-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.actions-left, .actions-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview-arena-btn {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60A5FA;
+}
+
+.preview-arena-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93C5FD;
+}
+
+.btn-seed {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border, #334155);
+  color: var(--text-secondary, #94A3B8);
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-seed:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #F1F5F9);
+}
+
+.apt-alert-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34D399;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* 4 KPI Grid */
+.apt-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.apt-kpi-card {
+  background: var(--surface, #131A2A);
+  border: 1px solid var(--border, #1E293B);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.apt-kpi-card:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 6px 22px var(--accent-glow, rgba(59, 130, 246, 0.15));
+  transform: translateY(-2px);
+}
+
+.kpi-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpi-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #94A3B8);
+}
+
+.kpi-icon-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary, #F1F5F9);
+}
+
+.kpi-detail {
+  font-size: 12px;
+  color: var(--text-muted, #64748B);
+}
+
+/* Section Card */
+.apt-section-card {
+  background: var(--surface, #131A2A);
+  border: 1px solid var(--border, #1E293B);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.apt-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary, #F1F5F9);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  color: var(--text-muted, #94A3B8);
+  margin-top: 3px;
+}
+
+.badge-season {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Placement Packs Grid */
+.placement-packs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.admin-pack-card {
+  background: var(--surface-elevated, #1A2234);
+  border: 1px solid var(--border, #1E293B);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.admin-pack-card:hover {
+  border-color: var(--card-accent, #3B82F6);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.admin-pack-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-pack-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-pack-duration {
+  font-size: 11px;
+  color: var(--text-muted, #94A3B8);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-pack-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary, #F1F5F9);
+  margin-top: 4px;
+}
+
+.admin-pack-meta {
+  font-size: 12px;
+  color: var(--text-secondary, #94A3B8);
+  margin-bottom: 4px;
+}
+
+.btn-filter-pack {
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid var(--border, #334155);
+  color: var(--text-primary, #F1F5F9);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-filter-pack:hover {
+  background: var(--surface-hover, #243048);
+  border-color: #3B82F6;
+  color: #60A5FA;
+}
+
+/* Filter Container */
+.apt-filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.apt-topic-pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.apt-tab-pill {
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: var(--surface, #131A2A);
+  border: 1px solid var(--border, #1E293B);
+  color: var(--text-secondary, #94A3B8);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.apt-tab-pill:hover {
+  background: var(--surface-hover, #243048);
+  color: var(--text-primary, #F1F5F9);
+  border-color: #3B82F6;
+}
+
+.apt-tab-pill.active {
+  background: linear-gradient(135deg, #2563EB, #3B82F6);
+  border-color: #3B82F6;
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.apt-search-bar-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-input-wrap {
+  flex: 1;
+  min-width: 260px;
+  position: relative;
+}
+
+.search-input-wrap .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  color: var(--text-muted, #64748B);
+}
+
+.search-input-wrap input {
+  padding-left: 42px;
+  height: 44px;
+}
+
+.filter-dropdowns {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-dropdowns select {
+  height: 44px;
+  min-width: 160px;
+}
+
+/* Questions Grid */
+.apt-questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 18px;
+}
+
+.apt-question-card {
+  background: var(--surface, #131A2A);
+  border: 1px solid var(--border, #1E293B);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.apt-question-card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tags-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.diff-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+}
+
+.diff-easy {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+}
+
+.diff-medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+}
+
+.diff-hard {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+}
+
+.topic-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #60A5FA;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.mini-company-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: #CBD5E1;
+  background: var(--surface-elevated, #1E293B);
+  border: 1px solid var(--border, #334155);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.marks-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #60A5FA;
+}
+
+.q-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary, #F1F5F9);
+  margin-bottom: 8px;
+}
+
+.q-content {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary, #94A3B8);
+  margin-bottom: 16px;
+}
+
+/* Options */
+.q-options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.q-option-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-elevated, #1A2234);
+  border: 1px solid var(--border, #1E293B);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  color: var(--text-primary, #F1F5F9);
+}
+
+.q-option-item.correct-option {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.opt-index {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--text-secondary, #94A3B8);
+}
+
+.correct-option .opt-index {
+  background: #10B981;
+  color: #FFFFFF;
+}
+
+.opt-text {
+  flex: 1;
+}
+
+.correct-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #34D399;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Solution Drawer */
+.solution-drawer {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border, #1E293B);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.solution-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FBBF24;
+  margin-bottom: 6px;
+}
+
+.solution-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary, #94A3B8);
+  white-space: pre-line;
+}
+
+.formula-tip-box {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 3px solid #3B82F6;
+  font-size: 11.5px;
+  color: #93C5FD;
+}
+
+/* Card Footer */
+.q-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border, #1E293B);
+}
+
+.btn-toggle-solution {
+  background: transparent;
+  border: none;
+  color: #60A5FA;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle-solution:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.footer-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #1E293B);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-action-btn.preview {
+  color: var(--text-secondary, #94A3B8);
+}
+
+.icon-action-btn.preview:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60A5FA;
+  border-color: #3B82F6;
+}
+
+.icon-action-btn.delete {
+  color: var(--text-muted, #64748B);
+}
+
+.icon-action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border-color: #EF4444;
+}
+
+/* Modal styling */
+.apt-create-modal {
+  max-width: 680px;
+  width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-icon-bubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.form-options-section {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border, #1E293B);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #F1F5F9);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.form-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--surface, #131A2A);
+  border: 1px solid var(--border, #1E293B);
+}
+
+.option-input-row.selected-correct {
+  border-color: #10B981;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary, #94A3B8);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Light theme overrides */
+[data-theme="light"] .apt-kpi-card,
+.light .apt-kpi-card,
+[data-theme="light"] .apt-section-card,
+.light .apt-section-card,
+[data-theme="light"] .apt-question-card,
+.light .apt-question-card {
+  background: #ffffff !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .admin-pack-card,
+.light .admin-pack-card,
+[data-theme="light"] .q-option-item,
+.light .q-option-item {
+  background: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (MOBILE, TABLET, LAPTOP, DESKTOP)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .apt-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .placement-packs-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .apt-admin-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .actions-left, .actions-right {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .actions-left .btn, .actions-right .btn,
+  .actions-left button, .actions-right button {
+    width: 100%;
+    justify-content: center;
+  }
+  .apt-kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .placement-packs-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .apt-create-modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+  }
+}
+

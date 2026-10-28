@@ -388,3 +388,70 @@
     width: 100%;
   }
 }
+
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR DATE RANGE PICKER
+   ========================================================================== */
+[data-theme="dark"] .shadcn-picker-trigger,
+.dark .shadcn-picker-trigger {
+  background-color: #131A2A !important;
+  color: #F1F5F9 !important;
+  border-color: #1E293B !important;
+}
+
+[data-theme="dark"] .shadcn-picker-trigger:hover,
+.dark .shadcn-picker-trigger:hover {
+  background-color: #1A2234 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .shadcn-picker-popover,
+.dark .shadcn-picker-popover {
+  background-color: #131A2A !important;
+  border-color: #1E293B !important;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .shadcn-picker-presets,
+.dark .shadcn-picker-presets {
+  background-color: #0F172A !important;
+  border-right-color: #1E293B !important;
+}
+
+[data-theme="dark"] .shadcn-preset-btn,
+.dark .shadcn-preset-btn {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .shadcn-preset-btn:hover,
+.dark .shadcn-preset-btn:hover {
+  background-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .shadcn-preset-btn.is-active,
+.dark .shadcn-preset-btn.is-active {
+  background-color: #2563EB !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .shadcn-calendar-month-caption,
+.dark .shadcn-calendar-month-caption {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .shadcn-day-btn,
+.dark .shadcn-day-btn {
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .shadcn-day-btn:hover:not(:disabled),
+.dark .shadcn-day-btn:hover:not(:disabled) {
+  background-color: #1E293B !important;
+}
+
+[data-theme="dark"] .shadcn-day-btn.is-outside,
+.dark .shadcn-day-btn.is-outside {
+  color: #475569 !important;
+}

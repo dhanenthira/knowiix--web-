@@ -78,8 +78,8 @@ export default function Assessments() {
               const marks = t.total_marks || (qCount * 2);
 
               return (
-                <div key={t.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                <div key={t.id} className="card flex-responsive-row">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
                     <div style={{
                       width: '48px',
                       height: '48px',

@@ -2985,3 +2985,54 @@
 
 
 
+
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR PROFILE PAGE
+   ========================================================================== */
+[data-theme="dark"] .lc-profile-wrapper,
+.dark .lc-profile-wrapper {
+  background-color: var(--color-bg, #0B0F19);
+  color: var(--color-text, #F1F5F9);
+}
+
+[data-theme="dark"] .lc-profile-card,
+.dark .lc-profile-card,
+[data-theme="dark"] .lc-card,
+.dark .lc-card,
+[data-theme="dark"] .lc-stat-box,
+.dark .lc-stat-box,
+[data-theme="dark"] .lc-sub-tab-item,
+.dark .lc-sub-tab-item,
+[data-theme="dark"] .lc-edit-modal-content,
+.dark .lc-edit-modal-content,
+[data-theme="dark"] .lc-modal-input,
+.dark .lc-modal-input {
+  background-color: var(--surface, #131A2A) !important;
+  border-color: var(--border, #1E293B) !important;
+  color: var(--text-primary, #F1F5F9) !important;
+}
+
+[data-theme="dark"] .lc-user-name,
+.dark .lc-user-name,
+[data-theme="dark"] .lc-card-title,
+.dark .lc-card-title,
+[data-theme="dark"] .lc-stat-value,
+.dark .lc-stat-value {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .lc-user-handle,
+.dark .lc-user-handle,
+[data-theme="dark"] .lc-card-subtitle,
+.dark .lc-card-subtitle,
+[data-theme="dark"] .lc-stat-label,
+.dark .lc-stat-label {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .lc-sub-tab-item.active,
+.dark .lc-sub-tab-item.active {
+  background-color: #1E293B !important;
+  color: #38BDF8 !important;
+}

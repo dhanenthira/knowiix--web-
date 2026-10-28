@@ -2,11 +2,13 @@ import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { UIProvider } from './context/UIContext';
+import { ResponsiveAppShell } from './theme';
 // Admin Components & Pages
 import Sidebar from './admin/components/Sidebar';
 import Dashboard from './admin/pages/Dashboard';
 import Students from './admin/pages/Students';
 import Questions from './admin/pages/Questions';
+import AptitudeManagement from './admin/pages/AptitudeManagement';
 import TechnicalManagement from './admin/pages/TechnicalManagement';
 import Assessments from './admin/pages/Assessments';
 import BattlesMonitor from './admin/pages/BattlesMonitor';
@@ -27,6 +29,7 @@ import Navbar from './shared/components/navbar';
 import Landing from './shared/pages/Landing';
 import Login from './shared/pages/Login';
 import Register from './shared/pages/Register';
+import ForgotPassword from './shared/pages/ForgotPassword';
 
 function ProtectedLayout() {
   const { admin } = useAuth();
@@ -40,15 +43,13 @@ function ProtectedLayout() {
   }
 
   return (
-    <UIProvider>
-      <div className="admin-app-wrapper" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg, #f8fafc)' }}>
-        <Navbar variant="admin" />
-        <div className="admin-layout" style={{ flex: 1, display: 'flex' }}>
-          <Sidebar />
-          <Outlet />
-        </div>
+    <div className="admin-app-wrapper" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color, var(--color-bg, #f8fafc))' }}>
+      <Navbar variant="admin" />
+      <div className="admin-layout" style={{ flex: 1, display: 'flex' }}>
+        <Sidebar />
+        <Outlet />
       </div>
-    </UIProvider>
+    </div>
   );
 }
 
@@ -57,9 +58,11 @@ function MainRoutes() {
 
   return (
     <Routes>
-      {/* Public Landing, Login, Register & Student Dashboard */}
+      {/* Public Landing, Login, Register, Forgot Password & Student Dashboard */}
       <Route path="/landing" element={<Landing />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ForgotPassword />} />
       <Route path="/register" element={<Register />} />
       <Route path="/signup" element={<Register />} />
       <Route path="/student" element={<UserDashboard />} />
@@ -71,9 +74,15 @@ function MainRoutes() {
       <Route path="/learning-notes" element={<Learning />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/student/profile" element={<Profile />} />
-      <Route path="/aptitude" element={<Aptitude />} />
+      {(!admin || admin?.role !== 'admin') && (
+        <>
+          <Route path="/aptitude" element={<Aptitude />} />
+          <Route path="/aptitude/test" element={<Aptitude />} />
+        </>
+      )}
       <Route path="/student/aptitude" element={<Aptitude />} />
-      <Route path="/aptitude/test" element={<Aptitude />} />
+      <Route path="/student/aptitude/test" element={<Aptitude />} />
+      <Route path="/student/aptitude/practice" element={<Aptitude />} />
 
       {/* Assessments & Results Page */}
       <Route path="/assessments" element={<AssessmentResults />} />
@@ -110,6 +119,9 @@ function MainRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/students" element={<Students />} />
         <Route path="/questions" element={<Questions />} />
+        <Route path="/aptitude" element={<AptitudeManagement />} />
+        <Route path="/admin/aptitude" element={<AptitudeManagement />} />
+        <Route path="/aptitude-admin" element={<AptitudeManagement />} />
         <Route path="/coding" element={<TechnicalManagement />} />
         <Route path="/technical-admin" element={<TechnicalManagement />} />
         <Route path="/admin/assessments" element={<Assessments />} />
@@ -128,8 +140,12 @@ function MainRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainRoutes />
-    </AuthProvider>
+    <UIProvider>
+      <AuthProvider>
+        <ResponsiveAppShell>
+          <MainRoutes />
+        </ResponsiveAppShell>
+      </AuthProvider>
+    </UIProvider>
   );
 }

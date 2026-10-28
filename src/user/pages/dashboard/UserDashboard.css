@@ -820,7 +820,7 @@
            4. DAILY PRACTICE — MAIN FOCUS
            -------------------------------------------------------------------------- */
 .daily-practice-card {
-    background: #FFFFFF;
+    background: var(--surface-card, var(--color-secondary, #FFFFFF));
     color: var(--color-text, #202124);
     border-radius: 24px;
     padding: 32px 36px;
@@ -1158,7 +1158,7 @@
 /* 6. PERFORMANCE CHART (FULL WIDTH) */
 .performance-overview-full-card {
     width: 100%;
-    background: #FFFFFF;
+    background: var(--surface-card, var(--color-secondary, #FFFFFF));
     border: 1px solid var(--color-border, #DADCE0);
     border-radius: 24px;
     padding: 32px 36px;
@@ -1192,7 +1192,7 @@
 }
 
 .btn-filter.active {
-    background: #FFFFFF;
+    background: var(--surface-elevated, var(--color-secondary, #FFFFFF));
     color: var(--color-text, #202124);
     font-weight: 600;
     box-shadow: 0 1px 3px rgba(60, 64, 67, 0.12);
@@ -1440,7 +1440,7 @@
     font-size: 12.5px;
     font-weight: 500;
     border: 1px solid var(--color-border, #DADCE0);
-    background: #FFFFFF;
+    background: var(--surface-card, var(--color-secondary, #FFFFFF));
     color: var(--color-muted-text, #5F6368);
     cursor: pointer;
     transition: all 0.18s ease;
@@ -1945,8 +1945,8 @@
 }
 
 body {
-    background: #ffffff;
-    color: var(--text-main);
+    background: var(--bg-body, var(--color-bg, #F8F9FA));
+    color: var(--text-main, var(--color-text, #202124));
 }
 
 .app-layout {
@@ -2745,4 +2745,208 @@ body {
         min-width: 420px;
         width: 100%;
     }
+}
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR USER DASHBOARD
+   ========================================================================== */
+[data-theme="dark"] .user-dashboard-wrapper,
+.dark .user-dashboard-wrapper {
+  background-color: var(--color-bg, #0B0F19);
+  color: var(--color-text, #F1F5F9);
+}
+
+[data-theme="dark"] .daily-practice-card,
+.dark .daily-practice-card,
+[data-theme="dark"] .performance-overview-full-card,
+.dark .performance-overview-full-card,
+[data-theme="dark"] .activity-item-card,
+.dark .activity-item-card,
+[data-theme="dark"] .practice-module-item,
+.dark .practice-module-item {
+  background: var(--surface-card, #131A2A) !important;
+  border-color: var(--color-border, #1E293B) !important;
+  color: var(--color-text, #F1F5F9) !important;
+}
+
+[data-theme="dark"] .module-title,
+.dark .module-title,
+[data-theme="dark"] .chart-card-title,
+.dark .chart-card-title,
+[data-theme="dark"] .daily-card-title,
+.dark .daily-card-title {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .module-desc,
+.dark .module-desc,
+[data-theme="dark"] .chart-card-subtitle,
+.dark .chart-card-subtitle,
+[data-theme="dark"] .daily-card-subtitle,
+.dark .daily-card-subtitle {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .filter-button-group,
+.dark .filter-button-group {
+  background: #0B0F19 !important;
+  border-color: #1E293B !important;
+}
+
+[data-theme="dark"] .btn-filter,
+.dark .btn-filter {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .btn-filter:hover,
+.dark .btn-filter:hover {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .btn-filter.active,
+.dark .btn-filter.active {
+  background: #1E293B !important;
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .metric-pill-btn,
+.dark .metric-pill-btn {
+  background: #131A2A !important;
+  border-color: #1E293B !important;
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .metric-pill-btn:hover,
+.dark .metric-pill-btn:hover {
+  color: #F1F5F9 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .metric-pill-btn.active.score,
+.dark .metric-pill-btn.active.score {
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: #3B82F6 !important;
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .chart-stat-item,
+.dark .chart-stat-item {
+  background: #1A2234 !important;
+  border-color: #1E293B !important;
+}
+
+[data-theme="dark"] .chart-stat-item p,
+.dark .chart-stat-item p {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .chart-stat-item h4,
+.dark .chart-stat-item h4 {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .btn-module-continue,
+.dark .btn-module-continue {
+  background: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .btn-module-continue:hover,
+.dark .btn-module-continue:hover {
+  background: #273449 !important;
+}
+
+[data-theme="dark"] .quick-action-btn,
+.dark .quick-action-btn {
+  background: #131A2A !important;
+  border-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .quick-action-btn:hover,
+.dark .quick-action-btn:hover {
+  background: #1E293B !important;
+  border-color: #3B82F6 !important;
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .mobile-horizontal-subnav,
+.dark .mobile-horizontal-subnav {
+  background: #131A2A !important;
+  border-top-color: #1E293B !important;
+}
+
+[data-theme="dark"] .user-profile-menu,
+.dark .user-profile-menu,
+[data-theme="dark"] .user-profile-pill,
+.dark .user-profile-pill {
+  background: #131A2A !important;
+  border-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .btn-icon,
+.dark .btn-icon {
+  background: #131A2A !important;
+  border-color: #1E293B !important;
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .btn-icon:hover,
+.dark .btn-icon:hover {
+  background: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .notification-dropdown,
+.dark .notification-dropdown {
+  background: #131A2A !important;
+  border-color: #1E293B !important;
+  color: #F1F5F9 !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR STUDENT DASHBOARD BODY & NAVBAR
+   ========================================================================== */
+[data-theme="dark"] .student-dashboard-body,
+.dark .student-dashboard-body {
+  background-color: var(--color-bg, #0B0F19) !important;
+  color: var(--color-text, #F1F5F9) !important;
+}
+
+[data-theme="dark"] .student-top-navbar,
+.dark .student-top-navbar {
+  background: var(--surface-card, #131A2A) !important;
+  border-bottom-color: var(--color-border, #1E293B) !important;
+}
+
+[data-theme="dark"] .nav-tab,
+.dark .nav-tab {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .nav-tab:hover,
+.dark .nav-tab:hover {
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .nav-tab.active,
+.dark .nav-tab.active {
+  color: #60A5FA !important;
+}
+
+[data-theme="dark"] .nav-tab.active::after,
+.dark .nav-tab.active::after {
+  background: #3B82F6 !important;
+}
+
+[data-theme="dark"] .user-display-name,
+.dark .user-display-name {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .user-level-badge,
+.dark .user-level-badge {
+  color: #94A3B8 !important;
 }

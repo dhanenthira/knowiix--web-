@@ -354,7 +354,12 @@ export default function Dashboard() {
           ========================================================== */}
       <section className="admin-stats-grid">
         {/* Total Students */}
-        <div className="admin-stat-card" style={{ '--card-glow': 'rgba(99, 102, 241, 0.25)' }}>
+        <div 
+          className="admin-stat-card" 
+          style={{ '--card-glow': 'rgba(99, 102, 241, 0.25)', cursor: 'pointer' }}
+          onClick={() => navigate('/students')}
+          title="View students roster"
+        >
           <div className="stat-top-row">
             <div className="stat-icon-bubble" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)' }}>
               <Users size={22} />
@@ -371,7 +376,12 @@ export default function Dashboard() {
         </div>
 
         {/* Active Today */}
-        <div className="admin-stat-card" style={{ '--card-glow': 'rgba(16, 185, 129, 0.25)' }}>
+        <div 
+          className="admin-stat-card" 
+          style={{ '--card-glow': 'rgba(16, 185, 129, 0.25)', cursor: 'pointer' }}
+          onClick={() => navigate('/students')}
+          title="View active learners"
+        >
           <div className="stat-top-row">
             <div className="stat-icon-bubble" style={{ background: 'linear-gradient(135deg, #059669, #10b981)' }}>
               <Activity size={22} />
@@ -388,7 +398,12 @@ export default function Dashboard() {
         </div>
 
         {/* Coding Problems */}
-        <div className="admin-stat-card" style={{ '--card-glow': 'rgba(6, 182, 212, 0.25)' }}>
+        <div 
+          className="admin-stat-card" 
+          style={{ '--card-glow': 'rgba(6, 182, 212, 0.25)', cursor: 'pointer' }}
+          onClick={() => navigate('/coding')}
+          title="Manage technical coding problems"
+        >
           <div className="stat-top-row">
             <div className="stat-icon-bubble" style={{ background: 'linear-gradient(135deg, #0891b2, #06b6d4)' }}>
               <Code2 size={22} />
@@ -405,7 +420,12 @@ export default function Dashboard() {
         </div>
 
         {/* Questions Bank */}
-        <div className="admin-stat-card" style={{ '--card-glow': 'rgba(245, 158, 11, 0.25)' }}>
+        <div 
+          className="admin-stat-card" 
+          style={{ '--card-glow': 'rgba(245, 158, 11, 0.25)', cursor: 'pointer' }}
+          onClick={() => navigate('/aptitude')}
+          title="Open Aptitude Arena & Question Bank manager"
+        >
           <div className="stat-top-row">
             <div className="stat-icon-bubble" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)' }}>
               <HelpCircle size={22} />
@@ -422,7 +442,12 @@ export default function Dashboard() {
         </div>
 
         {/* Learning Resources */}
-        <div className="admin-stat-card" style={{ '--card-glow': 'rgba(139, 92, 246, 0.25)' }}>
+        <div 
+          className="admin-stat-card" 
+          style={{ '--card-glow': 'rgba(139, 92, 246, 0.25)', cursor: 'pointer' }}
+          onClick={() => navigate('/learning')}
+          title="Manage learning modules and notes"
+        >
           <div className="stat-top-row">
             <div className="stat-icon-bubble" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)' }}>
               <BookOpen size={22} />
@@ -439,7 +464,12 @@ export default function Dashboard() {
         </div>
 
         {/* Assessments */}
-        <div className="admin-stat-card" style={{ '--card-glow': 'rgba(244, 63, 94, 0.25)' }}>
+        <div 
+          className="admin-stat-card" 
+          style={{ '--card-glow': 'rgba(244, 63, 94, 0.25)', cursor: 'pointer' }}
+          onClick={() => navigate('/admin/assessments')}
+          title="Configure campus assessments"
+        >
           <div className="stat-top-row">
             <div className="stat-icon-bubble" style={{ background: 'linear-gradient(135deg, #e11d48, #f43f5e)' }}>
               <ClipboardCheck size={22} />
@@ -594,7 +624,24 @@ export default function Dashboard() {
                 const fillPct = performanceView === 'accuracy' ? cat.accuracy : Math.min(100, (cat.submissions / Math.max(1, stats.totalSubmissions || 100)) * 100);
 
                 return (
-                  <div key={idx} className="perf-bar-item">
+                  <div 
+                    key={idx} 
+                    className="perf-bar-item"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      const n = (cat.name || '').toLowerCase();
+                      if (n.includes('aptitude') || n.includes('quant') || n.includes('logic')) {
+                        navigate('/aptitude');
+                      } else if (n.includes('code') || n.includes('tech')) {
+                        navigate('/coding');
+                      } else if (n.includes('assess')) {
+                        navigate('/admin/assessments');
+                      } else {
+                        navigate('/aptitude');
+                      }
+                    }}
+                    title={`View ${cat.name} curriculum and metrics`}
+                  >
                     <div className="perf-bar-top">
                       <span className="perf-category-title">
                         <span style={{ color: cat.color }}>{cat.icon}</span>

@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { PlusCircle, Search, Trash2, Edit3, Filter, HelpCircle, Check, X, AlertCircle } from 'lucide-react';
 import Header from '../components/Header';
 
 export default function Questions() {
+  const [searchParams] = useSearchParams();
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [catFilter, setCatFilter] = useState('All');
+  const [catFilter, setCatFilter] = useState(() => searchParams.get('category') || 'All');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) {
+      setCatFilter(cat);
+    }
+  }, [searchParams]);
 
   // New question form state
   const [newQ, setNewQ] = useState({
@@ -113,9 +122,9 @@ export default function Questions() {
 
       <div className="admin-content">
         {/* Actions Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', gap: '16px' }}>
-          <div style={{ display: 'flex', gap: '12px', flex: 1 }}>
-            <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
+        <div className="flex-responsive-row" style={{ marginBottom: '24px' }}>
+          <div className="flex-responsive-row" style={{ flex: 1, gap: '12px' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
               <input
                 type="text"
                 className="form-input"
@@ -129,7 +138,7 @@ export default function Questions() {
 
             <select
               className="form-select"
-              style={{ height: '44px' }}
+              style={{ height: '44px', minWidth: '160px' }}
               value={catFilter}
               onChange={(e) => setCatFilter(e.target.value)}
             >
@@ -139,7 +148,7 @@ export default function Questions() {
             </select>
           </div>
 
-          <button className="btn btn-primary" onClick={() => setIsModalOpen(true)}>
+          <button className="btn btn-primary btn-full-mobile" onClick={() => setIsModalOpen(true)}>
             <PlusCircle size={16} />
             <span>Create New Question</span>
           </button>

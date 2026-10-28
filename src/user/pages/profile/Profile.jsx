@@ -762,8 +762,8 @@ export default function Profile() {
                 <h3 className="lc-card-section-title">Languages</h3>
                 <div className="lc-languages-list">
                   {analyticsData.languages && analyticsData.languages.length > 0 ? (
-                    analyticsData.languages.map((lang) => (
-                      <div key={lang.language} className="lc-language-row">
+                    analyticsData.languages.map((lang, idx) => (
+                      <div key={`${lang.language || "lang"}-${idx}`} className="lc-language-row">
                         <span className="lc-lang-badge">{lang.language}</span>
                         <span className="lc-lang-solved-count">
                           <strong>{lang.count}</strong> problems solved
@@ -1115,8 +1115,8 @@ export default function Profile() {
                         onChange={(e) => setSelectedYear(e.target.value)}
                         className="lc-year-select"
                       >
-                        {activityData.availableYears.map((yr) => (
-                          <option key={yr} value={String(yr)}>
+                        {activityData.availableYears.map((yr, idx) => (
+                            <option key={`${yr}-${idx}`} value={String(yr)}>
                             {yr}
                           </option>
                         ))}
@@ -1131,9 +1131,9 @@ export default function Profile() {
                   <div className="lc-heatmap-grid-container">
                     {/* Top Month Labels */}
                     <div className="lc-heatmap-months-row">
-                      {monthLabels.map((m) => (
-                        <span
-                          key={m.label + m.col}
+                      {monthLabels.map((m, idx) => (
+                          <span
+                            key={`${m.label}-${m.col}-${idx}`}
                           className="lc-month-label"
                           style={{ left: `${m.col * 14.5}px` }}
                         >
@@ -1146,12 +1146,10 @@ export default function Profile() {
                     <div className="lc-heatmap-weeks-row">
                       {heatmapGrid.map((week, wIndex) => (
                         <div key={wIndex} className="lc-heatmap-week-col">
-                          {week.map((cell) => {
+                          {week.map((cell, cIndex) => {
                             const colorClass = getCellColorClass(cell.count);
                             return (
-                              <div
-                                key={cell.date}
-                                className={`lc-heatmap-day-cell ${colorClass}`}
+                              <div key={`${cell.date}-${wIndex}-${cIndex}`} className={`lc-heatmap-day-cell ${colorClass}`}
                                 onMouseEnter={(e) => {
                                   const rect = e.currentTarget.getBoundingClientRect();
                                   setHoveredCell({
@@ -1377,7 +1375,7 @@ export default function Profile() {
                           <span className="col-time">Date</span>
                         </div>
 
-                        {submissionsList.map((sub) => {
+                        {submissionsList.map((sub, sIdx) => {
                           const isAc = sub.status?.toLowerCase() === 'accepted';
                           const diffClass =
                             sub.difficulty?.toLowerCase() === 'easy'
@@ -1387,7 +1385,7 @@ export default function Profile() {
                               : 'badge-med';
 
                           return (
-                            <div key={sub.id} className="lc-submission-table-row">
+                            <div key={sub.id || sub.submission_id || `sub-${sIdx}`} className="lc-submission-table-row">
                               <div className="col-title">
                                 <Link
                                   to={sub.slug ? `/technical/problem/${sub.slug}` : `/technical/problem/${sub.problem_id}`}
@@ -1494,8 +1492,8 @@ export default function Profile() {
                           Fundamental Topics
                         </h4>
                         <div className="lc-skills-cards-grid">
-                          {skillsData.fundamental.map((topic) => (
-                            <div key={topic.name} className="lc-topic-progress-card">
+                          {skillsData.fundamental.map((topic, idx) => (
+                              <div key={`${topic.name || "fund"}-${idx}`} className="lc-topic-progress-card">
                               <div className="lc-topic-header">
                                 <span className="lc-topic-name">{topic.name}</span>
                                 <span className="lc-topic-count">
@@ -1524,8 +1522,8 @@ export default function Profile() {
                           Intermediate Topics
                         </h4>
                         <div className="lc-skills-cards-grid">
-                          {skillsData.intermediate.map((topic) => (
-                            <div key={topic.name} className="lc-topic-progress-card">
+                          {skillsData.intermediate.map((topic, idx) => (
+                              <div key={`${topic.name || "inter"}-${idx}`} className="lc-topic-progress-card">
                               <div className="lc-topic-header">
                                 <span className="lc-topic-name">{topic.name}</span>
                                 <span className="lc-topic-count">
@@ -1554,8 +1552,8 @@ export default function Profile() {
                           Advanced Topics
                         </h4>
                         <div className="lc-skills-cards-grid">
-                          {skillsData.advanced.map((topic) => (
-                            <div key={topic.name} className="lc-topic-progress-card">
+                          {skillsData.advanced.map((topic, idx) => (
+                              <div key={`${topic.name || "adv"}-${idx}`} className="lc-topic-progress-card">
                               <div className="lc-topic-header">
                                 <span className="lc-topic-name">{topic.name}</span>
                                 <span className="lc-topic-count">
@@ -1584,9 +1582,9 @@ export default function Profile() {
                 {activeTab === 'badges' && (
                   <div className="lc-tab-content-box">
                     <div className="lc-badges-gallery-grid">
-                      {badgesData.badges.map((b) => (
+                      {badgesData.badges.map((b, bIdx) => (
                         <div
-                          key={b.id}
+                          key={`${b.id || "badge"}-${bIdx}`}
                           className={`lc-badge-card-item ${b.is_unlocked ? 'unlocked' : 'locked'}`}
                         >
                           <div className="lc-badge-item-icon">
@@ -1627,8 +1625,8 @@ export default function Profile() {
                           <span>Solved</span>
                           <span>Date</span>
                         </div>
-                        {contestData.participations.map((part) => (
-                          <div key={part.id} className="lc-contest-table-row">
+                        {contestData.participations.map((part, pIdx) => (
+                            <div key={`${part.id || "contest"}-${pIdx}`} className="lc-contest-table-row">
                             <span className="contest-name">
                               <strong>{part.contest_title}</strong>
                             </span>
@@ -1986,9 +1984,9 @@ export default function Profile() {
               </button>
             </div>
             <div className="lc-badges-grid-popup">
-              {badgesData.badges.map((b) => (
-                <div
-                  key={b.id}
+              {badgesData.badges.map((b, bIdx) => (
+                        <div
+                          key={`${b.id || "badge"}-${bIdx}`}
                   className={`lc-badge-popup-item ${b.is_unlocked ? 'unlocked' : 'locked'}`}
                 >
                   {b.is_unlocked ? (

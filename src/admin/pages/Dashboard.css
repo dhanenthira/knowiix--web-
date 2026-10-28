@@ -830,3 +830,44 @@
   transform: translateX(4px);
   color: #ffffff;
 }
+
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVE RULES FOR ADMIN DASHBOARD
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px;
+  }
+  .admin-charts-grid,
+  .admin-side-by-side-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-welcome-hero {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    padding: 16px 14px !important;
+  }
+  .welcome-title-row h1 {
+    font-size: 18px !important;
+  }
+  .admin-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .quick-actions-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .chart-card-box {
+    padding: 16px 12px !important;
+  }
+}

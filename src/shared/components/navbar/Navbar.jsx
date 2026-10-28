@@ -12,9 +12,12 @@ import {
   Sparkles,
   ExternalLink,
   Flame,
-  CheckCircle2
+  CheckCircle2,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { useUI } from '../../../context/UIContext';
 import UserProfileModal from '../../../admin/components/UserProfileModal';
 import KnowiixLogo from '../KnowiixLogo';
 import logoImage from '../../../assets/knowiix-logo.jpg';
@@ -44,6 +47,7 @@ const ADMIN_NAV_ITEMS = [
 
 export default function Navbar({ variant }) {
   const { admin, logout, updateAdmin } = useAuth();
+  const { theme, toggleTheme } = useUI();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -315,7 +319,18 @@ export default function Navbar({ variant }) {
               )}
             </div>
 
-            {/* 3.3 User Profile Avatar - Directly Moves to Profile Page */}
+            {/* 3.3 Dark / Light Mode Toggle */}
+            <button
+              type="button"
+              className="bolt-action-icon-btn bolt-theme-toggle-btn"
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={17} style={{ color: '#F4B400' }} /> : <Moon size={17} style={{ color: '#4285F4' }} />}
+            </button>
+
+            {/* 3.4 User Profile Avatar - Directly Moves to Profile Page */}
             <button
               type="button"
               className="bolt-profile-avatar-capsule"
@@ -411,6 +426,14 @@ export default function Navbar({ variant }) {
             })}
           </div>
           <div className="bolt-mobile-drawer-footer">
+            <button
+              className="bolt-mobile-profile-btn"
+              onClick={toggleTheme}
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun size={16} style={{ color: '#F4B400' }} /> : <Moon size={16} style={{ color: '#4285F4' }} />}
+              <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
             <button
               className="bolt-mobile-profile-btn"
               onClick={() => {

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+axios.defaults.timeout = 10000;
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -42,9 +44,19 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
       return { success: true, user: userData };
     } catch (err) {
-      setError(err.response?.data?.detail || 'Invalid credentials');
+      let errMsg = err.response?.data?.detail;
+      if (!errMsg) {
+        if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+          errMsg = 'Connection timed out. The backend server took too long to respond.';
+        } else if (err.message === 'Network Error') {
+          errMsg = 'Cannot reach backend server. Please check if FastAPI is running on port 8000.';
+        } else {
+          errMsg = 'Invalid email or password. Please verify your credentials.';
+        }
+      }
+      setError(errMsg);
       setLoading(false);
-      return { success: false, error: err.response?.data?.detail };
+      return { success: false, error: errMsg };
     }
   };
 
@@ -80,8 +92,16 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const loginWithSession = (userData) => {
+    setAdmin(userData);
+    localStorage.setItem('codearena_admin', JSON.stringify(userData));
+    if (userData?.token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ admin, login, register, logout, updateAdmin, loading, error }}>
+    <AuthContext.Provider value={{ admin, login, register, logout, updateAdmin, loginWithSession, loading, error }}>
       {children}
     </AuthContext.Provider>
   );

@@ -83,7 +83,7 @@
     min-height: 100vh;
     width: 100%;
     padding: 48px 20px;
-    background: #F8F9FA;
+    background: var(--bg-color, var(--color-bg, #F8F9FA));
 }
 
 .skillprep-login-wrapper.login-page .auth-form-panel {
@@ -99,11 +99,24 @@
 
 .skillprep-login-wrapper.login-page .auth-card {
     width: 100%;
-    background: #FFFFFF;
-    border: 1px solid #DADCE0;
+    max-width: 460px;
+    background: var(--surface, var(--color-secondary, #FFFFFF));
+    border: 1px solid var(--border, var(--color-border, #DADCE0));
+    color: var(--text-primary, var(--color-text, #202124));
     border-radius: 20px;
-    padding: 40px 36px;
-    box-shadow: 0 4px 24px -2px rgba(60, 64, 67, 0.08), 0 1px 3px rgba(60, 64, 67, 0.04);
+    padding: 36px 32px;
+    box-shadow: var(--card-shadow, 0 4px 24px -2px rgba(60, 64, 67, 0.08));
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+@media (max-width: 640px) {
+    .skillprep-login-wrapper.login-page .auth-container {
+        padding: 24px 14px;
+    }
+    .skillprep-login-wrapper.login-page .auth-card {
+        padding: 24px 18px;
+        border-radius: 16px;
+    }
 }
 
 .skillprep-login-wrapper.login-page .auth-brand-header {
@@ -880,4 +893,83 @@
     text-align: center;
     font-family: monospace;
     font-weight: 700;
+}
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR AUTH PAGES (LOGIN / REGISTER / FORGOT)
+   ========================================================================== */
+[data-theme="dark"] .skillprep-login-wrapper,
+.dark .skillprep-login-wrapper {
+  background-color: var(--color-bg, #090D16);
+  color: var(--color-text, #F1F5F9);
+}
+
+[data-theme="dark"] .login-right-panel,
+.dark .login-right-panel,
+[data-theme="dark"] .auth-form-card,
+.dark .auth-form-card,
+[data-theme="dark"] .auth-card,
+.dark .auth-card {
+  background-color: var(--surface, #131A2A) !important;
+  color: var(--text-primary, #F1F5F9) !important;
+  border-color: var(--border, #1E293B) !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55) !important;
+}
+
+[data-theme="dark"] .auth-card h1,
+.dark .auth-card h1 {
+  color: var(--text-primary, #F1F5F9) !important;
+}
+
+[data-theme="dark"] .auth-card p,
+.dark .auth-card p {
+  color: var(--text-secondary, #94A3B8) !important;
+}
+
+[data-theme="dark"] .btn-google,
+.dark .btn-google {
+  background-color: #1A2234 !important;
+  color: #F1F5F9 !important;
+  border-color: #1E293B !important;
+}
+
+[data-theme="dark"] .btn-google:hover,
+.dark .btn-google:hover {
+  background-color: #243048 !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .demo-helper-box,
+.dark .demo-helper-box {
+  background-color: #131A2A !important;
+  border-color: #1E293B !important;
+}
+
+[data-theme="dark"] .form-input,
+.dark .form-input,
+[data-theme="dark"] .auth-input,
+.dark .auth-input {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .form-input:focus,
+.dark .form-input:focus,
+[data-theme="dark"] .auth-input:focus,
+.dark .auth-input:focus {
+  border-color: #3B82F6;
+  background-color: #1E293B;
+}
+
+[data-theme="dark"] .form-label,
+.dark .form-label,
+[data-theme="dark"] .auth-title,
+.dark .auth-title {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .auth-subtitle,
+.dark .auth-subtitle {
+  color: #94A3B8;
 }

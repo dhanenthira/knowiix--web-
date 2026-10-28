@@ -6,12 +6,12 @@
 
 .skillprep-login-wrapper .role-selector-tabs {
     display: flex;
-    background: #f1f5f9;
+    background: var(--surface-elevated, #f1f5f9);
     border-radius: 12px;
     padding: 4px;
     margin-bottom: 24px;
     gap: 4px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border, #e2e8f0);
 }
 
 .skillprep-login-wrapper .role-tab-btn {
@@ -24,7 +24,7 @@
     border: none;
     border-radius: 9px;
     background: transparent;
-    color: #64748b;
+    color: var(--text-muted, #64748b);
     font-size: 0.88rem;
     font-weight: 600;
     cursor: pointer;
@@ -32,12 +32,12 @@
 }
 
 .skillprep-login-wrapper .role-tab-btn:hover {
-    color: #1e293b;
+    color: var(--text-primary, #1e293b);
 }
 
 .skillprep-login-wrapper .role-tab-btn.active {
-    background: #ffffff;
-    color: #4f46e5;
+    background: var(--surface, #ffffff);
+    color: var(--color-accent, #4f46e5);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     font-weight: 700;
 }
@@ -62,10 +62,10 @@
     width: 100% !important;
     height: 48px !important;
     padding: 0 16px 0 48px !important;
-    background: #ffffff !important;
-    border: 1.5px solid #cbd5e1 !important;
+    background-color: var(--surface-elevated, #ffffff) !important;
+    border: 1.5px solid var(--border, #cbd5e1) !important;
     border-radius: 12px !important;
-    color: #0f172a !important;
+    color: var(--text-primary, #0f172a) !important;
     font-size: 0.92rem !important;
     font-family: inherit !important;
     outline: none !important;
@@ -80,7 +80,7 @@
 }
 
 .skillprep-login-wrapper .form-select:focus {
-    border-color: #4f46e5 !important;
+    border-color: var(--color-accent, #4f46e5) !important;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
 }
 
@@ -227,4 +227,30 @@
     font-size: 0.8rem;
     font-weight: 600;
     color: #e2e8f0;
+}
+
+/* Dark Theme Overrides for Register */
+[data-theme="dark"] .skillprep-login-wrapper .role-selector-tabs,
+.dark .skillprep-login-wrapper .role-selector-tabs {
+    background: #1A2234 !important;
+    border-color: #1E293B !important;
+}
+
+[data-theme="dark"] .skillprep-login-wrapper .role-tab-btn,
+.dark .skillprep-login-wrapper .role-tab-btn {
+    color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .skillprep-login-wrapper .role-tab-btn.active,
+.dark .skillprep-login-wrapper .role-tab-btn.active {
+    background: #131A2A !important;
+    color: #60A5FA !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .skillprep-login-wrapper .form-select,
+.dark .skillprep-login-wrapper .form-select {
+    background-color: #1A2234 !important;
+    border-color: #1E293B !important;
+    color: #F1F5F9 !important;
 }

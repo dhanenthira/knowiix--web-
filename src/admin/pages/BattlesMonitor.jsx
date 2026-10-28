@@ -75,7 +75,7 @@ export default function BattlesMonitor() {
             </p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '20px' }}>
+          <div className="grid-responsive-cards" style={{ gap: '20px' }}>
             {rooms.map((r) => {
               const code = r.room_code || r.code || 'CA-0000';
               const name = r.name || `Battle Room #${code}`;

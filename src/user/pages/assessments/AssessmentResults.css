@@ -1423,3 +1423,50 @@
     display: none;
   }
 }
+
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR ASSESSMENTS PAGE
+   ========================================================================== */
+[data-theme="dark"] .assessments-page-wrapper,
+.dark .assessments-page-wrapper {
+  background-color: var(--color-bg, #0B0F19);
+  color: var(--color-text, #F1F5F9);
+}
+
+[data-theme="dark"] .assessments-hero-card,
+.dark .assessments-hero-card,
+[data-theme="dark"] .assessment-metric-card,
+.dark .assessment-metric-card,
+[data-theme="dark"] .assessment-card,
+.dark .assessment-card,
+[data-theme="dark"] .question-review-card,
+.dark .question-review-card,
+[data-theme="dark"] .btn-back-dash,
+.dark .btn-back-dash,
+[data-theme="dark"] .action-btn-secondary,
+.dark .action-btn-secondary,
+[data-theme="dark"] .tab-btn,
+.dark .tab-btn {
+  background-color: var(--surface, #131A2A) !important;
+  border-color: var(--border, #1E293B) !important;
+  color: var(--text-primary, #F1F5F9) !important;
+}
+
+[data-theme="dark"] .assessment-title,
+.dark .assessment-title,
+[data-theme="dark"] .section-heading,
+.dark .section-heading,
+[data-theme="dark"] .metric-number,
+.dark .metric-number {
+  color: #F1F5F9 !important;
+}
+
+[data-theme="dark"] .assessment-subtitle,
+.dark .assessment-subtitle,
+[data-theme="dark"] .metric-title,
+.dark .metric-title,
+[data-theme="dark"] .review-instruction,
+.dark .review-instruction {
+  color: #94A3B8 !important;
+}

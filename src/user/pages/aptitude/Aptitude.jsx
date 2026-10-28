@@ -592,7 +592,39 @@ export default function Aptitude() {
     <div className="aptitude-page-container">
       {/* 1. BOLTSHIFT UNIFIED NAVBAR */}
       {viewMode === 'hub' ? (
-        <Navbar variant="user" />
+        <>
+          <Navbar variant={admin?.role === 'admin' ? 'admin' : 'user'} />
+          {admin?.role === 'admin' && (
+            <div style={{
+              backgroundColor: '#1E293B',
+              borderBottom: '1px solid #334155',
+              padding: '8px 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '12.5px',
+              color: '#CBD5E1',
+              zIndex: 10
+            }}>
+              <span><strong>Admin Preview Mode:</strong> Currently previewing student examination view.</span>
+              <button
+                onClick={() => navigate('/aptitude')}
+                style={{
+                  background: '#2563EB',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  padding: '5px 14px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '12px'
+                }}
+              >
+                Return to Admin Manager
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <header
           className={`aptitude-navbar ${!isAptNavVisible ? 'nav-hidden' : ''}`}
@@ -635,7 +667,17 @@ export default function Aptitude() {
               </div>
             )}
 
-            <div className="student-profile-chip" onClick={() => navigate('/profile')}>
+            <div
+              className="student-profile-chip"
+              onClick={() => {
+                if (admin?.role === 'admin') {
+                  navigate('/aptitude');
+                } else {
+                  navigate('/profile');
+                }
+              }}
+              title={admin?.role === 'admin' ? 'Return to Admin Aptitude Manager' : 'View Profile'}
+            >
               <span className="streak-badge">
                 <Flame size={14} className="streak-icon" /> 12 Days
               </span>

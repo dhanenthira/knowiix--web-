@@ -2957,4 +2957,70 @@
     width: 100%;
     justify-content: center;
   }
-}
+}
+
+
+/* ==========================================================================
+   OFFICIAL DARK THEME OVERRIDES FOR LEARNING DASHBOARD
+   ========================================================================== */
+[data-theme="dark"] .learning-dashboard-app,
+.dark .learning-dashboard-app {
+  background-color: var(--color-bg, #0B0F19);
+  color: var(--color-text, #F1F5F9);
+}
+
+[data-theme="dark"] .learning-top-navbar,
+.dark .learning-top-navbar {
+  background: rgba(19, 26, 42, 0.95);
+  border-bottom-color: #1E293B;
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .learning-sidebar,
+.dark .learning-sidebar,
+[data-theme="dark"] .learning-main-content,
+.dark .learning-main-content,
+[data-theme="dark"] .learning-doc-card,
+.dark .learning-doc-card,
+[data-theme="dark"] .w3-studio-card,
+.dark .w3-studio-card {
+  background-color: var(--surface, #131A2A);
+  border-color: var(--border, #1E293B);
+  color: var(--text-primary, #F1F5F9);
+}
+
+[data-theme="dark"] .w3-search-input-box,
+.dark .w3-search-input-box {
+  background: #1E293B;
+  border-color: #334155;
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .w3-search-input-box input,
+.dark .w3-search-input-box input {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .learning-topic-card,
+.dark .learning-topic-card {
+  background: #131A2A;
+  border-color: #1E293B;
+}
+
+[data-theme="dark"] .learning-topic-card:hover,
+.dark .learning-topic-card:hover {
+  border-color: #3B82F6;
+  background: #1A2234;
+}
+
+[data-theme="dark"] .w3-nav-pill-btn,
+.dark .w3-nav-pill-btn {
+  color: #94A3B8;
+  background: #1E293B;
+}
+
+[data-theme="dark"] .w3-nav-pill-btn.active,
+.dark .w3-nav-pill-btn.active {
+  background: #2563EB;
+  color: #FFFFFF;
+}

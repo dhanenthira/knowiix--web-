@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Sun, Moon } from 'lucide-react';
+import { useUI } from '../../context/UIContext';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import KnowiixLogo from '../components/KnowiixLogo';
@@ -16,6 +18,7 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login } = useAuth();
+  const { theme, toggleTheme } = useUI();
   const navigate = useNavigate();
 
   const validateEmail = (val) => {
@@ -70,13 +73,7 @@ export default function Login() {
   const [forgotMsg, setForgotMsg] = useState({ text: '', type: 'info' });
 
   const handleForgotPassword = () => {
-    setForgotEmail(email.trim());
-    setForgotOtp('');
-    setForgotNewPassword('');
-    setForgotConfirmPassword('');
-    setForgotStep('email');
-    setForgotMsg({ text: '', type: 'info' });
-    setShowForgotModal(true);
+    navigate(email ? `/forgot-password?email=${encodeURIComponent(email.trim())}` : '/forgot-password');
   };
 
   const handleSendResetCode = async (e) => {
@@ -214,20 +211,20 @@ export default function Login() {
           navigate(isStudent ? '/student' : '/');
         }, 600);
       } else {
-        setIsSubmitting(false);
         setAlert({
           show: true,
-          message: 'Invalid email or password. Please verify your credentials.',
+          message: res?.error || 'Invalid email or password. Please verify your credentials.',
           type: 'error'
         });
       }
     } catch (err) {
-      setIsSubmitting(false);
       setAlert({
         show: true,
-        message: 'An unexpected authentication error occurred. Please try again.',
+        message: err.message || 'An unexpected authentication error occurred. Please try again.',
         type: 'error'
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -238,10 +235,30 @@ export default function Login() {
         <main className="auth-form-panel">
           <div className="auth-card">
             {/* Knowiix Brand Logo Header */}
-            <div className="auth-brand-header">
+            <div className="auth-brand-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: '1.25rem' }}>
               <Link to="/" style={{ textDecoration: 'none' }} title="Back to Knowiix Home">
                 <KnowiixLogo size="md" />
               </Link>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                aria-label="Toggle Theme"
+                style={{
+                  background: 'var(--surface-elevated, rgba(255, 255, 255, 0.08))',
+                  border: '1px solid var(--border, rgba(255, 255, 255, 0.12))',
+                  borderRadius: '50%',
+                  width: '38px',
+                  height: '38px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.18s ease'
+                }}
+              >
+                {theme === 'dark' ? <Sun size={17} color="#F4B400" /> : <Moon size={17} color="#4285F4" />}
+              </button>
             </div>
 
             <div className="auth-header">
@@ -283,9 +300,7 @@ export default function Login() {
                     onChange={handleEmailChange}
                     style={{
                       paddingLeft: '48px',
-                      paddingRight: '16px',
-                      backgroundColor: '#ffffff',
-                      color: '#0f172a'
+                      paddingRight: '16px'
                     }}
                     required
                   />
@@ -313,9 +328,7 @@ export default function Login() {
                     onChange={handlePasswordChange}
                     style={{
                       paddingLeft: '48px',
-                      paddingRight: '46px',
-                      backgroundColor: '#ffffff',
-                      color: '#0f172a'
+                      paddingRight: '46px'
                     }}
                     required
                   />
@@ -358,16 +371,12 @@ export default function Login() {
                   </span>
                   <span>Remember me</span>
                 </label>
-                <a
-                  href="#forgot"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleForgotPassword();
-                  }}
+                <Link
+                  to={email ? `/forgot-password?email=${encodeURIComponent(email.trim())}` : '/forgot-password'}
                   className="forgot-link"
                 >
                   Forgot Password?
-                </a>
+                </Link>
               </div>
 
               {/* Primary Login CTA Button */}
@@ -376,7 +385,7 @@ export default function Login() {
                 className={`btn-submit ${isSubmitting ? 'loading' : ''}`}
                 disabled={isSubmitting}
                 style={{
-                  backgroundColor: '#4f46e5',
+                  backgroundColor: 'var(--color-accent, #4285F4)',
                   color: '#ffffff',
                   fontWeight: 700,
                   height: '48px',
@@ -408,12 +417,6 @@ export default function Login() {
               type="button"
               className="btn-google"
               onClick={handleGoogleLogin}
-              style={{
-                backgroundColor: '#ffffff',
-                color: '#0f172a',
-                border: '1.5px solid #cbd5e1',
-                borderRadius: '12px'
-              }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -432,7 +435,7 @@ export default function Login() {
             </div>
 
             {/* Quick Demo Credentials Helper */}
-            <div className="demo-helper-box" style={{ marginTop: '16px', padding: '12px 14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+            <div className="demo-helper-box" style={{ marginTop: '16px', padding: '12px 14px', borderRadius: '12px' }}>
               <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', textAlign: 'center' }}>
                 ⚡ Quick Fill Test Accounts:
               </div>

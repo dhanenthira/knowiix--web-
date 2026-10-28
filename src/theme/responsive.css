@@ -1,0 +1,455 @@
+/* ==========================================================================
+   OFFICIAL CENTRALIZED RESPONSIVE DESIGN SYSTEM
+   Mobile, Tablet, Laptop, and Desktop Viewports
+   Inherits directly from theme.css design tokens
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. RESPONSIVE BREAKPOINT TOKENS & FLUID SPACING
+   -------------------------------------------------------------------------- */
+:root {
+  /* Breakpoint References:
+     Mobile:         <= 640px
+     Small Tablet:   641px - 768px
+     Tablet:         769px - 1024px
+     Laptop:         1025px - 1440px
+     Desktop (Wide): >= 1441px
+  */
+  --bp-mobile: 640px;
+  --bp-tablet: 1024px;
+  --bp-laptop: 1440px;
+
+  /* Responsive Gutter & Layout Tokens */
+  --gutter-mobile: 14px;
+  --gutter-tablet: 20px;
+  --gutter-laptop: 28px;
+  --gutter-desktop: 36px;
+
+  --container-max-width: 1440px;
+  --container-max-width-wide: 1600px;
+  --container-max-width-narrow: 1040px;
+  --container-max-width-auth: 480px;
+
+  /* Fluid Responsive Typography Scale */
+  --font-size-h1: clamp(1.5rem, 2.8vw + 0.5rem, 2.25rem);
+  --font-size-h2: clamp(1.25rem, 1.8vw + 0.4rem, 1.75rem);
+  --font-size-h3: clamp(1.1rem, 1.2vw + 0.3rem, 1.35rem);
+  --font-size-body: clamp(0.9rem, 0.35vw + 0.75rem, 1rem);
+  --font-size-small: clamp(0.75rem, 0.25vw + 0.7rem, 0.875rem);
+
+  /* Touch Target Standard */
+  --touch-target-min: 44px;
+}
+
+/* --------------------------------------------------------------------------
+   2. GLOBAL RESET & HORIZONTAL OVERFLOW PREVENTION
+   -------------------------------------------------------------------------- */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent text clipping & overflow on smaller devices */
+h1, h2, h3, h4, h5, h6, p, span, a, label {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* --------------------------------------------------------------------------
+   3. UNIVERSAL THEME & CARD INHERITANCE
+   Every existing and newly created page automatically inherits theme & surface tokens
+   -------------------------------------------------------------------------- */
+.card,
+[class*="-card"],
+.stat-card,
+.box,
+.panel {
+  background-color: var(--surface, var(--color-secondary));
+  border: 1px solid var(--border, var(--color-border));
+  color: var(--text-primary, var(--color-text));
+  border-radius: var(--radius-card, 16px);
+  box-shadow: var(--card-shadow, 0 1px 3px rgba(60, 64, 67, 0.08));
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Dark mode automatic card enforcement */
+:root[data-theme='dark'] .card,
+.dark .card,
+:root[data-theme='dark'] [class*="-card"],
+.dark [class*="-card"],
+:root[data-theme='dark'] .stat-card,
+.dark .stat-card,
+:root[data-theme='dark'] .box,
+.dark .box,
+:root[data-theme='dark'] .panel,
+.dark .panel {
+  background-color: var(--surface, #131A2A) !important;
+  border-color: var(--border, #1E293B) !important;
+  color: var(--text-primary, #F1F5F9) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45) !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. CENTRAL RESPONSIVE PAGE CONTAINERS
+   -------------------------------------------------------------------------- */
+.app-responsive-shell {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color, var(--color-bg));
+  color: var(--text-primary, var(--color-text));
+  overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.page-container,
+.responsive-page-container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 32px var(--gutter-laptop);
+  box-sizing: border-box;
+  flex: 1;
+}
+
+.page-container.wide,
+.responsive-page-container.wide {
+  max-width: var(--container-max-width-wide);
+}
+
+.page-container.narrow,
+.responsive-page-container.narrow {
+  max-width: var(--container-max-width-narrow);
+}
+
+.page-container.auth,
+.responsive-page-container.auth {
+  max-width: var(--container-max-width-auth);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px var(--gutter-mobile);
+}
+
+/* Tablet Padding Adjustment */
+@media (max-width: 1024px) {
+  .page-container,
+  .responsive-page-container {
+    padding: 24px var(--gutter-tablet);
+  }
+}
+
+/* Mobile Padding Adjustment */
+@media (max-width: 640px) {
+  .page-container,
+  .responsive-page-container {
+    padding: 16px var(--gutter-mobile);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   5. RESPONSIVE GRID UTILITIES
+   -------------------------------------------------------------------------- */
+.grid-responsive-1col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+.grid-responsive-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.grid-responsive-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.grid-responsive-4col {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+/* Auto-adapting card grids: adapts seamlessly without media queries */
+.grid-responsive-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.grid-responsive-cards-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+.grid-responsive-cards-wide {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+/* Grid Breakdowns for Smaller Devices */
+@media (max-width: 1024px) {
+  .grid-responsive-4col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .grid-responsive-3col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-responsive-4col,
+  .grid-responsive-3col,
+  .grid-responsive-2col {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .grid-responsive-cards,
+  .grid-responsive-cards-compact,
+  .grid-responsive-cards-wide {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. RESPONSIVE FLEX UTILITIES
+   -------------------------------------------------------------------------- */
+.flex-responsive-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.flex-responsive-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .flex-responsive-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   7. RESPONSIVE FORMS & INPUT CONTROLS
+   -------------------------------------------------------------------------- */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea,
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  background-color: var(--surface-elevated, var(--surface));
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input, 8px);
+  padding: 10px 14px;
+  min-height: var(--touch-target-min);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+  outline: none;
+}
+
+:root[data-theme='dark'] input:not([type="checkbox"]):not([type="radio"]),
+.dark input:not([type="checkbox"]):not([type="radio"]),
+:root[data-theme='dark'] select,
+.dark select,
+:root[data-theme='dark'] textarea,
+.dark textarea,
+:root[data-theme='dark'] .form-input,
+.dark .form-input,
+:root[data-theme='dark'] .form-select,
+.dark .form-select,
+:root[data-theme='dark'] .form-textarea,
+.dark .form-textarea {
+  background-color: #1A2234 !important;
+  border-color: #1E293B !important;
+  color: #F1F5F9 !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. RESPONSIVE TABLES & DATA GRIDS
+   Touch-friendly smooth horizontal scrolling
+   -------------------------------------------------------------------------- */
+.table-responsive,
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card-sm, 10px);
+  background-color: var(--surface);
+  margin-bottom: 20px;
+}
+
+.table-responsive table,
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* guarantees readable columns on small mobile */
+}
+
+@media (max-width: 640px) {
+  .table-responsive table,
+  .table-container table {
+    min-width: 520px;
+    font-size: 13px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   9. RESPONSIVE MODALS & DIALOGS
+   -------------------------------------------------------------------------- */
+.modal-overlay,
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background-color: rgba(11, 15, 25, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.modal-content,
+.dialog-content {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-modal, 16px);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: var(--modal-shadow, 0 16px 40px rgba(0, 0, 0, 0.3));
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .modal-overlay,
+  .dialog-overlay {
+    padding: 10px;
+    align-items: flex-end; /* Mobile bottom sheet style */
+  }
+  .modal-content,
+  .dialog-content {
+    max-width: 100%;
+    max-height: 85vh;
+    padding: 18px 16px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   10. RESPONSIVE BUTTONS & TOUCH TARGETS
+   -------------------------------------------------------------------------- */
+.btn, button.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch-target-min);
+  padding: 8px 18px;
+  border-radius: var(--radius-btn, 8px);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .btn-full-mobile {
+    width: 100% !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   11. RESPONSIVE VISIBILITY UTILITY CLASSES
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .hide-on-mobile { display: none !important; }
+  .show-on-mobile { display: block !important; }
+  .show-on-mobile-flex { display: flex !important; }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hide-on-tablet { display: none !important; }
+  .show-on-tablet { display: block !important; }
+  .show-on-tablet-flex { display: flex !important; }
+}
+
+@media (min-width: 1025px) {
+  .hide-on-desktop { display: none !important; }
+  .show-on-desktop { display: block !important; }
+  .show-on-desktop-flex { display: flex !important; }
+}
+
+@media (min-width: 641px) {
+  .show-on-mobile { display: none !important; }
+  .show-on-mobile-flex { display: none !important; }
+}
+
+@media (max-width: 640px), (min-width: 1025px) {
+  .show-on-tablet { display: none !important; }
+  .show-on-tablet-flex { display: none !important; }
+}
+

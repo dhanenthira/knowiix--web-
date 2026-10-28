@@ -862,7 +862,7 @@ export default function Dashboard() {
                         </div>
                       </td>
                       <td>
-                        <div className="student-college-text">{st.college_name || 'CodeArena Campus'}</div>
+                        <div className="student-college-text">{st.college_name || 'Knowiix Campus'}</div>
                       </td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 800, color: '#f8fafc' }}>

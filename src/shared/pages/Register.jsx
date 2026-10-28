@@ -199,7 +199,7 @@ export default function Register() {
         college_name: collegeName.trim() || undefined,
         department: department || undefined,
         graduation_year: parseInt(graduationYear, 10) || 2026,
-        bio: 'Student joining CodeArena.'
+        bio: 'Student joining Knowiix.'
       };
 
       const res = await axios.post('/api/v1/auth/register/send-otp', payload);
@@ -286,7 +286,7 @@ export default function Register() {
 
       setAlert({
         show: true,
-        message: 'Account verified and activated successfully! Welcome to CodeArena. Redirecting to your dashboard...',
+        message: 'Account verified and activated successfully! Welcome to Knowiix. Redirecting to your dashboard...',
         type: 'success'
       });
 
@@ -315,7 +315,7 @@ export default function Register() {
         college_name: collegeName.trim() || undefined,
         department: department || undefined,
         graduation_year: parseInt(graduationYear, 10) || 2026,
-        bio: 'Student joining CodeArena.'
+        bio: 'Student joining Knowiix.'
       };
 
       const res = await axios.post('/api/v1/auth/register/send-otp', payload);

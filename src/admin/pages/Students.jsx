@@ -118,7 +118,7 @@ export default function Students() {
                   No Students Registered
                 </h4>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', maxWidth: '420px', lineHeight: 1.5 }}>
-                  No student accounts exist in the database yet. When students register on CodeArena, their profile details and performance statistics will appear here in real time.
+                  No student accounts exist in the database yet. When students register on Knowiix, their profile details and performance statistics will appear here in real time.
                 </p>
               </div>
             ) : (

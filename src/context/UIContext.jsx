@@ -15,7 +15,7 @@ const UIContext = createContext({
 export const UIProvider = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setThemeState] = useState(() => {
-    return localStorage.getItem('codearena_theme') || 'dark';
+    return localStorage.getItem('knowiix_theme') || 'dark';
   });
   const location = useLocation();
 
@@ -34,7 +34,7 @@ export const UIProvider = ({ children }) => {
     body.classList.add(theme);
 
     root.style.colorScheme = theme;
-    localStorage.setItem('codearena_theme', theme);
+    localStorage.setItem('knowiix_theme', theme);
     applyGlobalTheme(theme);
   }, [theme]);
 

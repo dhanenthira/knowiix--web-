@@ -13,7 +13,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     try {
-      const savedUser = localStorage.getItem('codearena_admin');
+      const savedUser = localStorage.getItem('knowiix_admin');
       if (savedUser) {
         const parsed = JSON.parse(savedUser);
         const token = parsed?.token || parsed?.access_token;

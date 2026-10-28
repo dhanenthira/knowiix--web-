@@ -51,7 +51,7 @@ export function applyGlobalTheme(customColors = {}, customTypography = {}) {
 
   const currentTheme = typeof customColors === 'string'
     ? customColors
-    : (document.documentElement.getAttribute('data-theme') || (typeof localStorage !== 'undefined' ? localStorage.getItem('codearena_theme') : null) || 'dark');
+    : (document.documentElement.getAttribute('data-theme') || (typeof localStorage !== 'undefined' ? localStorage.getItem('knowiix_theme') : null) || 'dark');
 
   const baseColors = currentTheme === 'light' ? LIGHT_THEME_COLORS : DARK_THEME_COLORS;
   const colors = typeof customColors === 'object' ? { ...baseColors, ...customColors } : baseColors;
@@ -102,7 +102,7 @@ export function applyGlobalTheme(customColors = {}, customTypography = {}) {
 
 // Automatically apply theme on load in browser environments
 if (typeof document !== 'undefined') {
-  const savedTheme = localStorage.getItem('codearena_theme') || 'dark';
+  const savedTheme = localStorage.getItem('knowiix_theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
   document.documentElement.classList.toggle('dark', savedTheme === 'dark');
   document.documentElement.classList.toggle('light', savedTheme === 'light');

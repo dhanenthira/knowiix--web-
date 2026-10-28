@@ -133,7 +133,7 @@ export default function Navbar({ variant }) {
 
   // Profile text & avatar details
   const displayName = admin?.name || (isVariantAdmin ? 'System Administrator' : 'Ananya Kumar');
-  const userEmail = admin?.email || (isVariantAdmin ? 'admin@codearena.com' : 'ananya@student.edu');
+  const userEmail = admin?.email || (isVariantAdmin ? 'admin@knowiix.com' : 'ananya@student.edu');
   const avatarUrl = admin?.avatar_url || (isVariantAdmin
     ? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80'
     : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80');

@@ -350,7 +350,7 @@ export default function Learning() {
   // User details derived from API or Auth
   const displayUser = currentUser || admin || {
     name: 'Learner',
-    email: 'student@codearena.com',
+    email: 'student@knowiix.com',
     profile_image_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Learner'
   };
 

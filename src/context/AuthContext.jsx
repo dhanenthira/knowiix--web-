@@ -7,7 +7,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(() => {
-    const saved = localStorage.getItem('codearena_admin');
+    const saved = localStorage.getItem('knowiix_admin');
     return saved ? JSON.parse(saved) : null;
   });
 
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
       const { access_token, user } = response.data;
       const userData = { ...user, token: access_token };
       setAdmin(userData);
-      localStorage.setItem('codearena_admin', JSON.stringify(userData));
+      localStorage.setItem('knowiix_admin', JSON.stringify(userData));
       setLoading(false);
       return { success: true, user: userData };
     } catch (err) {
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }) => {
       const { access_token, user } = response.data;
       const registeredUser = { ...user, token: access_token };
       setAdmin(registeredUser);
-      localStorage.setItem('codearena_admin', JSON.stringify(registeredUser));
+      localStorage.setItem('knowiix_admin', JSON.stringify(registeredUser));
       setLoading(false);
       return { success: true, user: registeredUser };
     } catch (err) {
@@ -81,20 +81,20 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setAdmin(null);
-    localStorage.removeItem('codearena_admin');
+    localStorage.removeItem('knowiix_admin');
   };
 
   const updateAdmin = (updatedFields) => {
     setAdmin(prev => {
       const next = { ...prev, ...updatedFields };
-      localStorage.setItem('codearena_admin', JSON.stringify(next));
+      localStorage.setItem('knowiix_admin', JSON.stringify(next));
       return next;
     });
   };
 
   const loginWithSession = (userData) => {
     setAdmin(userData);
-    localStorage.setItem('codearena_admin', JSON.stringify(userData));
+    localStorage.setItem('knowiix_admin', JSON.stringify(userData));
     if (userData?.token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
     }

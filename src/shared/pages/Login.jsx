@@ -163,10 +163,10 @@ export default function Login() {
   const handleGoogleLogin = () => {
     setAlert({ show: true, message: 'Connecting with Google SSO...', type: 'info' });
     setTimeout(() => {
-      setEmail('admin@codearena.com');
+      setEmail('admin@knowiix.com');
       setPassword('admin123');
       setAlert({ show: true, message: 'Google SSO credentials verified. Logging in...', type: 'success' });
-      handleSubmit(null, 'admin@codearena.com', 'admin123');
+      handleSubmit(null, 'admin@knowiix.com', 'admin123');
     }, 600);
   };
 
@@ -547,7 +547,7 @@ export default function Login() {
                   <input
                     type="email"
                     className="input-field"
-                    placeholder="student@codearena.com"
+                    placeholder="student@knowiix.com"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
                     autoFocus

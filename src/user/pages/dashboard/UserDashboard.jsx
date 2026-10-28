@@ -91,7 +91,7 @@ export default function UserDashboard() {
     let token = admin?.token;
     if (!token) {
       try {
-        const saved = localStorage.getItem('codearena_admin');
+        const saved = localStorage.getItem('knowiix_admin');
         if (saved) {
           const parsed = JSON.parse(saved);
           token = parsed?.token || parsed?.access_token;
